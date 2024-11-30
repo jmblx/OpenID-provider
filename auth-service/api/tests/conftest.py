@@ -24,7 +24,7 @@ sys.path.insert(
 from api.tests.config import TEST_DATABASE_URI
 from core.di.container import container
 from infrastructure.db.models import User
-from domain.services.security.pwd_service import HashService
+from domain.common.services.pwd_service import PasswordHasher
 from presentation.web_api.main import app
 
 os.environ["USE_NULLPOOL"] = "true"
@@ -113,7 +113,7 @@ async def mock_user(async_session: AsyncSession) -> User:
     Фикстура для создания тестового пользователя в базе данных с использованием ORM.
     """
     async with container() as ioc:
-        hash_service = await ioc.get(HashService)
+        hash_service = await ioc.get(PasswordHasher)
 
         user_mock = User(
             first_name="iojввввв",

@@ -7,7 +7,7 @@ from domain.entities.user.value_objects import UserID
 
 class UserRepository(ABC):
     @abstractmethod
-    async def save(self, user: User) -> UserCreateOutputDTO:
+    async def save(self, user: User) -> None:
         """Сохранить пользователя в базе данных."""
         raise NotImplementedError
 

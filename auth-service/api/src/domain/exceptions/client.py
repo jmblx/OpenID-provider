@@ -1,4 +1,4 @@
-from domain.exceptions.base import DomainError
+from domain.common.exceptions.base import DomainError
 
 
 class ClientNameLengthError(DomainError): ...

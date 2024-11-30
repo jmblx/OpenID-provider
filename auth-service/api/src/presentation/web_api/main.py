@@ -6,24 +6,29 @@ from dishka.integrations.fastapi import (
 )
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from sqlalchemy.orm import configure_mappers
+from fastapi.responses import ORJSONResponse
 
 from core.di.container import container
-from infrastructure.gunicorn.app_options import get_app_options
-from infrastructure.gunicorn.application import Application
+
+# from infrastructure.gunicorn.app_options import get_app_options
+# from infrastructure.gunicorn.application import Application
 import core.db.logs  # noqa: F401
 from infrastructure.gunicorn.config import app_settings
+from presentation.web_api.auth.router import auth_router
+from presentation.web_api.client.client_router import client_router
+from presentation.web_api.exceptions import setup_exception_handlers
+from presentation.web_api.registration.router import reg_router
 
-configure_mappers()
 
-
-@asynccontextmanager
-async def lifespan(app: FastAPI) -> None:
+@asynccontextmanager  # type: ignore
+async def lifespan(app: FastAPI) -> None:  # type: ignore
     yield
-    await app.state.dishka_container.close()
+    await app.state.dishka_container.close()  # type: ignore
 
 
-app = FastAPI(lifespan=lifespan, root_path="/api")
+app = FastAPI(
+    lifespan=lifespan, root_path="/api", default_response_class=ORJSONResponse
+)
 
 setup_dishka(container=container, app=app)
 
@@ -34,6 +39,10 @@ logger.setLevel(logging.INFO)
 # logger.addHandler(logstash_handler)
 
 app.include_router(reg_router)
+app.include_router(client_router)
+app.include_router(auth_router)
+setup_exception_handlers(app)
+
 
 origins = ["*"]
 app.add_middleware(

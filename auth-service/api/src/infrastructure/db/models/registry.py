@@ -3,8 +3,3 @@ from sqlalchemy.orm import registry
 
 metadata = MetaData()
 mapper_registry = registry(metadata=metadata)
-
-
-
-
-mapper_registry.map_imperatively(ClientDB, client_table)

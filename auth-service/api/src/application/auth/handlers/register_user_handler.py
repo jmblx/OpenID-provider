@@ -1,26 +1,23 @@
-from uuid import uuid4
-
-import orjson
-import redis.asyncio as aioredis
-from fastapi import HTTPException
-from sqlalchemy.ext.asyncio import AsyncSession
-
 from application.auth.commands.register_user_command import RegisterUserCommand
+from application.auth.services.auth_code import (
+    AuthorizationCodeStorage,
+    AuthCodeData,
+)
+from application.auth.services.pkce import PKCEData, PKCEService
 from application.client.interfaces.reader import ClientReader
 from application.common.uow import Uow
 from application.user.interfaces.reader import UserReader
 from application.user.interfaces.repo import UserRepository
-from domain.entities.auth.pkce import PKCEData
-from domain.entities.client.value_objects import ClientID
-from domain.entities.role.value_objects import RoleID
+from domain.entities.client.model import Client
+from domain.entities.client.value_objects import ClientID, ClientRedirectUrl
 from domain.entities.user.model import User
-from domain.entities.user.value_objects import HashedPassword, Email
+from domain.entities.user.value_objects import Email
 from domain.exceptions.auth import (
     InvalidRedirectURLError,
     InvalidClientError,
-    UserAlreadyExistsError,
 )
-from domain.services.security.pwd_service import HashService
+from domain.exceptions.user import UserAlreadyExistsError
+from domain.common.services.pwd_service import PasswordHasher
 
 
 class RegisterUserCommandHandler:
@@ -28,75 +25,59 @@ class RegisterUserCommandHandler:
         self,
         user_repository: UserRepository,
         user_reader: UserReader,
-        hash_service: HashService,
-        redis_client: aioredis.Redis,
+        hash_service: PasswordHasher,
+        auth_code_storage: AuthorizationCodeStorage,
         client_reader: ClientReader,
         uow: Uow,
+        pkce_service: PKCEService,
     ):
         self.user_repository = user_repository
         self.user_reader = user_reader
         self.hash_service = hash_service
-        self.redis_client = redis_client
+        self.auth_code_storage = auth_code_storage
         self.client_reader = client_reader
         self.uow = uow
+        self.pkce_service = pkce_service
 
     async def handle(self, command: RegisterUserCommand) -> str:
-        client_id_vo = ClientID(command.client_id)
-        client = await self.client_reader.with_id(client_id_vo)
-        if not client:
-            raise InvalidClientError("Invalid client_id")
+        client: Client = await self.client_reader.with_id(ClientID(command.client_id))  # type: ignore
+        await Client.validate_redirect_url(
+            client=client,
+            redirect_url=ClientRedirectUrl(command.redirect_url)
+        )
 
-        if command.redirect_url not in client.allowed_redirect_urls:
-            raise InvalidRedirectURLError("Invalid redirect URL")
-
-        email_vo = Email(command.email)
-        existing_user = await self.user_reader.get_by_email(email_vo)
+        existing_user = await self.user_reader.with_email(Email(command.email))
         if existing_user:
-            raise UserAlreadyExistsError("User already exists")
+            raise UserAlreadyExistsError(existing_user.email.value)
 
-        hashed_password_vo = HashedPassword.create(
-            command.password, self.hash_service
+        user_id = User.generate_id()
+        user = User.create(
+            user_id=user_id,
+            role_id=command.role_id,
+            email=command.email,
+            raw_password=command.password,
+            password_hasher=self.hash_service,
         )
-
-        role_id_vo = RoleID(command.role_id)
-        user = User(
-            email=email_vo,
-            hashed_password=hashed_password_vo,
-            role_id=role_id_vo,
-        )
+        user.clients.append(client)
         await self.user_repository.save(user)
-        await self.uow.commit()
-        auth_code = str(uuid4())
 
+        auth_code = self.auth_code_storage.generate_auth_code()
         pkce_data = PKCEData(
-            code_challenge=command.code_challenge,
+            code_verifier=command.code_verifier,
             code_challenge_method=command.code_challenge_method,
         )
 
-        auth_code_data = {
-            "user_email": user.email.value,
-            "client_id": client_id_vo.value,
+        auth_code_data: AuthCodeData = {
+            "user_id": str(user_id),
+            "client_id": str(client.id.value),
             "redirect_url": command.redirect_url,
-            "code_challenge": pkce_data.code_challenge,
-            "code_challenge_method": pkce_data.code_challenge_method,
+            "code_challenger": self.pkce_service.generate_code_challenge(
+                pkce_data
+            ),
         }
 
-        temp_user_data = {
-            "email": user.email.value,
-            "hashed_password": user.hashed_password.value,
-            "role_id": user.role_id.value,
-        }
-
-        await self.redis_client.set(
-            f"auth_code:{auth_code}",
-            orjson.dumps(auth_code_data),
-            ex=600,
+        await self.auth_code_storage.store_auth_code_data(
+            auth_code, auth_code_data, expiration_time=6000
         )
-
-        await self.redis_client.set(
-            f"temp_user:{user.email.value}",
-            orjson.dumps(temp_user_data),
-            ex=600,
-        )
-
+        await self.uow.commit()
         return auth_code

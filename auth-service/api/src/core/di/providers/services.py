@@ -1,49 +1,27 @@
-import os
-
-import firebase_admin
+import argon2
 from dishka import Provider, Scope, provide
-from fastapi import HTTPException
-from fastapi.requests import Request
-from firebase_admin import credentials, auth
-from sqlalchemy.ext.asyncio import AsyncSession
 
-from config import FirebaseConfig
-from domain.services.achievement.ach_service_interface import (
-    AchievementServiceInterface,
-)
-from domain.services.event.event_service_interface import EventServiceInterface
-from domain.services.reward.ach_service_interface import RewardServiceInterface
+from application.auth.interfaces.http_auth import HttpAuthService
+from application.auth.interfaces.jwt_service import JWTService
+from application.auth.interfaces.token_creation import TokenCreationService
+from application.auth.interfaces.white_list import TokenWhiteListService
+from application.auth.services.auth_code import AuthorizationCodeStorage
+from application.auth.services.pkce import PKCEService
+from domain.common.services.pwd_service import PasswordHasher
 from domain.services.storage.storage_service import StorageServiceInterface
-from domain.services.user.user_service_interface import UserService
-from infrastructure.db.models import User
-from infrastructure.external_services.receipt.service import ExternalAPIService
 from infrastructure.external_services.storage.minio_service import MinIOService
-from infrastructure.services.achievements.ach_service_impl import (
-    AchievementServiceImpl,
+from infrastructure.services.auth.auth_code import (
+    RedisAuthorizationCodeStorage,
 )
-from infrastructure.services.event.event_service_impl import EventServiceImpl
-from infrastructure.services.reward.reward_service_impl import (
-    RewardServiceImpl,
+from infrastructure.services.auth.http_auth_service import HttpAuthServiceImpl
+from infrastructure.services.auth.jwt_service import JWTServiceImpl
+from infrastructure.services.auth.token_creation_service import (
+    TokenCreationServiceImpl,
 )
-from infrastructure.services.user.user_service_impl import UserServiceImpl
-from presentation.web_api.registration.schemas import UserLogin
-
-
-class Firebase:
-    pass
-
-
-async def auth_user_id_by_token(token_id: str) -> dict:
-    try:
-        decoded_token = auth.verify_id_token(token_id)
-        return {
-            "id": decoded_token.get("uid"),
-            "email": decoded_token.get("email"),
-        }
-
-    except Exception as e:
-        print("Error verifying token:", e)
-        return None
+from infrastructure.services.auth.white_list_service import (
+    TokenWhiteListServiceImpl,
+)
+from infrastructure.services.security.pwd_service import PasswordHasherImpl
 
 
 class ServiceProvider(Provider):
@@ -53,67 +31,40 @@ class ServiceProvider(Provider):
     #     self, user_repo: UserRepository
     # ) -> UserService:
     #     return UserServiceImpl(user_repo)
-    user_service = provide(
-        UserServiceImpl, scope=Scope.REQUEST, provides=UserService
-    )
-    achievement_service = provide(
-        AchievementServiceImpl,
-        scope=Scope.REQUEST,
-        provides=AchievementServiceInterface,
-    )
     storage_service = provide(
         MinIOService, scope=Scope.REQUEST, provides=StorageServiceInterface
     )
-    reward_service = provide(
-        RewardServiceImpl, scope=Scope.REQUEST, provides=RewardServiceInterface
+    ph = provide(
+        lambda _: PasswordHasherImpl(argon2.PasswordHasher()),
+        scope=Scope.REQUEST,
+        provides=PasswordHasher,
     )
-    event_service = provide(
-        EventServiceImpl, scope=Scope.REQUEST, provides=EventServiceInterface
+    pkce_service = provide(
+        lambda _: PKCEService(), scope=Scope.APP, provides=PKCEService
     )
-
-    @provide(scope=Scope.APP)
-    def provide_firebase(self) -> Firebase:
-        cred = credentials.Certificate(FirebaseConfig.from_env().rd_uri)
-        firebase_admin.initialize_app(cred)
-        return Firebase()
-
-    @provide(scope=Scope.REQUEST)
-    async def get_user_from_auth(
-        self, request: Request, session: AsyncSession, fb: Firebase
-    ) -> User:  # noqa
-        token_id = request.headers.get("Authorization")
-        if token_id == "bob":
-            return await session.get(User, "cTqj1BzxfWS9gQGgn033WIcmn4e2")
-        user_uid = (await auth_user_id_by_token(token_id)).get("id")
-        return await session.get(User, user_uid)
-        # return await session.get(UserDB, "gNySnybUZLht9O8kfYQXGdUkkJG2")
-
-    @provide(scope=Scope.REQUEST)
-    async def get_data_by_auth_header(
-        self, request: Request, fb: Firebase
-    ) -> UserLogin:  # noqa
-        token_id = request.headers.get("Authorization")
-        data = await auth_user_id_by_token(token_id)
-        return UserLogin(**data)
-
+    auth_code_service = provide(
+        RedisAuthorizationCodeStorage,
+        scope=Scope.REQUEST,
+        provides=AuthorizationCodeStorage,
+    )
+    jwt_service = provide(
+        JWTServiceImpl, scope=Scope.REQUEST, provides=JWTService
+    )
+    http_auth_service = provide(
+        HttpAuthServiceImpl, scope=Scope.REQUEST, provides=HttpAuthService
+    )
+    token_creation_service = provide(
+        TokenCreationServiceImpl,
+        scope=Scope.REQUEST,
+        provides=TokenCreationService,
+    )
+    token_white_list_service = provide(
+        TokenWhiteListServiceImpl,
+        scope=Scope.REQUEST,
+        provides=TokenWhiteListService,
+    )
     # reg_validation_service = provide(
     #     RegUserValidationService,
     #     scope=Scope.REQUEST,
     #     provides=UserValidationService,
     # )
-
-
-class ExternalAPIProvider(Provider):
-    @provide(scope=Scope.REQUEST)
-    async def provide_external_service(
-        self, request: Request
-    ) -> ExternalAPIService:
-        auth_token = request.headers.get("Authorization")
-        if not auth_token:
-            raise HTTPException(
-                status_code=401, detail="Отсутствует токен аутентификации"
-            )
-        base_url = os.getenv(
-            "RECEIPT_SERVICE_BASE_URL"
-        )  # Адрес вашего внешнего приложения
-        return ExternalAPIService(base_url=base_url, auth_token=auth_token)

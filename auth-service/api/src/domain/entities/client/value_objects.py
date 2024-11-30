@@ -1,6 +1,6 @@
 import re
 from dataclasses import dataclass
-from enum import Enum
+from enum import IntEnum
 
 from domain.exceptions.client import ClientNameLengthError, InvalidUrlError
 
@@ -10,7 +10,7 @@ class ClientID:
     value: int
 
 
-class ClientTypeEnum(Enum):
+class ClientTypeEnum(IntEnum):
     PUBLIC = 1
     PRIVATE = 2
 
@@ -19,9 +19,7 @@ class ClientTypeEnum(Enum):
 class ClientType:
     value: ClientTypeEnum
 
-    def __post_init__(self) -> None:
-        if not isinstance(self.value, ClientTypeEnum):
-            raise TypeError("value must be an instance of ClientTypeEnum")
+    def __post_init__(self) -> None: ...
 
 
 @dataclass(frozen=True)
@@ -56,8 +54,6 @@ class ClientBaseUrl:
     value: str
 
     def __post_init__(self) -> None:
-        if not isinstance(self.value, str):
-            raise TypeError("value must be an instance of str")
         check_is_valid_url(self.value)
 
 
@@ -66,6 +62,13 @@ class ClientRedirectUrl:
     value: str
 
     def __post_init__(self) -> None:
-        if not isinstance(self.value, str):
-            raise TypeError("value must be an instance of str")
         check_is_valid_url(self.value)
+
+
+@dataclass(frozen=True)
+class AllowedRedirectUrls:
+    value: list[str]
+
+    def __post_init__(self) -> None:
+        for url in self.value:
+            check_is_valid_url(url)

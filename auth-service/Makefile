@@ -43,9 +43,7 @@ down-dev: check_docker
 deps:
 	poetry install
 
-# Работа с базой данных
-db: deps
-	cd api && \
+migration:
 	alembic revision --autogenerate && \
 	alembic upgrade head
 
@@ -66,7 +64,7 @@ dev: db
 
 uv:
 	cd api/src && \
-	uvicorn main:app --reload
+	uvicorn presentation.web_api.main:app --reload
 
 nfy:
 	cd notification/ && \

@@ -6,10 +6,12 @@ from alembic import context
 from sqlalchemy import engine_from_config, pool, create_engine
 
 
+sys.path.append(
+    os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../"))
+)
 
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../../')))
-
-from infrastructure.db.models.registry import metadata
+import infrastructure.db.models
+from infrastructure.db.models.registry import mapper_registry
 from infrastructure.db.config import (
     DB_HOST,
     DB_PORT,
@@ -17,6 +19,8 @@ from infrastructure.db.config import (
     DB_USER,
     DB_PASS,
 )
+
+print("Registered tables:", mapper_registry.metadata.tables.keys())
 
 # Настройка конфигурации Alembic
 config = context.config
@@ -31,7 +35,7 @@ config.set_section_option(section, "DB_PASS", DB_PASS)
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
-target_metadata = metadata
+target_metadata = mapper_registry.metadata
 
 
 # Получаем URL базы данных

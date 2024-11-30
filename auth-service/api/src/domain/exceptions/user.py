@@ -1,28 +1,31 @@
-from domain.exceptions.base import DomainError
+from dataclasses import dataclass
+
+from application.common.exceptions import ApplicationError
+from domain.common.exceptions.base import DomainError
 
 
-class InvalidPasswordError(DomainError): ...
+@dataclass(eq=False)
+class UserNotFoundByIdError(DomainError):
+    user_id: str
+
+    @property
+    def title(self) -> str:
+        return f"User with id {self.user_id} not found."
 
 
-class EmptyValueError(DomainError): ...
+@dataclass(eq=False)
+class UserAlreadyExistsError(DomainError):
+    email: str
+
+    @property
+    def title(self) -> str:
+        return f"{self.email} is already registered."
 
 
-class InvalidCharacterError(DomainError): ...
+@dataclass(eq=False)
+class UserNotFoundByEmailError(DomainError):
+    email: str
 
-
-class InvalidFilePathError(DomainError): ...
-
-
-class InvalidRegisterDateError(DomainError): ...
-
-
-class InvalidUserIDError(DomainError): ...
-
-
-class InvalidEmailError(DomainError): ...
-
-
-class InvalidRoleIDError(DomainError): ...
-
-
-class InvalidRoleNameError(DomainError): ...
+    @property
+    def title(self) -> str:
+        return f"{self.email} doesn't exists."

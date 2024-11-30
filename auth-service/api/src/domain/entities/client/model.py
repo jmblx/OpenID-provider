@@ -1,17 +1,16 @@
-from typing import Self
+from dataclasses import dataclass, field
+from typing import Self, Union
 
 from domain.entities.client.value_objects import (
     ClientID,
     ClientType,
     ClientName,
     ClientBaseUrl,
+    AllowedRedirectUrls,
+    ClientTypeEnum,
     ClientRedirectUrl,
 )
-
-from dataclasses import dataclass, field
-
-from infrastructure.db.models.client.client_models import client_table
-from infrastructure.db.models.registry import mapper_registry
+from domain.exceptions.auth import InvalidRedirectURLError, InvalidClientError
 
 
 @dataclass
@@ -19,37 +18,34 @@ class Client:
     id: ClientID = field(init=False)
     name: ClientName
     base_url: ClientBaseUrl
-    allowed_redirect_urls: list[ClientRedirectUrl]
+    allowed_redirect_urls: AllowedRedirectUrls
     type: ClientType
 
     @classmethod
     def create(
         cls,
-        name: ClientName,
-        base_url: ClientBaseUrl,
-        allowed_redirect_urls: list[ClientRedirectUrl],
-        type: ClientType,
+        name: str,
+        base_url: str,
+        allowed_redirect_urls: list[str],
+        type: ClientTypeEnum,
     ) -> Self:
-        client = cls(name, base_url, allowed_redirect_urls, type)
-        client._validate_urls()
+        client = cls(
+            ClientName(name),
+            ClientBaseUrl(base_url),
+            AllowedRedirectUrls(allowed_redirect_urls),
+            ClientType(type),
+        )
         return client
 
-    def _validate_urls(self) -> None:
-        for url in self.allowed_redirect_urls:
-            if self.base_url.value not in url.value:
-                raise ValueError(
-                    f"Base url {self.base_url.value} not in redirect url {url.value}"
-                )
+    @staticmethod
+    async def validate_redirect_url(
+        client: Union["Client", None],
+        redirect_url: ClientRedirectUrl,
+    ) -> None:
+        if not client:
+            raise InvalidClientError()
 
-
-mapper_registry.map_imperatively(
-    Client,
-    client_table,
-    properties={
-        "id": client_table.c.id,
-        "name": client_table.c.name,
-        "base_url": client_table.c.base_url,
-        "allowed_redirect_urls": client_table.c.allowed_redirect_urls,
-        "type": client_table.c.type,
-    },
-)
+        if redirect_url.value not in client.allowed_redirect_urls.value:
+            raise InvalidRedirectURLError(
+                redirect_url=redirect_url.value, client_id=client.id.value
+            )

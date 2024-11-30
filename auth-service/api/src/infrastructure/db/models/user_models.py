@@ -1,42 +1,51 @@
-import uuid
-import sqlalchemy as sa
-from sqlalchemy.orm import relationship
-
-from infrastructure.db.models.registry import metadata, mapper_registry
-
-user_table = sa.Table(
-    "user",
-    metadata,
-    sa.Column(
-        "id", sa.UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
-    ),
-    sa.Column("email", sa.String, nullable=False),
-    sa.Column("is_email_confirmed", sa.Boolean, default=False),
-    sa.Column("hashed_password", sa.String, nullable=False),
-    sa.Column("role_id", sa.Integer, sa.ForeignKey("role.id"), default=1),
+from sqlalchemy import (
+    Table,
+    Column,
+    String,
+    Boolean,
+    Integer,
+    ForeignKey,
+    UUID as SQLAlchemyUUID,
 )
+from sqlalchemy.orm import relationship, composite
+import uuid
 
+from domain.entities.client.value_objects import ClientID
+from domain.entities.role.value_objects import RoleID
+from domain.entities.user.model import User
+from domain.entities.user.value_objects import UserID, Email, HashedPassword
+from infrastructure.db.models.registry import mapper_registry
+from infrastructure.db.models.secondary import user_client_association_table
 
-class UserDB:
-    def __init__(
-        self,
-        id: uuid.UUID,
-        email: str,
-        is_email_confirmed: bool,
-        hashed_password: str,
-        role_id: int,
-    ):
-        self.id = id
-        self.email = email
-        self.is_email_confirmed = is_email_confirmed
-        self.hashed_password = hashed_password
-        self.role_id = role_id
-
+user_table = Table(
+    "user",
+    mapper_registry.metadata,
+    Column("id", SQLAlchemyUUID(as_uuid=True), primary_key=True),
+    Column("email", String, nullable=False),
+    Column("is_email_confirmed", Boolean, default=False),
+    Column("hashed_password", String, nullable=False),
+    Column("role_id", Integer, ForeignKey("role.id"), nullable=False),
+)
 
 mapper_registry.map_imperatively(
-    UserDB,
+    User,
     user_table,
     properties={
-        "role": relationship("Role", back_populates="users_role", uselist=False)
+        "id": composite(UserID, user_table.c.id),
+        "email": composite(Email, user_table.c.email),
+        "hashed_password": composite(HashedPassword, user_table.c.hashed_password),
+        "is_email_confirmed": user_table.c.is_email_confirmed,
+        "role_id": composite(RoleID, user_table.c.role_id),
+        "role": relationship(
+            "Role", back_populates="users_role", uselist=False
+        ),
+        "clients": relationship(
+            "Client",
+            secondary=user_client_association_table,
+            back_populates="users",
+            uselist=True
+        ),
     },
+    column_prefix="_",
 )
+

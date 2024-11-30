@@ -18,11 +18,11 @@ class OkResponse(Response, Generic[TResult]):
 
 @dataclass(frozen=True)
 class ErrorData(Generic[TError]):
-    title: str = "Unknown error occurred"
+    title: str
     data: TError | None = None
 
 
 @dataclass(frozen=True)
 class ErrorResponse(Response, Generic[TError]):
-    status: int = 500
-    error: ErrorData[TError] = field(default_factory=ErrorData)
+    status: int
+    error: ErrorData[TError]

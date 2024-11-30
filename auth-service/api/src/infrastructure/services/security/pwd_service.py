@@ -1,23 +1,22 @@
-from argon2 import PasswordHasher
+import argon2
 from argon2.exceptions import VerifyMismatchError
 
-from domain.services.security.pwd_service import HashService
+from domain.common.services.pwd_service import PasswordHasher
+from domain.entities.user.value_objects import RawPassword, HashedPassword
+from domain.exceptions.pwd_hasher import PasswordMismatchError
 
 
-class HashServiceImpl(HashService):
-    def __init__(self):
-        self.ph = PasswordHasher()
+class PasswordHasherImpl(PasswordHasher):
+    def __init__(self, ph: argon2.PasswordHasher) -> None:
+        self.ph = ph
 
-    def hash_password(self, password: str) -> bytes:
-        hashed_password_str = self.ph.hash(password)
-        return hashed_password_str.encode("utf-8")
+    def hash_password(self, raw_password: RawPassword) -> HashedPassword:
+        return HashedPassword(self.ph.hash(raw_password.value))
 
     def check_password(
-        self, plain_password: str, hashed_password: bytes
-    ) -> bool:
+        self, plain_password: RawPassword, hashed_password: HashedPassword
+    ) -> None:
         try:
-            hashed_password_str = hashed_password.decode("utf-8")
-            self.ph.verify(hashed_password_str, plain_password)
-            return True
-        except VerifyMismatchError:
-            return False
+            self.ph.verify(hashed_password.value, plain_password.value)
+        except VerifyMismatchError as exc:
+            raise PasswordMismatchError from exc

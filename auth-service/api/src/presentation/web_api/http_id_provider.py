@@ -1,4 +1,4 @@
-from application.auth.services.jwt_service import JWTService
+from application.auth.interfaces.jwt_service import JWTService
 from application.auth.token_types import AccessToken
 from application.common.id_provider import HttpIdentityProvider
 from domain.entities.user.model import User

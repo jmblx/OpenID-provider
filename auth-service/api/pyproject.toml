@@ -19,6 +19,9 @@ redis = "^5.2.0"
 pillow = "^11.0.0"
 minio = "^7.2.10"
 nats-py = "^2.9.0"
+pyjwt = "^2.10.1"
+pytz = "^2024.2"
+cryptography = "^44.0.0"
 
 [tool.poetry.group.dev.dependencies]
 setuptools = "^75.2.0"

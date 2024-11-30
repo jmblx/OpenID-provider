@@ -4,7 +4,7 @@ from typing import TypedDict, cast, Any
 import jwt
 from pytz import timezone
 
-from application.auth.services.jwt_service import JWTService
+from application.auth.interfaces.jwt_service import JWTService
 from application.auth.token_types import Payload, JwtToken, BaseToken
 from infrastructure.services.auth.config import JWTSettings
 
@@ -41,8 +41,8 @@ class JWTServiceImpl(JWTService):
         )
         return {
             "token": BaseToken(token),
-            "expires_in": expire.isoformat(),
-            "created_at": now.isoformat(),
+            "created_at": now,
+            "expires_at": expire,
         }
 
     def decode(self, token: BaseToken) -> Payload:

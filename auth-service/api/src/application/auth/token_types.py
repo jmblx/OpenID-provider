@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import NewType, TypedDict
 from uuid import UUID
 
@@ -13,7 +13,6 @@ class BaseToken(str):
 AccessToken = NewType("AccessToken", BaseToken)
 RefreshToken = NewType("RefreshToken", BaseToken)
 Fingerprint = NewType("Fingerprint", str)
-JTI = str | UUID
 
 
 class Payload(TypedDict, total=False):
@@ -22,19 +21,19 @@ class Payload(TypedDict, total=False):
     sub: UserID
     exp: datetime
     iat: datetime
-    jti: JTI
+    jti: UUID
 
 
 class JwtToken(TypedDict):
     token: BaseToken
-    expires_in: str
-    created_at: str
+    created_at: datetime
+    expires_at: datetime
 
 
-@dataclass(frozen=True)
+@dataclass
 class RefreshTokenData:
     token: RefreshToken
     user_id: UserID
-    jti: str
-    fingerprint: str
-    created_at: str
+    jti: UUID
+    fingerprint: Fingerprint
+    created_at: datetime

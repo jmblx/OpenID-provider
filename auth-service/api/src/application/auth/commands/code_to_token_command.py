@@ -1,7 +1,9 @@
 from dataclasses import dataclass
 
 
-@dataclass(frozen=True)
-class AuthenticateUserCommand:
-    redirect_uri: str
-    code_verifier: str
+@dataclass
+class CodeToTokenCommand:
+    auth_code: str
+    code_challenger: str
+    redirect_url: str
+    scopes: list[str]
