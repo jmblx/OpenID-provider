@@ -50,7 +50,7 @@ migration:
 dbo:
 	cd api && \
 	alembic revision --autogenerate && \
-	alembic upgrade head
+#	alembic upgrade head
 
 
 downgrade:

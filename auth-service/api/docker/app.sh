@@ -1,5 +1,4 @@
 #!/bin/sh
-cd src
 
 make migration
 
