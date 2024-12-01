@@ -18,7 +18,6 @@ else
 endif
 
 migration:
-	alembic revision --autogenerate && \
 	alembic upgrade head
 
 mypy-check:
