@@ -89,7 +89,7 @@ services:
       - fastapi_app
       - db
       - redis
-      - minio
+#      - minio
       - app
       - certbot  # Зависимость от certbot
     networks:
