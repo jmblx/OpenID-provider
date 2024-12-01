@@ -13,7 +13,8 @@ services:
     networks:
       - custom
     volumes:
-      - db-command:/var/lib/postgresql/command
+      - db-data:/var/lib/postgresql/data
+#      - db-command:/var/lib/postgresql/command
 
   redis:
     image: redis:7
