@@ -1,4 +1,6 @@
 #!/bin/sh
-alembic upgrade head
+cd src
+
+make migration
 
 make server-prod
