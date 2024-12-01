@@ -12,7 +12,6 @@ services:
       - custom
     volumes:
       - db-data:/var/lib/postgresql/data
-#      - db-command:/var/lib/postgresql/command
 
   redis:
     image: redis:7
@@ -24,38 +23,6 @@ services:
       - 6379
     networks:
       - custom
-
-#  db-init:
-#    image: postgres:15
-#    container_name: db_init
-#    depends_on:
-#      - db
-#    environment:
-#      PGPASSWORD: postgres
-#    networks:
-#      - custom
-#    command: >
-#      bash -c "
-#      sleep 5 &&
-#      psql -h db_app -U postgres -f /docker-entrypoint-initdb.d/init-db.sql
-#      "
-#    volumes:
-#      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
-
-#  keycloak:
-#    image: quay.io/keycloak/keycloak:latest
-#    container_name: keycloak
-#    ports:
-#      - "8080:8080"
-#    env_file:
-#      - keycloak.env
-#    command: start-dev
-#    depends_on:
-#      - db
-#      - db-init
-#    networks:
-#      - custom
-#    restart: unless-stopped
 
   fastapi_app:
     env_file:
@@ -70,18 +37,17 @@ services:
       - custom
     depends_on:
       - db
-
   nginx:
     image: nginx:latest
     container_name: nginx_app
     ports:
-      - "80:80"     # HTTP
-      - "443:443"   # HTTPS
+      - "80:80"  # HTTP
+      - "443:443"  # HTTPS
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
       - ./app/conf.d:/etc/nginx/conf.d
       - ./nginx-logs:/var/log/nginx
-      - ./certbot/www:/var/www/certbot/:ro
+      - ./certbot/www:/var/www/certbot/:rw  # Убедитесь, что это rw
     depends_on:
       - fastapi_app
       - db
@@ -93,7 +59,9 @@ services:
   certbot:
     image: certbot/certbot:latest
     volumes:
-      - ./certbot/www/:/var/www/certbot/:rw
+      - ./certbot/www/:/var/www/certbot/:rw  # Убедитесь, что это rw
+    networks:
+      - custom
 
 networks:
   custom:
@@ -101,5 +69,3 @@ networks:
 
 volumes:
   db-data:
-#  minio-data:
-#  minio-config:
