@@ -4,8 +4,6 @@ from fastapi import HTTPException
 
 from application.auth.services.pkce import (
     PKCEService,
-    PKCEData,
-    PKCECodeChallengeMethod,
 )
 from application.auth.token_types import Fingerprint, AccessToken, RefreshToken
 from application.auth.interfaces.jwt_service import JWTService
@@ -19,7 +17,6 @@ from domain.common.services.pwd_service import PasswordHasher
 from infrastructure.services.auth.config import JWTSettings
 from application.auth.services.auth_code import (
     AuthorizationCodeStorage,
-    AuthCodeData,
 )
 
 
@@ -67,7 +64,7 @@ class HttpAuthServiceImpl(HttpAuthService):
             raise HTTPException(
                 status_code=401, detail="Invalid refresh token or fingerprint"
             )
-        user = await self.user_service.read_by_id(token_data.user_id)
+        user: User = await self.user_service.read_by_id(token_data.user_id)  # type: ignore
         return self.token_creation_service.create_access_token(user)
 
     async def logout(self, refresh_token: RefreshToken) -> None:

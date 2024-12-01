@@ -8,11 +8,10 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import ORJSONResponse
 
-from core.di.container import container
-
-# from infrastructure.gunicorn.app_options import get_app_options
-# from infrastructure.gunicorn.application import Application
 import core.db.logs  # noqa: F401
+from core.di.container import container
+from infrastructure.gunicorn.app_options import get_app_options
+from infrastructure.gunicorn.application import Application
 from infrastructure.gunicorn.config import app_settings
 from presentation.web_api.auth.router import auth_router
 from presentation.web_api.client.client_router import client_router
@@ -72,5 +71,5 @@ def main():
     ).run()
 
 
-# if __name__ == "__main__":
-#     main()
+if __name__ == "__main__":
+    main()
