@@ -30,6 +30,7 @@ jobs:
 
   deploy:
     runs-on: ubuntu-latest
+    needs: build
 
     steps:
       - name: Checkout repository
@@ -49,5 +50,5 @@ jobs:
             cd ${{ secrets.DIR_AUTH_SERVICE }}
             git pull
             docker-compose down
-            docker-compose up -d --pull
+            docker-compose up -d
           EOF
