@@ -64,7 +64,7 @@ services:
       - api/.env-prod
 #    build:
 #      context: api/
-    image: menoitami/auth-service
+    image: menoitami/auth_service:latest
     command: [ "/fastapi_app/docker/app.sh" ]
     expose:
       - 8000
