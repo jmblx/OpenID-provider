@@ -21,11 +21,11 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -f ./Server/deployment/Dockerfile -t menoitami/mushenger-server:latest .
+          docker build -f ./auth-service/api/Dockerfile -t menoitami/auth_service:latest .
 
       - name: Push Docker image to Docker Hub
         run: |
-          docker push menoitami/mushenger-server:latest
+          docker push menoitami/auth_service:latest
 
   deploy:
     runs-on: ubuntu-latest
@@ -41,12 +41,12 @@ jobs:
 
       - name: Deploy via SSH
         env:
-          HOST: "90.156.170.155"
-          USER: "root"
+          HOST: ${{ secrets.HOST_IP }}
+          USER: ${{ secrets.USER_NAME }}
         run: |
           ssh -o StrictHostKeyChecking=no $USER@$HOST << 'EOF'
-            cd rep
-            docker-compose down
+            cd ${{ secrets.DIR_AUTH_SERVICE }}
             git pull
-            docker-compose up --build -d
+            docker-compose down
+            docker-compose up -d --pull
           EOF
