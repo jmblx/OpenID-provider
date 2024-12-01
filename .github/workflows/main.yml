@@ -21,7 +21,7 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -f ./auth-service/api/Dockerfile -t menoitami/auth_service:latest .
+          cd ./auth-service/api docker build -t menoitami/auth_service:latest .
 
       - name: Push Docker image to Docker Hub
         run: |

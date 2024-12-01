@@ -61,9 +61,9 @@ services:
   fastapi_app:
     env_file:
       - api/.env-prod
-    build:
-      context: api/
-    # image: menoitami/task-tracker
+#    build:
+#      context: api/
+    image: menoitami/auth-service
     command: [ "/fastapi_app/docker/app.sh" ]
     expose:
       - 8000
@@ -71,16 +71,6 @@ services:
       - custom
     depends_on:
       - db
-
-yaml
-
-version: '3.8'
-
-
-services:
-
-  # ... ваши другие сервисы ...
-
 
   nginx:
     image: nginx:latest
