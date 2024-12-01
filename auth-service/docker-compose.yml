@@ -96,9 +96,9 @@ services:
   certbot:
     image: certbot/certbot
     volumes:
-     - ./certs:/etc/letsencrypt
+      - ./certs:/etc/letsencrypt
+      - ./certs/renewal-hooks:/etc/letsencrypt/renewal-hooks
     entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
-
 
 networks:
   custom:
