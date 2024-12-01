@@ -27,9 +27,9 @@ services:
   fastapi_app:
     env_file:
       - api/.env-prod
-    build:
-      context: api/
-#    image: menoitami/auth_service:latest
+#    build:
+#      context: api/
+    image: menoitami/auth_service:latest
     command: [ "/fastapi_app/docker/app.sh" ]
     expose:
       - 8000

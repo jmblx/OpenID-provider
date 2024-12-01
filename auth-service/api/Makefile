@@ -22,3 +22,9 @@ migration:
 
 mypy-check:
 	mypy src --config-file pyproject.toml --explicit-package-bases
+
+server-prod:
+	cd src && \
+	python3 -m presentation.web_api.main
+
+
