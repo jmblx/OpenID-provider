@@ -43,10 +43,6 @@ down-dev: check_docker
 deps:
 	poetry install
 
-migration:
-	alembic revision --autogenerate && \
-	alembic upgrade head
-
 dbo:
 	cd api && \
 	alembic revision --autogenerate && \

@@ -17,6 +17,9 @@ else
 	@docker ps > /dev/null 2>&1 || (echo "Docker is not running. Please start Docker and try again." && exit 1)
 endif
 
+migration:
+	alembic revision --autogenerate && \
+	alembic upgrade head
 
 mypy-check:
 	mypy src --config-file pyproject.toml --explicit-package-bases
