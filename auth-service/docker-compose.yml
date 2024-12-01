@@ -90,7 +90,6 @@ services:
       - db
       - redis
 #      - minio
-      - app
       - certbot  # Зависимость от certbot
     networks:
       - custom
