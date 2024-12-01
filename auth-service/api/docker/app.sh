@@ -1,6 +1,6 @@
 #!/bin/sh
 
-cd /fastapi-app
+cd /fastapi_app
 
 make migration
 
