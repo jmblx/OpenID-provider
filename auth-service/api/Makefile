@@ -18,7 +18,6 @@ else
 endif
 
 migration:
-	cd src/infrastructure/db/alembic/
 	alembic upgrade head
 
 mypy-check:
