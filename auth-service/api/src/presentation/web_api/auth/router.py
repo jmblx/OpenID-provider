@@ -5,7 +5,7 @@ from starlette.responses import RedirectResponse
 
 from application.auth.commands.auth_user_command import AuthenticateUserCommand
 from application.auth.handlers.auth_user_handler import (
-    AuthenticateUserCommandHandler,
+    AuthenticateUserHandler,
 )
 from application.auth.token_types import Fingerprint
 
@@ -15,7 +15,7 @@ auth_router = APIRouter(route_class=DishkaRoute, tags=["auth"])
 @auth_router.post("/auth/login")
 async def login(
     command: AuthenticateUserCommand,
-    handler: FromDishka[AuthenticateUserCommandHandler],
+    handler: FromDishka[AuthenticateUserHandler],
 ) -> RedirectResponse:
     auth_code = await handler.handle(command)
     redirect_url = f"{command.redirect_url}?code={auth_code}&state=xyz"

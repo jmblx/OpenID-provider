@@ -2,7 +2,7 @@ from dishka import make_async_container
 from dishka.integrations.fastapi import FastapiProvider
 
 from core.di.providers.db import DBProvider
-from core.di.providers.handler import HandlerProvider
+from core.di.providers.handlers import HandlerProvider
 from core.di.providers.presentation import PresentationProvider
 from core.di.providers.readers import ReaderProvider
 from core.di.providers.redis_provider import RedisProvider

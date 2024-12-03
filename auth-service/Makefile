@@ -39,7 +39,6 @@ up-dev: check_docker
 down-dev: check_docker
 	docker-compose -f ./docker-compose-local-dev.yml down
 
-# Установка зависимостей с помощью poetry и создание виртуального окружения
 deps:
 	poetry install
 
@@ -52,11 +51,6 @@ dbo:
 downgrade:
 	cd api && \
 	alembic downgrade -1
-
-# Запуск приложения в режиме разработки
-dev: db
-	cd api/src && \
-	uvicorn main:app --reload
 
 uv:
 	cd api/src && \

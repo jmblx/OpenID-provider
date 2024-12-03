@@ -20,7 +20,7 @@ from domain.exceptions.user import UserAlreadyExistsError
 from domain.common.services.pwd_service import PasswordHasher
 
 
-class RegisterUserCommandHandler:
+class RegisterUserHandler:
     def __init__(
         self,
         user_repository: UserRepository,
@@ -46,7 +46,7 @@ class RegisterUserCommandHandler:
             redirect_url=ClientRedirectUrl(command.redirect_url)
         )
 
-        existing_user = await self.user_reader.with_email(Email(command.email))
+        existing_user = await self.user_reader.by_email(Email(command.email))
         if existing_user:
             raise UserAlreadyExistsError(existing_user.email.value)
 

@@ -10,13 +10,11 @@ from fastapi.responses import ORJSONResponse
 
 import core.db.logs  # noqa: F401
 from core.di.container import container
-from infrastructure.gunicorn.app_options import get_app_options
-from infrastructure.gunicorn.application import Application
-from infrastructure.gunicorn.config import app_settings
 from presentation.web_api.auth.router import auth_router
 from presentation.web_api.client.client_router import client_router
 from presentation.web_api.exceptions import setup_exception_handlers
 from presentation.web_api.registration.router import reg_router
+from presentation.web_api.role.router import role_router
 
 
 @asynccontextmanager  # type: ignore
@@ -40,6 +38,7 @@ logger.setLevel(logging.INFO)
 app.include_router(reg_router)
 app.include_router(client_router)
 app.include_router(auth_router)
+app.include_router(role_router)
 setup_exception_handlers(app)
 
 
@@ -58,18 +57,21 @@ app.add_middleware(
 )
 
 
-def main():
-    Application(
-        application=app,
-        options=get_app_options(
-            host=app_settings.gunicorn.host,
-            port=app_settings.gunicorn.port,
-            timeout=app_settings.gunicorn.timeout,
-            workers=app_settings.gunicorn.workers,
-            log_level=app_settings.logging.log_level,
-        ),
-    ).run()
-
-
-if __name__ == "__main__":
-    main()
+# def main():
+#     from infrastructure.gunicorn.app_options import get_app_options
+#     from infrastructure.gunicorn.application import Application
+#     from infrastructure.gunicorn.config import app_settings
+#     Application(
+#         application=app,
+#         options=get_app_options(
+#             host=app_settings.gunicorn.host,
+#             port=app_settings.gunicorn.port,
+#             timeout=app_settings.gunicorn.timeout,
+#             workers=app_settings.gunicorn.workers,
+#             log_level=app_settings.logging.log_level,
+#         ),
+#     ).run()
+#
+#
+# if __name__ == "__main__":
+#     main()

@@ -12,17 +12,15 @@ class IdentificationFields(TypedDict, total=False):
 
 class UserReader(ABC):
     @abstractmethod
-    async def with_email(self, email: Email) -> Optional[User]:
+    async def by_email(self, email: Email) -> User | None:
         """Получить пользователя по email."""
         raise NotImplementedError
 
     @abstractmethod
-    async def read_by_id(self, user_id: UserID) -> Optional[User]:
+    async def by_id(self, user_id: UserID) -> User | None:
         """Получить пользователя по ID."""
         raise NotImplementedError
 
     @abstractmethod
-    async def read_by_fields_with_client(self, fields: IdentificationFields) -> Optional[User]:
+    async def by_fields_with_clients(self, fields: IdentificationFields) -> User | None:
         raise NotImplementedError
-
-

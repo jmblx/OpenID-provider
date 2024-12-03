@@ -26,4 +26,7 @@ class InvalidRedirectURLError(ApplicationError):
 
 
 @dataclass(eq=False)
-class InvalidCredentialsError(ApplicationError): ...
+class InvalidCredentialsError(DomainError):
+    @property
+    def title(self) -> str:
+        return "Invalid credentials."

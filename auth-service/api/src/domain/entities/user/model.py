@@ -2,7 +2,7 @@ from uuid import UUID, uuid4
 
 from domain.common.services.pwd_service import PasswordHasher
 from domain.entities.client.model import Client
-from domain.entities.role.value_objects import RoleID, RolePermissions
+from domain.entities.role.value_objects import RoleID, RoleBaseScopes
 from domain.entities.user.value_objects import (
     UserID,
     Email,
@@ -23,7 +23,7 @@ class User:
     email: Email
     hashed_password: HashedPassword
     is_email_confirmed: bool
-    permissions: RolePermissions = field(init=False)
+    permissions: RoleBaseScopes = field(init=False)
     clients: list[Client] = field(default_factory=list)
 
     @classmethod

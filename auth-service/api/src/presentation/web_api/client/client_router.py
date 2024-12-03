@@ -1,11 +1,11 @@
 from dishka import FromDishka
 from dishka.integrations.fastapi import DishkaRoute
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter
 
-from application.auth.commands.register_client_command import (
+from application.client.commands.register_client_command import (
     RegisterClientCommand,
 )
-from application.auth.handlers.register_client_hadler import (
+from application.client.handlers.register_client_hadler import (
     RegisterClientHandler,
 )
 from application.dtos.client import ClientCreateDTO

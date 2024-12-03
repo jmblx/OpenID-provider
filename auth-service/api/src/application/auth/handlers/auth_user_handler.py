@@ -13,7 +13,7 @@ from domain.common.services.pwd_service import PasswordHasher
 from domain.exceptions.user import UserNotFoundByEmailError
 
 
-class AuthenticateUserCommandHandler:
+class AuthenticateUserHandler:
     def __init__(
         self,
         user_reader: UserReader,
@@ -36,8 +36,7 @@ class AuthenticateUserCommandHandler:
             client=client,
             redirect_url=ClientRedirectUrl(command.redirect_url)
         )
-
-        user = await self.user_reader.read_by_fields_with_client({"email": Email(command.email)})
+        user = await self.user_reader.by_fields_with_clients({"email": Email(command.email)})
         if not user:
             raise UserNotFoundByEmailError(command.email)
         if client not in user.clients:

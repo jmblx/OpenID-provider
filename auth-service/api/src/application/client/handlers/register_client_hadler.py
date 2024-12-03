@@ -1,16 +1,10 @@
-from application.auth.commands.register_client_command import (
+from application.client.commands.register_client_command import (
     RegisterClientCommand,
 )
 from application.client.interfaces.repo import ClientRepository
 from application.common.uow import Uow
 from application.dtos.client import ClientCreateDTO
 from domain.entities.client.model import Client
-from domain.entities.client.value_objects import (
-    ClientName,
-    ClientBaseUrl,
-    ClientRedirectUrl,
-    ClientType,
-)
 
 
 class RegisterClientHandler:

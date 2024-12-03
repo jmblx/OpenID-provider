@@ -1,4 +1,4 @@
-from sqlalchemy import select
+from sqlalchemy import select, and_
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from application.client.interfaces.repo import ClientRepository
@@ -24,9 +24,9 @@ class ClientRepositoryImpl(ClientRepository):
         """
         Удаляет клиента по его идентификатору.
         """
-        query = select(client_table).where(
+        query = select(client_table).where(and_(
             client_table.c.id == client_id.value
-        )
+        ))
         result = await self.session.execute(query)
         client = await result.scalar_one_or_none()
         if client:

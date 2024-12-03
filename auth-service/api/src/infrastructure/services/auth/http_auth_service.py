@@ -46,7 +46,7 @@ class HttpAuthServiceImpl(HttpAuthService):
     async def authenticate_user(
         self, email: Email, password: RawPassword, fingerprint: Fingerprint
     ) -> tuple[AccessToken, RefreshToken]:
-        user = await self.user_service.with_email(email)
+        user = await self.user_service.by_email(email)
         if not user:
             raise HTTPException(status_code=401, detail="Invalid credentials")
         self.hash_service.check_password(password, user.hashed_password)
@@ -64,7 +64,7 @@ class HttpAuthServiceImpl(HttpAuthService):
             raise HTTPException(
                 status_code=401, detail="Invalid refresh token or fingerprint"
             )
-        user: User = await self.user_service.read_by_id(token_data.user_id)  # type: ignore
+        user: User = await self.user_service.by_id(token_data.user_id)  # type: ignore
         return self.token_creation_service.create_access_token(user)
 
     async def logout(self, refresh_token: RefreshToken) -> None:
@@ -95,7 +95,7 @@ class HttpAuthServiceImpl(HttpAuthService):
         if not self._validate_pkce(code_challenger, real_code_challenger):
             raise HTTPException(status_code=400, detail="Invalid PKCE")
 
-        user = await self.user_service.read_by_id(
+        user = await self.user_service.by_id(
             UserID(UUID(auth_code_data["user_id"]))
         )
         if not user:

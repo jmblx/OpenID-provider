@@ -1,5 +1,5 @@
 #!/bin/sh
 
-make migration
+make migrate
 
 make server-prod

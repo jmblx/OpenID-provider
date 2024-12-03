@@ -8,7 +8,7 @@ from application.auth.commands.code_to_token_command import CodeToTokenCommand
 from application.auth.commands.register_user_command import RegisterUserCommand
 from application.auth.handlers.code_to_token_handler import CodeToTokenHandler
 from application.auth.handlers.register_user_handler import (
-    RegisterUserCommandHandler,
+    RegisterUserHandler,
 )
 from application.auth.token_types import Fingerprint
 from domain.exceptions.auth import (
@@ -39,7 +39,7 @@ reg_router = APIRouter(route_class=DishkaRoute, tags=["reg"])
     status_code=status.HTTP_307_TEMPORARY_REDIRECT,
 )
 async def registration(
-    handler: FromDishka[RegisterUserCommandHandler],
+    handler: FromDishka[RegisterUserHandler],
     command: RegisterUserCommand,
 ) -> RedirectResponse:
     auth_code = await handler.handle(command)

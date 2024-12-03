@@ -8,7 +8,7 @@ endif
 .PHONY: all mypy-check
 
 # Основная цель
-all: mypy-check
+all: mypy-check migration
 
 check_docker:
 ifeq ($(OS),windows)
@@ -17,7 +17,7 @@ else
 	@docker ps > /dev/null 2>&1 || (echo "Docker is not running. Please start Docker and try again." && exit 1)
 endif
 
-migration:
+migrate:
 	alembic upgrade head
 
 mypy-check:
@@ -27,4 +27,6 @@ server-prod:
 	cd src && \
 	python3 -m presentation.web_api.main
 
-
+migration:
+	alembic revision --autogenerate
+	alembic upgrade head

@@ -1,51 +1,46 @@
 from dataclasses import dataclass
 
-from domain.exceptions.user_vo import InvalidRoleIDError, InvalidRoleNameError
 from domain.exceptions.role import InvalidPermissionsError
 
 
 @dataclass(frozen=True)
 class RoleID:
     value: int
-    _valid_values = (0, 1, 2)
-
-    def __post_init__(self):
-        if self.value not in self._valid_values:
-            raise InvalidRoleIDError(
-                "RoleID must be a valid int and refer to a valid role."
-            )
 
 
 @dataclass(frozen=True)
 class RoleName:
     value: str
-    _allowed_names = {"user", "admin"}
-
-    def __post_init__(self):
-        if self.value not in self._allowed_names:
-            raise InvalidRoleNameError(
-                "RoleName must be one of the allowed names."
-            )
 
 
 @dataclass(frozen=True)
-class RolePermissions:
+class RoleBaseScopes:
     value: dict[str, int]
+
+    @classmethod
+    def create(cls, value_dict: dict[str, str]) -> "RoleBaseScopes":
+        """
+        Создает объект RoleBaseScopes из словаря, где значения - строки побитовых чисел.
+        Преобразует строки в целые числа.
+        """
+        new_value = {}
+        for key, permission_str in value_dict.items():
+            if not isinstance(permission_str, str) or len(permission_str) != 4 or not all(
+                    c in '01' for c in permission_str):
+                raise InvalidPermissionsError(f"Permission value for key '{key}' must be a 4-bit binary string.")
+            permission_int = int(permission_str, 2)
+            new_value[key] = permission_int
+        return cls(new_value)
 
     def __post_init__(self) -> None:
         """
         Проверка валидности значений в словаре.
-        Убедитесь, что все значения - 4-значные побитовые числа.
+        Убедитесь, что все значения - целые числа от 0 до 15.
         """
-        if not isinstance(self.value, dict):
-            raise TypeError("Permissions must be a dictionary")
-
         for key, permission in self.value.items():
             if not isinstance(key, str):
                 raise TypeError(f"Key {key} must be a string")
-            if not isinstance(permission, int) or not self._is_valid_bitwise(
-                permission
-            ):
+            if not isinstance(permission, int) or not self._is_valid_bitwise(permission):
                 raise InvalidPermissionsError(
                     f"Permission value {permission} for key '{key}' is not a valid 4-bit number"
                 )
@@ -63,8 +58,9 @@ class RolePermissions:
         """
         return self.value.get(key, 0)
 
-    def set_permission(self, key: str, permission: int) -> "RolePermissions":
+    def set_permission(self, key: str, permission: int) -> "RoleBaseScopes":
         """
+        Устанавливает разрешение по ключу.
         Возвращает новый объект с обновленным значением разрешения.
         """
         if not self._is_valid_bitwise(permission):
@@ -73,7 +69,33 @@ class RolePermissions:
             )
         new_permissions = dict(self.value)
         new_permissions[key] = permission
-        return RolePermissions(new_permissions)
+        return RoleBaseScopes(new_permissions)
+
+    def add_permission(self, key: str, permission_str: str) -> "RoleBaseScopes":
+        """
+        Добавляет разрешение по ключу. Если в аргументе передается 1 в строке,
+        то соответствующие биты в текущем значении заменяются на 1.
+        """
+        if len(permission_str) != 4 or not all(c in '01' for c in permission_str):
+            raise InvalidPermissionsError(f"Permission string must be a 4-bit binary string.")
+
+        permission_to_add = int(permission_str, 2)
+        current_permission = self.get_permission(key)
+        new_permission = current_permission | permission_to_add
+        return self.set_permission(key, new_permission)
+
+    def remove_permission(self, key: str, permission_str: str) -> "RoleBaseScopes":
+        """
+        Убирает разрешение по ключу. Если в аргументе передается 1 в строке,
+        то соответствующие биты в текущем значении заменяются на 0.
+        """
+        if len(permission_str) != 4 or not all(c in '01' for c in permission_str):
+            raise InvalidPermissionsError(f"Permission string must be a 4-bit binary string.")
+
+        permission_to_remove = int(permission_str, 2)
+        current_permission = self.get_permission(key)
+        new_permission = current_permission & ~permission_to_remove
+        return self.set_permission(key, new_permission)
 
     def has_permission(self, key: str, bit: int) -> bool:
         """

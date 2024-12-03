@@ -45,6 +45,7 @@ mapper_registry.map_imperatively(
             back_populates="clients",
             uselist=True
         ),
+        "roles": relationship("Role", back_populates="client", uselist=True),
     },
     column_prefix="_",
 )

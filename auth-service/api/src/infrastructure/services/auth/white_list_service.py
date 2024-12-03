@@ -20,7 +20,7 @@ class TokenWhiteListServiceImpl(TokenWhiteListService):
 
     def _serialize_refresh_token_data(
         self, refresh_token_data: RefreshTokenData
-    ) -> dict:
+    ) -> dict[str, str]:
         """Приводит все поля к типам, которые можно сериализовать в JSON (UUID -> str)."""
         return {
             "jti": str(refresh_token_data.jti),
@@ -52,7 +52,6 @@ class TokenWhiteListServiceImpl(TokenWhiteListService):
         serialized_token_data = self._serialize_refresh_token_data(
             refresh_token_data
         )
-
         await self.redis.hset(
             f"refresh_token:{jti}", mapping=serialized_token_data
         )
@@ -60,7 +59,6 @@ class TokenWhiteListServiceImpl(TokenWhiteListService):
             f"refresh_token_index:{user_id.value}:{fingerprint}", jti
         )
         logger.info("Сохранён новый токен с jti: %s", jti)
-
         await self.redis.zadd(
             f"refresh_tokens:{user_id.value}", {jti: created_at}
         )
@@ -101,6 +99,6 @@ class TokenWhiteListServiceImpl(TokenWhiteListService):
         self, user_id: UserID, fingerprint: str
     ) -> Optional[str]:
         """Получение существующего JTI для пользователя по fingerprint."""
-        return await self.redis.get(
+        return await self.redis.get( #type: ignore
             f"refresh_token_index:{user_id.value}:{fingerprint}"
         )
