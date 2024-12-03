@@ -37,6 +37,7 @@ services:
       - custom
     depends_on:
       - db
+
   nginx:
     image: nginx:latest
     container_name: nginx_app
@@ -49,6 +50,7 @@ services:
       - ./certbot/conf:/etc/letsencrypt
       - ./nginx-logs:/var/log/nginx
       - ./certbot/www:/var/www/certbot:rw
+      - ./static:/usr/share/nginx/html  # Путь для статических файлов
     depends_on:
       - fastapi_app
       - db
