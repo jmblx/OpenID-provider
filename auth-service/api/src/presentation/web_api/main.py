@@ -57,21 +57,21 @@ app.add_middleware(
 )
 
 
-# def main():
-#     from infrastructure.gunicorn.app_options import get_app_options
-#     from infrastructure.gunicorn.application import Application
-#     from infrastructure.gunicorn.config import app_settings
-#     Application(
-#         application=app,
-#         options=get_app_options(
-#             host=app_settings.gunicorn.host,
-#             port=app_settings.gunicorn.port,
-#             timeout=app_settings.gunicorn.timeout,
-#             workers=app_settings.gunicorn.workers,
-#             log_level=app_settings.logging.log_level,
-#         ),
-#     ).run()
-#
-#
-# if __name__ == "__main__":
-#     main()
+def main():
+    from infrastructure.gunicorn.app_options import get_app_options
+    from infrastructure.gunicorn.application import Application
+    from infrastructure.gunicorn.config import app_settings
+    Application(
+        application=app,
+        options=get_app_options(
+            host=app_settings.gunicorn.host,
+            port=app_settings.gunicorn.port,
+            timeout=app_settings.gunicorn.timeout,
+            workers=app_settings.gunicorn.workers,
+            log_level=app_settings.logging.log_level,
+        ),
+    ).run()
+
+
+if __name__ == "__main__":
+    main()
