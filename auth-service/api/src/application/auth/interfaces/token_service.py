@@ -1,5 +1,6 @@
 from uuid import uuid4
 
+from application.auth.token_types import Payload
 from domain.entities.user.model import User
 
 
@@ -10,7 +11,7 @@ class TokenService:
         self.jwt_settings = jwt_settings
 
     def create_access_token(self, user: User) -> str:
-        payload = {
+        payload: Payload = {
             "sub": str(user.id.value),
             "email": user.email.value,
             "role_id": user.role_id.value,

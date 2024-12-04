@@ -1,10 +1,15 @@
 from dishka import Provider, provide, Scope
 from fastapi import Request
 
-from application.auth.token_types import Fingerprint
+from application.auth.handlers.refresh_tokens_handler import RefreshTokensHandler
+from application.auth.token_types import Fingerprint, RefreshToken
 
 
 class PresentationProvider(Provider):
     @provide(scope=Scope.REQUEST, provides=Fingerprint)
     async def provide_session(self, request: Request) -> Fingerprint:
         return Fingerprint(request.headers.get("fingerprint"))  # type: ignore
+
+    @provide(scope=Scope.REQUEST, provides=RefreshToken)
+    async def provide_session_from_cookie(self, request: Request) -> RefreshToken:
+        return RefreshToken(request.cookies.get("refresh_token"))

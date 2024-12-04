@@ -28,7 +28,8 @@ services:
     env_file:
       - api/.env-prod
     build:
-      context: api/
+      context: api
+      dockerfile: Dockerfile.webapi
 #    image: menoitami/auth_service:latest
     command: [ "/fastapi_app/docker/app.sh" ]
     expose:

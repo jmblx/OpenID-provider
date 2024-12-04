@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 from application.auth.token_types import (
     AccessToken,
     Fingerprint,
-    RefreshTokenData,
+    RefreshTokenWithData,
 )
 from domain.entities.user.model import User
 
@@ -18,5 +18,5 @@ class TokenCreationService(ABC):
     @abstractmethod
     async def create_refresh_token(
         self, user: User, fingerprint: Fingerprint
-    ) -> RefreshTokenData:
+    ) -> RefreshTokenWithData:
         """Создание RefreshToken."""

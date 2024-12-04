@@ -48,11 +48,13 @@ class JWTServiceImpl(JWTService):
     def decode(self, token: BaseToken) -> Payload:
         """Декодирует JWT токен и возвращает его payload."""
         try:
+
             payload = jwt.decode(
                 token,
                 self.auth_settings.public_key,
                 algorithms=[self.auth_settings.algorithm],
             )
+            print(payload, token)
             return cast(Payload, payload)
         except jwt.ExpiredSignatureError:
             raise Exception("Token has expired")

@@ -17,7 +17,6 @@ Fingerprint = NewType("Fingerprint", str)
 
 class Payload(TypedDict, total=False):
     """Типизированный словарь для представления данных в payload JWT."""
-
     sub: UserID
     exp: datetime
     iat: datetime
@@ -32,8 +31,12 @@ class JwtToken(TypedDict):
 
 @dataclass
 class RefreshTokenData:
-    token: RefreshToken
-    user_id: UserID
+    user_id: UUID
     jti: UUID
     fingerprint: Fingerprint
     created_at: datetime
+
+
+@dataclass
+class RefreshTokenWithData(RefreshTokenData):
+    token: RefreshToken

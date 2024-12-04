@@ -2,7 +2,7 @@ from datetime import timedelta
 
 from application.auth.interfaces.jwt_service import JWTService
 from application.auth.interfaces.token_creation import TokenCreationService
-from application.auth.token_types import AccessToken, RefreshTokenData
+from application.auth.token_types import AccessToken, RefreshTokenWithData
 from domain.entities.user.model import User
 from uuid import uuid4
 
@@ -18,9 +18,9 @@ class TokenCreationServiceImpl(TokenCreationService):
 
     def create_access_token(self, user: User) -> AccessToken:
         jwt_payload = {
-            "sub": str(user.id),
-            "email": user.email.value,
+            "sub": str(user.id.value),
             "role_id": user.role_id.value,
+            "jti": str(uuid4()),
         }
         encoded_token = self.jwt_service.encode(
             payload=jwt_payload,
@@ -30,18 +30,18 @@ class TokenCreationServiceImpl(TokenCreationService):
 
     async def create_refresh_token(
         self, user: User, fingerprint: str
-    ) -> RefreshTokenData:
+    ) -> RefreshTokenWithData:
         jti = str(uuid4())
-        jwt_payload = {"sub": str(user.id), "jti": jti}
+        jwt_payload = {"sub": str(user.id.value), "jti": jti}
         encoded_token = self.jwt_service.encode(
             payload=jwt_payload,
             expire_timedelta=timedelta(
                 days=self.jwt_settings.refresh_token_expire_days
             ),
         )
-        refresh_token_data = RefreshTokenData(
+        refresh_token_data = RefreshTokenWithData(
             token=encoded_token["token"],
-            user_id=user.id,
+            user_id=user.id.value,
             jti=jti,
             fingerprint=fingerprint,
             created_at=encoded_token["created_at"],

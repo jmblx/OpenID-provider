@@ -11,8 +11,6 @@ class JWTService(ABC):
     def encode(
         self,
         payload: Payload,
-        expire_minutes: int | None = None,
-        expire_timedelta: timedelta | None = None,
     ) -> JwtToken:
         """Создание JWT токена с заданным сроком действия."""
 

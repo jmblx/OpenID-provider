@@ -61,7 +61,6 @@ server-prod:
 	cd api/src && \
 	uvicorn presentation.web_api.main:app --reload
 
-
 nfy:
 	cd notification/ && \
 	python app.py
