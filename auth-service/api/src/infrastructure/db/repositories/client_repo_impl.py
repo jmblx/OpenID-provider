@@ -20,6 +20,10 @@ class ClientRepositoryImpl(ClientRepository):
         await self.session.flush()
         return ClientCreateDTO(client_id=client.id.value)
 
+    async def get_by_id(self, client_id: ClientID) -> Client | None:
+        client = await self.session.get(Client, client_id.value)
+        return client
+
     async def delete(self, client_id: ClientID) -> None:
         """
         Удаляет клиента по его идентификатору.
