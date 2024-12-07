@@ -169,11 +169,12 @@
     </div>
     <script>
         document.addEventListener('DOMContentLoaded', async function() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const client_id = urlParams.get('client_id');
-            const redirect_url = urlParams.get('redirect_url');
-            const code_verifier = urlParams.get('code_verifier');
-            const code_challenge_method = urlParams.get('code_challenge_method');
+           const urlParams = new URLSearchParams(window.location.search);
+
+            const params = {};
+            for (let [key, value] of urlParams.entries()) {
+                params[key] = value;
+            }
 
             try {
                 const clientResponse = await fetch(`/api/client/auth?client_id=${client_id}&redirect_url=${redirect_url}`);
