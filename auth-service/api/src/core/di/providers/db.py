@@ -23,9 +23,7 @@ class DBProvider(Provider):
     @provide(scope=Scope.APP)
     def provide_engine(self, config: DatabaseConfig) -> AsyncEngine:
         pool_class = (
-            NullPool
-            if os.getenv("USE_NULLPOOL", "false").lower() == "true"
-            else None
+            NullPool if os.getenv("USE_NULLPOOL", "false").lower() == "true" else None
         )
         return create_async_engine(config.db_uri, poolclass=pool_class)
 

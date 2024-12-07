@@ -40,9 +40,7 @@ class User:
             id=UserID(user_id),
             role_id=RoleID(role_id),
             email=Email(email),
-            hashed_password=password_hasher.hash_password(
-                RawPassword(raw_password)
-            ),
+            hashed_password=password_hasher.hash_password(RawPassword(raw_password)),
             is_email_confirmed=is_email_confirmed,
         )
 
@@ -56,9 +54,7 @@ class User:
         password_hasher: PasswordHasher,
     ) -> None:
         try:
-            password_hasher.check_password(
-                plain_password, self.hashed_password
-            )
+            password_hasher.check_password(plain_password, self.hashed_password)
         except PasswordMismatchError as exc:
             raise InvalidCredentialsError from exc
 

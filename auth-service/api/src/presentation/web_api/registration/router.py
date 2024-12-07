@@ -1,8 +1,10 @@
 from dishka import FromDishka
 from dishka.integrations.fastapi import DishkaRoute
 from fastapi import APIRouter
+from jinja2 import PackageLoader
 from starlette import status
 from starlette.responses import RedirectResponse
+from starlette.templating import Jinja2Templates
 
 from application.auth.commands.register_user_command import RegisterUserCommand
 from application.auth.handlers.register_user_handler import (
@@ -25,9 +27,7 @@ reg_router = APIRouter(route_class=DishkaRoute, tags=["reg"])
             "description": "redirection to invoice download link",
         },
         status.HTTP_400_BAD_REQUEST: {
-            "model": ErrorResponse[
-                InvalidRedirectURLError | InvalidClientError
-            ],
+            "model": ErrorResponse[InvalidRedirectURLError | InvalidClientError],
         },
         status.HTTP_409_CONFLICT: {
             "model": ErrorResponse[UserAlreadyExistsError],

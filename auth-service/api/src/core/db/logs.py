@@ -12,9 +12,7 @@ configure_logging()
 
 
 @event.listens_for(Engine, "before_cursor_execute")
-def before_cursor_execute(
-    conn, cursor, statement, parameters, context, executemany
-):
+def before_cursor_execute(conn, cursor, statement, parameters, context, executemany):
     conn.info.setdefault("query_start_time", []).append(time.time())
     logger.info("Start Query: %s", statement)
     logger.info("Parameters: %s", parameters)
@@ -22,9 +20,7 @@ def before_cursor_execute(
 
 
 @event.listens_for(Engine, "after_cursor_execute")
-def after_cursor_execute(
-    conn, cursor, statement, parameters, context, executemany
-):
+def after_cursor_execute(conn, cursor, statement, parameters, context, executemany):
     total = time.time() - context._query_start_time
     logger.info("Query Complete!")
     logger.info("Total Time: %f", total)

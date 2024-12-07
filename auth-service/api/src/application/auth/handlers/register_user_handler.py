@@ -4,18 +4,12 @@ from application.auth.services.auth_code import (
     AuthCodeData,
 )
 from application.auth.services.pkce import PKCEData, PKCEService
-from application.client.interfaces.reader import ClientReader
+from application.client.commands.validate_client_request import ValidateClientRequest
+from application.client.service import ClientService
 from application.common.uow import Uow
-from application.user.interfaces.reader import UserReader
 from application.user.interfaces.repo import UserRepository
-from domain.entities.client.model import Client
-from domain.entities.client.value_objects import ClientID, ClientRedirectUrl
 from domain.entities.user.model import User
 from domain.entities.user.value_objects import Email
-from domain.exceptions.auth import (
-    InvalidRedirectURLError,
-    InvalidClientError,
-)
 from domain.exceptions.user import UserAlreadyExistsError
 from domain.common.services.pwd_service import PasswordHasher
 
@@ -24,29 +18,27 @@ class RegisterUserHandler:
     def __init__(
         self,
         user_repository: UserRepository,
-        user_reader: UserReader,
         hash_service: PasswordHasher,
         auth_code_storage: AuthorizationCodeStorage,
-        client_reader: ClientReader,
+        client_service: ClientService,
         uow: Uow,
         pkce_service: PKCEService,
     ):
         self.user_repository = user_repository
-        self.user_reader = user_reader
         self.hash_service = hash_service
         self.auth_code_storage = auth_code_storage
-        self.client_reader = client_reader
+        self.client_service = client_service
         self.uow = uow
         self.pkce_service = pkce_service
 
     async def handle(self, command: RegisterUserCommand) -> str:
-        client: Client = await self.client_reader.with_id(ClientID(command.client_id))  # type: ignore
-        await Client.validate_redirect_url(
-            client=client,
-            redirect_url=ClientRedirectUrl(command.redirect_url)
+        client = await self.client_service.get_validated_client(
+            ValidateClientRequest(
+                client_id=command.client_id,
+                redirect_url=command.redirect_url,
+            )
         )
-
-        existing_user = await self.user_reader.by_email(Email(command.email))
+        existing_user = await self.user_repository.by_email(Email(command.email))
         if existing_user:
             raise UserAlreadyExistsError(existing_user.email.value)
 
@@ -71,9 +63,7 @@ class RegisterUserHandler:
             "user_id": str(user_id),
             "client_id": str(client.id.value),
             "redirect_url": command.redirect_url,
-            "code_challenger": self.pkce_service.generate_code_challenge(
-                pkce_data
-            ),
+            "code_challenger": self.pkce_service.generate_code_challenge(pkce_data),
         }
 
         await self.auth_code_storage.store_auth_code_data(

@@ -39,13 +39,10 @@ class Client:
 
     @staticmethod
     async def validate_redirect_url(
-        client: Union["Client", None],
+        allowed_redirect_urls: "AllowedRedirectUrls",
         redirect_url: ClientRedirectUrl,
     ) -> None:
-        if not client:
-            raise InvalidClientError()
-
-        if redirect_url.value not in client.allowed_redirect_urls.value:
+        if redirect_url.value not in allowed_redirect_urls.value:
             raise InvalidRedirectURLError(
-                redirect_url=redirect_url.value, client_id=client.id.value
+                redirect_url=redirect_url.value
             )

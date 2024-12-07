@@ -19,13 +19,9 @@ async def save_refresh_token_to_redis(
     jti = str(refresh_token_data.pop("jti"))
     user_id = refresh_token_data["user_id"]
     fingerprint = refresh_token_data["fingerprint"]
-    created_at = datetime.fromisoformat(
-        refresh_token_data["created_at"]
-    ).timestamp()
+    created_at = datetime.fromisoformat(refresh_token_data["created_at"]).timestamp()
 
-    existing_jti = await redis.get(
-        f"refresh_token_index:{user_id}:{fingerprint}"
-    )
+    existing_jti = await redis.get(f"refresh_token_index:{user_id}:{fingerprint}")
     if existing_jti:
         logging.info("Found existing token with jti: %s", existing_jti)
         await redis.delete(f"refresh_token:{existing_jti}")
@@ -60,12 +56,8 @@ async def save_refresh_token_to_redis(
 
 
 async def token_to_redis(redis: aioredis.Redis, user_id: UUID, token: str):
-    await redis.set(
-        f"reset_password:{token}", str(user_id), ex=timedelta(minutes=15)
-    )
+    await redis.set(f"reset_password:{token}", str(user_id), ex=timedelta(minutes=15))
 
 
-async def get_user_id_from_reset_pwd_token(
-    redis: aioredis.Redis, token: str
-) -> UUID:
+async def get_user_id_from_reset_pwd_token(redis: aioredis.Redis, token: str) -> UUID:
     return UUID(await redis.get(f"reset_password:{token}"))

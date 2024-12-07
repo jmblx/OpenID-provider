@@ -25,9 +25,14 @@ class RoleBaseScopes:
         """
         new_value = {}
         for key, permission_str in value_dict.items():
-            if not isinstance(permission_str, str) or len(permission_str) != 4 or not all(
-                    c in '01' for c in permission_str):
-                raise InvalidPermissionsError(f"Permission value for key '{key}' must be a 4-bit binary string.")
+            if (
+                not isinstance(permission_str, str)
+                or len(permission_str) != 4
+                or not all(c in "01" for c in permission_str)
+            ):
+                raise InvalidPermissionsError(
+                    f"Permission value for key '{key}' must be a 4-bit binary string."
+                )
             permission_int = int(permission_str, 2)
             new_value[key] = permission_int
         return cls(new_value)
@@ -40,7 +45,9 @@ class RoleBaseScopes:
         for key, permission in self.value.items():
             if not isinstance(key, str):
                 raise TypeError(f"Key {key} must be a string")
-            if not isinstance(permission, int) or not self._is_valid_bitwise(permission):
+            if not isinstance(permission, int) or not self._is_valid_bitwise(
+                permission
+            ):
                 raise InvalidPermissionsError(
                     f"Permission value {permission} for key '{key}' is not a valid 4-bit number"
                 )
@@ -76,8 +83,10 @@ class RoleBaseScopes:
         Добавляет разрешение по ключу. Если в аргументе передается 1 в строке,
         то соответствующие биты в текущем значении заменяются на 1.
         """
-        if len(permission_str) != 4 or not all(c in '01' for c in permission_str):
-            raise InvalidPermissionsError(f"Permission string must be a 4-bit binary string.")
+        if len(permission_str) != 4 or not all(c in "01" for c in permission_str):
+            raise InvalidPermissionsError(
+                f"Permission string must be a 4-bit binary string."
+            )
 
         permission_to_add = int(permission_str, 2)
         current_permission = self.get_permission(key)
@@ -89,8 +98,10 @@ class RoleBaseScopes:
         Убирает разрешение по ключу. Если в аргументе передается 1 в строке,
         то соответствующие биты в текущем значении заменяются на 0.
         """
-        if len(permission_str) != 4 or not all(c in '01' for c in permission_str):
-            raise InvalidPermissionsError(f"Permission string must be a 4-bit binary string.")
+        if len(permission_str) != 4 or not all(c in "01" for c in permission_str):
+            raise InvalidPermissionsError(
+                f"Permission string must be a 4-bit binary string."
+            )
 
         permission_to_remove = int(permission_str, 2)
         current_permission = self.get_permission(key)

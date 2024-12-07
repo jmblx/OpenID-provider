@@ -29,8 +29,7 @@ class JWTServiceImpl(JWTService):
             expire = now + expire_timedelta
         else:
             expire = now + timedelta(
-                minutes=expire_minutes
-                or self.auth_settings.access_token_expire_minutes
+                minutes=expire_minutes or self.auth_settings.access_token_expire_minutes
             )
         payload["exp"] = expire
         payload["iat"] = now

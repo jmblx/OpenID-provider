@@ -18,11 +18,10 @@ class InvalidClientError(ApplicationError):
 @dataclass(eq=False)
 class InvalidRedirectURLError(ApplicationError):
     redirect_url: str
-    client_id: int
 
     @property
     def title(self) -> str:
-        return f"{self.redirect_url} is not a valid redirect URL for client with id: {self.client_id}."
+        return f"{self.redirect_url} is not a valid redirect URL for your client."
 
 
 @dataclass(eq=False)

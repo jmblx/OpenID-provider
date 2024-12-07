@@ -36,16 +36,13 @@ mapper_registry.map_imperatively(
         "hashed_password": composite(HashedPassword, user_table.c.hashed_password),
         "is_email_confirmed": user_table.c.is_email_confirmed,
         "role_id": composite(RoleID, user_table.c.role_id),
-        "role": relationship(
-            "Role", back_populates="users_role", uselist=False
-        ),
+        "role": relationship("Role", back_populates="users_role", uselist=False),
         "clients": relationship(
             "Client",
             secondary=user_client_association_table,
             back_populates="users",
-            uselist=True
+            uselist=True,
         ),
     },
     column_prefix="_",
 )
-

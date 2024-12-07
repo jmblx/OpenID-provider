@@ -28,7 +28,5 @@ class TokenWhiteListService(ABC):
         """Удаление токена по его JTI."""
 
     @abstractmethod
-    async def get_existing_jti(
-        self, user_id: UUID, fingerprint: str
-    ) -> str | None:
+    async def get_existing_jti(self, user_id: UUID, fingerprint: str) -> str | None:
         """Получение существующего JTI для пользователя по fingerprint."""

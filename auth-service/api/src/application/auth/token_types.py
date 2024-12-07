@@ -17,6 +17,7 @@ Fingerprint = NewType("Fingerprint", str)
 
 class Payload(TypedDict, total=False):
     """Типизированный словарь для представления данных в payload JWT."""
+
     sub: UserID
     exp: datetime
     iat: datetime

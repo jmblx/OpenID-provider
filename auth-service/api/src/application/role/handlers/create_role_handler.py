@@ -11,7 +11,11 @@ class CreateRoleHandler:
         self.uow = uow
 
     async def handle(self, command: CreateRoleCommand) -> int:
-        role = Role.create(name=command.name, base_scopes=command.base_scopes, client_id=command.client_id)
+        role = Role.create(
+            name=command.name,
+            base_scopes=command.base_scopes,
+            client_id=command.client_id,
+        )
         role_id: RoleID = await self.role_repo.save(role)
         await self.uow.commit()
         return role_id.value

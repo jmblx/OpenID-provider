@@ -17,9 +17,7 @@ query {
 
 
 async def send_auth_request(session, url, headers, query):
-    async with session.post(
-        url, json={"query": query}, headers=headers
-    ) as response:
+    async with session.post(url, json={"query": query}, headers=headers) as response:
         data = await response.json()
         print(f"Response status: {response.status}")
         print(f"Response data: {data}")

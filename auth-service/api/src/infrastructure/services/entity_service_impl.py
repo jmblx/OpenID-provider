@@ -29,9 +29,7 @@ class EntityServiceImpl(EntityService[T], Generic[T]):
         search_params: dict[str, Any],
         selected_fields: dict[Any, dict[Any, dict]] | None = None,
     ) -> T:
-        entity = await self._base_repo.get_by_fields(
-            search_params, selected_fields
-        )
+        entity = await self._base_repo.get_by_fields(search_params, selected_fields)
         return entity
 
     async def get_random_rows(self, amount: int, exclude_ids: list):
@@ -49,9 +47,7 @@ class EntityServiceImpl(EntityService[T], Generic[T]):
         search_params: dict[str, Any],
         upd_data: dict[str, Any],
     ):
-        await self._base_repo.update_by_fields(
-            search_params, upd_data, return_id=False
-        )
+        await self._base_repo.update_by_fields(search_params, upd_data, return_id=False)
 
     async def update_and_fetch(
         self,
@@ -91,11 +87,7 @@ class EntityServiceImpl(EntityService[T], Generic[T]):
             search_data, selected_fields, order_by
         )
         if full_delete:
-            await self._base_repo.delete_by_ids(
-                [entity.id for entity in entities]
-            )
+            await self._base_repo.delete_by_ids([entity.id for entity in entities])
         else:
-            await self._base_repo.soft_delete_by_ids(
-                [entity.id for entity in entities]
-            )
+            await self._base_repo.soft_delete_by_ids([entity.id for entity in entities])
         return entities

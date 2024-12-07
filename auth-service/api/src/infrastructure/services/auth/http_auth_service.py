@@ -12,6 +12,7 @@ from application.auth.interfaces.token_creation import TokenCreationService
 from application.auth.interfaces.http_auth import HttpAuthService
 from application.auth.interfaces.white_list import TokenWhiteListService
 from application.user.interfaces.reader import UserReader
+from application.user.interfaces.repo import UserRepository
 from domain.entities.user.model import User
 from domain.entities.user.value_objects import Email, RawPassword, UserID
 from domain.common.services.pwd_service import PasswordHasher
@@ -28,7 +29,7 @@ class HttpAuthServiceImpl(HttpAuthService):
 
     def __init__(
         self,
-        user_reader: UserReader,
+        user_repository: UserRepository,
         jwt_service: JWTService,
         token_creation_service: TokenCreationService,
         token_whitelist_service: TokenWhiteListService,
@@ -37,7 +38,7 @@ class HttpAuthServiceImpl(HttpAuthService):
         auth_code_storage: AuthorizationCodeStorage,
         pkce_service: PKCEService,
     ):
-        self.user_service = user_reader
+        self.user_repository = user_repository
         self.jwt_service = jwt_service
         self.token_creation_service = token_creation_service
         self.token_whitelist_service = token_whitelist_service
@@ -46,14 +47,14 @@ class HttpAuthServiceImpl(HttpAuthService):
         self.auth_code_storage = auth_code_storage
         self.pkce_service = pkce_service
 
-    async def _token_to_user(self, refresh_token: RefreshToken, fingerprint: Fingerprint) -> User:
+    async def _token_to_user(
+        self, refresh_token: RefreshToken, fingerprint: Fingerprint
+    ) -> User:
         payload = self.jwt_service.decode(refresh_token)
         logger.info(f"payload: {payload}")
         jti = payload["jti"]
-        token_data = await self.token_whitelist_service.get_refresh_token_data(
-            jti
-        )
-        logger.info("tokend data: %s, jti: %s",token_data, jti)
+        token_data = await self.token_whitelist_service.get_refresh_token_data(jti)
+        logger.info("tokend data: %s, jti: %s", token_data, jti)
         if not token_data or token_data.fingerprint != fingerprint:
             raise HTTPException(
                 status_code=401, detail="Invalid refresh token or fingerprint"
@@ -62,16 +63,16 @@ class HttpAuthServiceImpl(HttpAuthService):
         return user
 
     async def authenticate_user(
-            self, email: Email, password: RawPassword, fingerprint: Fingerprint
+        self, email: Email, password: RawPassword, fingerprint: Fingerprint
     ) -> tuple[AccessToken, RefreshToken]:
-        user = await self.user_service.by_email(email)
+        user = await self.user_repository.by_email(email)
         if not user:
             raise HTTPException(status_code=401, detail="Invalid credentials")
         self.hash_service.check_password(password, user.hashed_password)
         return await self._create_and_save_tokens(user, fingerprint)
 
     async def refresh_tokens(
-            self, refresh_token: RefreshToken, fingerprint: Fingerprint
+        self, refresh_token: RefreshToken, fingerprint: Fingerprint
     ) -> tuple[AccessToken, RefreshToken]:
         user = await self._token_to_user(refresh_token, fingerprint)
         return await self._create_and_save_tokens(user, fingerprint)
@@ -94,13 +95,9 @@ class HttpAuthServiceImpl(HttpAuthService):
         fingerprint: Fingerprint,
         code_challenger: str,
     ) -> tuple[AccessToken, RefreshToken]:
-        auth_code_data = await self.auth_code_storage.retrieve_auth_code_data(
-            auth_code
-        )
+        auth_code_data = await self.auth_code_storage.retrieve_auth_code_data(auth_code)
         if not auth_code_data:
-            raise HTTPException(
-                status_code=400, detail="Invalid authorization code"
-            )
+            raise HTTPException(status_code=400, detail="Invalid authorization code")
 
         if auth_code_data["redirect_url"] != redirect_url:
             raise HTTPException(status_code=400, detail="Invalid redirect URL")
@@ -109,9 +106,7 @@ class HttpAuthServiceImpl(HttpAuthService):
         if not self._validate_pkce(code_challenger, real_code_challenger):
             raise HTTPException(status_code=400, detail="Invalid PKCE")
 
-        user = await self.user_service.by_id(
-            UserID(UUID(auth_code_data["user_id"]))
-        )
+        user = await self.user_repository.by_id(UserID(UUID(auth_code_data["user_id"])))
         if not user:
             raise HTTPException(status_code=404, detail="User not found")
 
@@ -120,14 +115,12 @@ class HttpAuthServiceImpl(HttpAuthService):
         return tokens
 
     async def _create_and_save_tokens(
-            self, user: User, fingerprint: Fingerprint
+        self, user: User, fingerprint: Fingerprint
     ) -> tuple[AccessToken, RefreshToken]:
         """Создаёт и сохраняет токены."""
         access_token = self.token_creation_service.create_access_token(user)
-        refresh_token_data = (
-            await self.token_creation_service.create_refresh_token(
-                user, fingerprint
-            )
+        refresh_token_data = await self.token_creation_service.create_refresh_token(
+            user, fingerprint
         )
         await self.token_whitelist_service.save_refresh_token(
             refresh_token_data,

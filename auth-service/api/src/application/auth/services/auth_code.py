@@ -21,9 +21,7 @@ class AuthorizationCodeStorage(ABC):
         pass
 
     @abstractmethod
-    async def retrieve_auth_code_data(
-        self, auth_code: str
-    ) -> Optional[AuthCodeData]:
+    async def retrieve_auth_code_data(self, auth_code: str) -> Optional[AuthCodeData]:
         """
         Извлекает и удаляет данные, связанные с авторизационным кодом.
         """

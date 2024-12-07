@@ -8,14 +8,10 @@ load_dotenv()
 
 class JWTSettings(BaseModel):
     private_key_path: Path = (
-        Path(__file__).parent.parent.parent.parent.parent
-        / "certs"
-        / "jwt-private.pem"
+        Path(__file__).parent.parent.parent.parent.parent / "certs" / "jwt-private.pem"
     )
     public_key_path: Path = (
-        Path(__file__).parent.parent.parent.parent.parent
-        / "certs"
-        / "jwt-public.pem"
+        Path(__file__).parent.parent.parent.parent.parent / "certs" / "jwt-public.pem"
     )
     algorithm: str = "RS512"
     access_token_expire_minutes: int = 1500

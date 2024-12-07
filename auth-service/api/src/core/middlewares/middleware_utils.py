@@ -1,9 +1,7 @@
 from fastapi import Request
 
 
-def form_state(
-    request: Request, headers: dict[str, str], cookies: dict[str, str]
-):
+def form_state(request: Request, headers: dict[str, str], cookies: dict[str, str]):
     """
     Формирует состояния запроса из заголовков и cookies
     """

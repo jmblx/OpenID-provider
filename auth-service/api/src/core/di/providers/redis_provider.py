@@ -12,9 +12,7 @@ class RedisProvider(Provider):
         return RedisConfig.from_env()
 
     @provide(scope=Scope.REQUEST, provides=aioredis.Redis)
-    async def provide_redis(
-        self, config: RedisConfig
-    ) -> AsyncIterable[aioredis.Redis]:
+    async def provide_redis(self, config: RedisConfig) -> AsyncIterable[aioredis.Redis]:
         redis = await aioredis.from_url(
             config.rd_uri, encoding="utf8", decode_responses=True
         )

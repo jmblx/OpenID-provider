@@ -17,4 +17,6 @@ class RepositoriesProvider(Provider):
     client_repo = provide(
         ClientRepositoryImpl, scope=Scope.REQUEST, provides=ClientRepository
     )
-    role_repo = provide(RoleRepositoryImpl, scope=Scope.REQUEST, provides=RoleRepository)
+    role_repo = provide(
+        RoleRepositoryImpl, scope=Scope.REQUEST, provides=RoleRepository
+    )

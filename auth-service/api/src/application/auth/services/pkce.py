@@ -15,9 +15,7 @@ class PKCECodeChallengeMethod(StrEnum):
 @dataclass
 class PKCEData:
     code_verifier: str
-    code_challenge_method: PKCECodeChallengeMethod = (
-        PKCECodeChallengeMethod.S256
-    )
+    code_challenge_method: PKCECodeChallengeMethod = PKCECodeChallengeMethod.S256
 
     def __post_init__(self) -> None:
         """Валидация данных PKCE"""
@@ -52,11 +50,7 @@ class PKCEService:
         """
         Генерация случайного `code_verifier` согласно рекомендациям PKCE (32 байта).
         """
-        return (
-            base64.urlsafe_b64encode(os.urandom(32))
-            .decode("utf-8")
-            .rstrip("=")
-        )
+        return base64.urlsafe_b64encode(os.urandom(32)).decode("utf-8").rstrip("=")
 
     @staticmethod
     def generate_code_challenge(pkce_data: PKCEData) -> str:
@@ -67,11 +61,7 @@ class PKCEService:
             sha256_hash = hashlib.sha256(
                 pkce_data.code_verifier.encode("utf-8")
             ).digest()
-            return (
-                base64.urlsafe_b64encode(sha256_hash)
-                .decode("utf-8")
-                .rstrip("=")
-            )
+            return base64.urlsafe_b64encode(sha256_hash).decode("utf-8").rstrip("=")
         elif pkce_data.code_challenge_method == PKCECodeChallengeMethod.plain:
             return pkce_data.code_verifier
         else:

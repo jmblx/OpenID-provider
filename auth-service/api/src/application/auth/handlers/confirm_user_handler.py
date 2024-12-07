@@ -8,18 +8,12 @@ from domain.entities.user.value_objects import Email
 
 
 class ConfirmUserCommandHandler:
-    def __init__(
-        self, user_repository: UserRepository, redis_client: aioredis.Redis
-    ):
+    def __init__(self, user_repository: UserRepository, redis_client: aioredis.Redis):
         self.user_repository = user_repository
         self.redis_client = redis_client
 
-    async def handle(
-        self, command: ConfirmUserCommand, session: AsyncSession
-    ) -> User:
-        email = await self.redis_client.get(
-            f"confirm:{command.confirmation_code}"
-        )
+    async def handle(self, command: ConfirmUserCommand, session: AsyncSession) -> User:
+        email = await self.redis_client.get(f"confirm:{command.confirmation_code}")
         if not email:
             raise Exception("Неверный или истекший код подтверждения")
 

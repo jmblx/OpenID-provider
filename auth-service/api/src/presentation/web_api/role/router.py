@@ -9,7 +9,10 @@ from application.role.handlers.create_role_handler import CreateRoleHandler
 
 role_router = APIRouter(route_class=DishkaRoute, tags=["role"], prefix="/role")
 
+
 @role_router.post("/")
-async def create_role(command: CreateRoleCommand, handler: FromDishka[CreateRoleHandler]) -> ORJSONResponse:
+async def create_role(
+    command: CreateRoleCommand, handler: FromDishka[CreateRoleHandler]
+) -> ORJSONResponse:
     role_id = await handler.handle(command)
     return ORJSONResponse({"role_id": role_id}, status_code=HTTP_201_CREATED)

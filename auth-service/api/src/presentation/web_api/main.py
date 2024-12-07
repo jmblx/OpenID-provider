@@ -65,6 +65,7 @@ if os.getenv("GUNICORN_MAIN", "false").lower() not in ("false", "0"):
         from infrastructure.gunicorn.app_options import get_app_options
         from infrastructure.gunicorn.application import Application
         from infrastructure.gunicorn.config import app_settings
+
         Application(
             application=app,
             options=get_app_options(
@@ -75,7 +76,6 @@ if os.getenv("GUNICORN_MAIN", "false").lower() not in ("false", "0"):
                 log_level=app_settings.logging.log_level,
             ),
         ).run()
-
 
     if __name__ == "__main__":
         main()

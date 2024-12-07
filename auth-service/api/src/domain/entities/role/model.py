@@ -17,4 +17,8 @@ class Role:
 
     @classmethod
     def create(cls, name: str, base_scopes: dict[str, str], client_id: int) -> "Role":
-        return cls(name=RoleName(name), base_scopes=RoleBaseScopes.create(base_scopes), client_id=ClientID(client_id))
+        return cls(
+            name=RoleName(name),
+            base_scopes=RoleBaseScopes.create(base_scopes),
+            client_id=ClientID(client_id),
+        )

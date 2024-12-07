@@ -7,6 +7,7 @@ from application.auth.interfaces.token_creation import TokenCreationService
 from application.auth.interfaces.white_list import TokenWhiteListService
 from application.auth.services.auth_code import AuthorizationCodeStorage
 from application.auth.services.pkce import PKCEService
+from application.client.service import ClientService
 from domain.common.services.pwd_service import PasswordHasher
 from domain.services.storage.storage_service import StorageServiceInterface
 from infrastructure.external_services.storage.minio_service import MinIOService
@@ -47,9 +48,7 @@ class ServiceProvider(Provider):
         scope=Scope.REQUEST,
         provides=AuthorizationCodeStorage,
     )
-    jwt_service = provide(
-        JWTServiceImpl, scope=Scope.REQUEST, provides=JWTService
-    )
+    jwt_service = provide(JWTServiceImpl, scope=Scope.REQUEST, provides=JWTService)
     http_auth_service = provide(
         HttpAuthServiceImpl, scope=Scope.REQUEST, provides=HttpAuthService
     )
@@ -63,6 +62,7 @@ class ServiceProvider(Provider):
         scope=Scope.REQUEST,
         provides=TokenWhiteListService,
     )
+    client_service = provide(ClientService, scope=Scope.REQUEST)
     # reg_validation_service = provide(
     #     RegUserValidationService,
     #     scope=Scope.REQUEST,

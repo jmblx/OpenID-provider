@@ -42,7 +42,7 @@ class TokenWhiteListServiceImpl(TokenWhiteListService):
         logger.info("Удалён токен с jti %s из всех связанных ключей.", jti)
 
     async def save_refresh_token(
-            self, refresh_token_data: RefreshTokenWithData, limit: int
+        self, refresh_token_data: RefreshTokenWithData, limit: int
     ) -> None:
         """Сохраняет токен, удаляя старые при необходимости."""
         jti = refresh_token_data.jti
@@ -58,30 +58,18 @@ class TokenWhiteListServiceImpl(TokenWhiteListService):
         # Удаление самых старых токенов, если превышен лимит
         num_tokens = await self.redis.zcard(f"refresh_tokens:{user_id}")
         if num_tokens >= limit:
-            oldest_jti_list = await self.redis.zrange(
-                f"refresh_tokens:{user_id}", 0, 0
-            )
+            oldest_jti_list = await self.redis.zrange(f"refresh_tokens:{user_id}", 0, 0)
             if oldest_jti_list:
                 await self.remove_token_by_jti(oldest_jti_list[0])
 
         # Сохранение нового токена
-        serialized_token_data = self._serialize_refresh_token_data(
-            refresh_token_data
-        )
-        await self.redis.hset(
-            f"refresh_token:{jti}", mapping=serialized_token_data
-        )
-        await self.redis.set(
-            f"refresh_token_index:{user_id}:{fingerprint}", jti
-        )
-        await self.redis.zadd(
-            f"refresh_tokens:{user_id}", {jti: created_at}
-        )
+        serialized_token_data = self._serialize_refresh_token_data(refresh_token_data)
+        await self.redis.hset(f"refresh_token:{jti}", mapping=serialized_token_data)
+        await self.redis.set(f"refresh_token_index:{user_id}:{fingerprint}", jti)
+        await self.redis.zadd(f"refresh_tokens:{user_id}", {jti: created_at})
         logger.info("Сохранён новый токен с jti: %s", jti)
 
-    async def get_refresh_token_data(
-        self, jti: UUID
-    ) -> Optional[RefreshTokenData]:
+    async def get_refresh_token_data(self, jti: UUID) -> Optional[RefreshTokenData]:
         token_data = await self.redis.hgetall(f"refresh_token:{jti}")
         if not token_data:
             return None
@@ -92,19 +80,13 @@ class TokenWhiteListServiceImpl(TokenWhiteListService):
     ) -> None:
         num_tokens = await self.redis.zcard(f"refresh_tokens:{user_id}")
         if num_tokens > limit:
-            oldest_jti_list = await self.redis.zrange(
-                f"refresh_tokens:{user_id}", 0, 0
-            )
+            oldest_jti_list = await self.redis.zrange(f"refresh_tokens:{user_id}", 0, 0)
             if oldest_jti_list:
                 oldest_jti = oldest_jti_list[0]
-                logger.info(
-                    "Удаление самого старого токена с jti: %s", oldest_jti
-                )
+                logger.info("Удаление самого старого токена с jti: %s", oldest_jti)
                 await self.redis.zrem(f"refresh_tokens:{user_id}", oldest_jti)
                 await self.redis.delete(f"refresh_token:{oldest_jti}")
-                await self.redis.delete(
-                    f"refresh_token_index:{user_id}:{fingerprint}"
-                )
+                await self.redis.delete(f"refresh_token_index:{user_id}:{fingerprint}")
 
     async def remove_token(self, jti: UUID) -> None:
         """Удаление токена по его JTI из всех связанных ключей."""
@@ -128,10 +110,8 @@ class TokenWhiteListServiceImpl(TokenWhiteListService):
             fingerprint,
         )
 
-    async def get_existing_jti(
-        self, user_id: UUID, fingerprint: str
-    ) -> Optional[str]:
+    async def get_existing_jti(self, user_id: UUID, fingerprint: str) -> Optional[str]:
         """Получение существующего JTI для пользователя по fingerprint."""
-        return await self.redis.get( #type: ignore
+        return await self.redis.get(  # type: ignore
             f"refresh_token_index:{user_id}:{fingerprint}"
         )

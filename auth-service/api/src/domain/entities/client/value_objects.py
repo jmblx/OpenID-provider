@@ -33,9 +33,7 @@ class ClientName:
 
     def check_length(self) -> None:
         if len(self.value) > 100:
-            raise ClientNameLengthError(
-                "value must be less than 100 characters"
-            )
+            raise ClientNameLengthError("value must be less than 100 characters")
 
 
 def check_is_valid_url(url: str) -> None:

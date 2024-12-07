@@ -22,9 +22,7 @@ class RedisAuthorizationCodeStorage(AuthorizationCodeStorage):
             f"auth_code:{auth_code}", json_data, ex=expiration_time
         )
 
-    async def retrieve_auth_code_data(
-        self, auth_code: str
-    ) -> Optional[AuthCodeData]:
+    async def retrieve_auth_code_data(self, auth_code: str) -> Optional[AuthCodeData]:
         """
         Извлекает данные, связанные с авторизационным кодом из Redis.
         """

@@ -9,7 +9,7 @@ class HttpAuthService(ABC):
 
     @abstractmethod
     async def authenticate_user(
-            self, email: Email, password: RawPassword, fingerprint: Fingerprint
+        self, email: Email, password: RawPassword, fingerprint: Fingerprint
     ) -> tuple[AccessToken, RefreshToken]:
         """
         Аутентифицирует пользователя по email и паролю.
@@ -19,7 +19,7 @@ class HttpAuthService(ABC):
 
     @abstractmethod
     async def refresh_access_token(
-            self, refresh_token: RefreshToken, fingerprint: Fingerprint
+        self, refresh_token: RefreshToken, fingerprint: Fingerprint
     ) -> AccessToken:
         """
         Обновляет AccessToken на основе валидного RefreshToken.
@@ -31,7 +31,7 @@ class HttpAuthService(ABC):
 
     @abstractmethod
     async def refresh_tokens(
-            self, refresh_token: RefreshToken, fingerprint: Fingerprint
+        self, refresh_token: RefreshToken, fingerprint: Fingerprint
     ) -> tuple[AccessToken, RefreshToken]:
         """
         Обновляет AccessToken и RefreshToken.
@@ -51,11 +51,11 @@ class HttpAuthService(ABC):
 
     @abstractmethod
     async def authenticate_by_auth_code(
-            self,
-            auth_code: str,
-            redirect_url: str,
-            fingerprint: Fingerprint,
-            code_challenger: str,
+        self,
+        auth_code: str,
+        redirect_url: str,
+        fingerprint: Fingerprint,
+        code_challenger: str,
     ) -> tuple[AccessToken, RefreshToken]:
         """
         Аутентифицирует пользователя с использованием авторизационного кода.
@@ -89,4 +89,3 @@ class HttpAuthService(ABC):
     #     :param user: Экземпляр пользователя.
     #     :return: Список активных токенов с метаданными.
     #     """
-

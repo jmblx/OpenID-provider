@@ -11,5 +11,5 @@ class RegisterUserCommand:
     client_id: int
     code_verifier: str
     code_challenge_method: PKCECodeChallengeMethod
-    scopes: list[str] | None
+    scopes: dict[str, str] | None
     role_id: int = field(default=1)

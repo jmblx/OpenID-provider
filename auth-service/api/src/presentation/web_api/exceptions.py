@@ -64,13 +64,9 @@ async def app_error_handler(
     )
 
 
-async def unknown_exception_handler(
-    request: Request, err: Exception
-) -> ORJSONResponse:
+async def unknown_exception_handler(request: Request, err: Exception) -> ORJSONResponse:
     logger.error("Handle error", exc_info=err, extra={"error": err})
-    logger.exception(
-        "Unknown error occurred", exc_info=err, extra={"error": err}
-    )
+    logger.exception("Unknown error occurred", exc_info=err, extra={"error": err})
     return ORJSONResponse(
         ErrorResponse(
             error=ErrorData(data=str(err), title="Unknown error"),

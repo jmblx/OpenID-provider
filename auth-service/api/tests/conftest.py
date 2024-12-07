@@ -17,9 +17,7 @@ from sqlalchemy.ext.asyncio import (
 )
 from sqlalchemy.orm.exc import ObjectDeletedError
 
-sys.path.insert(
-    0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../src"))
-)
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../src")))
 
 from api.tests.config import TEST_DATABASE_URI
 from core.di.container import container
@@ -96,9 +94,7 @@ async def auth_headers(ac: AsyncClient) -> dict:
     """
     headers = {"Fingerprint": "3ccc784000c0c0c11cab8508dffaa578"}
 
-    response = await ac.post(
-        "/graphql", headers=headers, json={"query": query}
-    )
+    response = await ac.post("/graphql", headers=headers, json={"query": query})
 
     assert response.status_code == 200
     data = response.json()
