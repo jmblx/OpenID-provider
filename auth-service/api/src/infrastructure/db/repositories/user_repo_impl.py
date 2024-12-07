@@ -4,6 +4,7 @@ from uuid import UUID
 
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
+from sqlalchemy.orm import joinedload
 
 from application.user.dto.user import UserCreateOutputDTO
 from application.user.interfaces.repo import UserRepository, IdentificationFields
@@ -38,7 +39,7 @@ class UserRepositoryImpl(UserRepository):
     async def by_fields_with_clients(
         self, fields: IdentificationFields
     ) -> User | None:
-        stmt = select(User).options(joinedload(User.clients))  # type: ignore
+        stmt = select(User).options(joinedload(User.clients))
 
         filters = []
         for field, value in fields.items():
