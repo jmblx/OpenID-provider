@@ -21,7 +21,9 @@ class ClientRepositoryImpl(ClientRepository):
         return ClientCreateDTO(client_id=client.id.value)
 
     async def get_by_id(self, client_id: ClientID) -> Client | None:
-        client = await self.session.get(Client, client_id.value)
+        query = select(client_table).where(and_(client_table.c.id == client_id.value))
+        result = await self.session.execute(query)
+        client = result.scalar_one_or_none()
         return client
 
     async def delete(self, client_id: ClientID) -> None:
@@ -30,6 +32,6 @@ class ClientRepositoryImpl(ClientRepository):
         """
         query = select(client_table).where(and_(client_table.c.id == client_id.value))
         result = await self.session.execute(query)
-        client = await result.scalar_one_or_none()
+        client = result.scalar_one_or_none()
         if client:
             await self.session.delete(client)
