@@ -163,7 +163,7 @@
                 <button type="button" id="loginButton" class="btn btn-primary w-100">Войти</button>
             </form>
             <div class="link text-center">
-                <a href="/register">Нет аккаунта? Зарегистрироваться</a>
+                <a href="#" id="reg-link">Нет аккаунта? Зарегистрироваться</a>
             </div>
         </div>
     </div>
@@ -188,6 +188,17 @@
             } catch (error) {
                 document.getElementById('client-name').innerText = "Ошибка загрузки данных клиента";
             }
+
+            const loginLink = document.getElementById('reg-link');
+            const loginUrl = new URL('/pages/reg.html', window.location.origin);
+
+            // Добавляем все параметры в URL логина
+            Object.keys(params).forEach(key => {
+                loginUrl.searchParams.append(key, params[key]);
+            });
+
+            // Устанавливаем сформированную ссылку для логина
+            loginLink.href = loginUrl.toString();
 
             // Отправка данных на сервер
             document.getElementById('loginButton').addEventListener('click', async function () {
