@@ -169,16 +169,13 @@
     </div>
     <script>
     document.addEventListener('DOMContentLoaded', async function() {
-    // Извлекаем все параметры из строки запроса
         const urlParams = new URLSearchParams(window.location.search);
 
-        // Формируем объект, который будет хранить все параметры
         const params = {};
         for (let [key, value] of urlParams.entries()) {
             params[key] = value;
         }
 
-        // Запрос к серверу для получения данных о клиенте
         try {
             const clientResponse = await fetch(`/api/client/auth?client_id=${params.client_id}&redirect_url=${params.redirect_url}`);
             if (clientResponse.ok) {
