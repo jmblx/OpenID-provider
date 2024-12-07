@@ -11,4 +11,4 @@ class AuthenticateUserCommand:
     code_verifier: str
     code_challenge_method: PKCECodeChallengeMethod
     client_id: int
-    scopes: list[str] | None
+    scopes: dict[str, str] | None
