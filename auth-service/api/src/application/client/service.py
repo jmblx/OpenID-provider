@@ -12,8 +12,8 @@ class ClientService:
     async def get_validated_client(self, data: ValidateClientRequest) -> Client:
         client = await self.client_repo.get_by_id(ClientID(data.client_id))
         if not client:
-            raise ClientNotFound(data.client_id)
+            raise ClientNotFound()
         await Client.validate_redirect_url(
-            client=client, redirect_url=ClientRedirectUrl(data.redirect_url)
+            allowed_redirect_urls=client.allowed_redirect_urls, redirect_url=ClientRedirectUrl(data.redirect_url)
         )
         return client
