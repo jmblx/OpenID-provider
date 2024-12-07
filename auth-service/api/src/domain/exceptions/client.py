@@ -5,8 +5,13 @@ from domain.common.exceptions.base import DomainError
 
 class ClientNameLengthError(DomainError): ...
 
+@dataclass(eq=False)
+class InvalidUrlError(DomainError):
+    details: str
 
-class InvalidUrlError(DomainError): ...
+    @property
+    def title(self) -> str:
+        return f"Client not found {self.details}"
 
 @dataclass(eq=False)
 class ClientNotFound(DomainError):
