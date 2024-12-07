@@ -22,8 +22,7 @@ class ClientRepositoryImpl(ClientRepository):
 
     async def get_by_id(self, client_id: ClientID) -> Client | None:
         query = select(client_table).where(and_(client_table.c.id == client_id.value))
-        result = await self.session.execute(query)
-        client = result.scalar_one_or_none()
+        client = await self.session.scalar(query)
         return client
 
     async def delete(self, client_id: ClientID) -> None:
