@@ -39,18 +39,13 @@ class UserRepositoryImpl(UserRepository):
     async def by_fields_with_clients(
         self, fields: IdentificationFields
     ) -> User | None:
-        stmt = select(User).options(joinedload(User.clients))
+        query = select(User).options(joinedload(User.clients))
 
-        filters = []
         for field, value in fields.items():
             if hasattr(User, field):
-                column = getattr(User, field)
-                filters.append(column == value)
+                query = query.where(getattr(User, field) == value)
 
-        if filters:
-            stmt = stmt.where(and_(*filters))
-
-        result = await self.session.execute(stmt)
+        result = await self.session.execute(query)
         return result.scalars().first()
 
     async def by_id(self, user_id: UserID) -> User | None:
