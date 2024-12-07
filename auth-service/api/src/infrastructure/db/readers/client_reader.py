@@ -12,7 +12,7 @@ class ClientReaderImpl(ClientReader):
         self.session = db_session
 
     async def read_for_auth_page(self, client_id: ClientID) -> ClientAuthData | None:
-        query = select(client_table).where(client_table.c.id == client_id)
+        query = select(client_table).where(client_table.c.id == client_id.value )
         result = await self.session.execute(query)
         client = result.mappings().first()
         return ClientAuthData(client["name"], client["allowed_redirect_urls"]) if client else None
