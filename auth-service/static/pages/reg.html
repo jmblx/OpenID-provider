@@ -16,9 +16,10 @@
         body {
             font-family: 'Montserrat', sans-serif;
             background: #f6f5f7;
-            height: 100vh; /* Растягиваем на весь экран */
-            display: grid;
-            place-items: center; /* Центрируем содержимое */
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
             margin: 0;
         }
 
@@ -27,6 +28,14 @@
             margin: 0;
             margin-bottom: 20px;  /* Отступ снизу */
             text-align: center;
+        }
+
+        p {
+            font-size: 14px;
+            font-weight: 100;
+            line-height: 20px;
+            letter-spacing: .5px;
+            margin: 20px 0 30px;
         }
 
         .container {
@@ -38,7 +47,7 @@
             width: 100%;
             max-width: 400px;
             padding: 30px 50px;
-            min-height: 100%; /* Растягиваем карточку на весь экран */
+            margin-top: 25vh;
         }
 
         .form-container form {
@@ -126,13 +135,13 @@
             text-align: center; /* Центрируем текст */
         }
 
-        .client-name span {
-            font-size: 18px;
-            color: #4fadf3;
-            font-weight: 600;
-            margin: 10px 0 20px;
-            text-align: center; /* Центрируем текст */
-        }
+       .client-name span {
+           font-size: 18px;
+           color: #4fadf3;
+           font-weight: 600;
+           margin: 10px 0 20px;
+           text-align: center; /* Центрируем текст */
+       }
     </style>
 </head>
 <body>
@@ -153,9 +162,9 @@
                 </div>
                 <button type="button" id="registerButton" class="btn btn-primary w-100">Зарегистрироваться</button>
             </form>
-            <div class="link text-center">
-                <a href="#" id="login-link">Уже есть аккаунт? Войти</a>
-            </div>
+        <div class="link text-center">
+            <a href="#" id="login-link">Уже есть аккаунт? Войти</a>
+        </div>
         </div>
     </div>
     <script>
@@ -179,15 +188,19 @@
             document.getElementById('client-name').innerText = "Ошибка загрузки данных клиента";
         }
 
+        // Формируем ссылку для логина с параметрами
         const loginLink = document.getElementById('login-link');
         const loginUrl = new URL('/pages/login.html', window.location.origin);
 
+        // Добавляем все параметры в URL логина
         Object.keys(params).forEach(key => {
             loginUrl.searchParams.append(key, params[key]);
         });
 
+        // Устанавливаем сформированную ссылку для логина
         loginLink.href = loginUrl.toString();
 
+        // Отправка данных на сервер
         document.getElementById('registerButton').addEventListener('click', async function () {
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
@@ -195,7 +208,7 @@
             const payload = {
                 email: email,
                 password: password,
-                ...params,
+                ...params, // Добавляем все параметры из текущего URL в тело запроса
                 scopes: {"bob": "1111"}
             };
 
@@ -208,10 +221,14 @@
                     body: JSON.stringify(payload)
                 });
 
+                // Если сервер отправляет редирект (status 307)
                 if (response.status === 307) {
+                    // Получаем редирект URL из заголовка Location
                     const redirectUrl = response.headers.get('Location');
+                    // Перенаправляем пользователя
                     window.location.href = redirectUrl;
                 } else {
+                    // Если ошибка, показываем сообщение
                     const errorData = await response.json();
                     alert(`Ошибка регистрации: ${errorData.detail || 'Неизвестная ошибка'}`);
                 }
@@ -220,6 +237,7 @@
             }
         });
     });
+
     </script>
 </body>
 </html>
