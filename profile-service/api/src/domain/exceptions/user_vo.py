@@ -1,9 +1,6 @@
 from domain.common.exceptions.base import DomainError
 
 
-class InvalidPasswordError(DomainError): ...
-
-
 class EmptyValueError(DomainError): ...
 
 
