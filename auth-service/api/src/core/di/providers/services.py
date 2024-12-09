@@ -10,7 +10,7 @@ from application.auth.services.pkce import PKCEService
 from application.client.service import ClientService
 from domain.common.services.pwd_service import PasswordHasher
 # from domain.services.storage.storage_service import StorageServiceInterface
-from infrastructure.external_services.storage.minio_service import MinIOService
+# from infrastructure.external_services.storage.minio_service import MinIOService
 from infrastructure.services.auth.auth_code import (
     RedisAuthorizationCodeStorage,
 )
