@@ -43,7 +43,7 @@ class Client:
         redirect_url: ClientRedirectUrl,
     ) -> None:
         for allowed_redirect_url in allowed_redirect_urls.value:
-            if redirect_url.value in allowed_redirect_url:
+            if redirect_url.value in allowed_redirect_url.replace("/{auth_code}", ""):
                 return
             raise InvalidRedirectURLError(
                 redirect_url=redirect_url.value
