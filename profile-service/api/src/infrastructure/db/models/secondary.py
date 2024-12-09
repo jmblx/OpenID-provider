@@ -4,7 +4,6 @@ from sqlalchemy.dialects.postgresql import UUID as PGUUID
 
 from infrastructure.db.models.registry import mapper_registry
 
-# Association Table between User and Client
 user_client_association_table = Table(
     "user_client_association",
     mapper_registry.metadata,

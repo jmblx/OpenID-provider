@@ -20,12 +20,12 @@ class User:
         cls,
         user_id: UUID,
         email: str,
-        is_email_confirmed: bool = False,
+        # is_email_confirmed: bool = False,
     ) -> "User":
         return cls(
             id=UserID(user_id),
             email=Email(email),
-            is_email_confirmed=is_email_confirmed,
+            # is_email_confirmed=is_email_confirmed,
         )
 
     def get_scopes(self) -> str:
