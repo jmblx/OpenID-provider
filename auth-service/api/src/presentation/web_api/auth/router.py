@@ -17,6 +17,7 @@ from application.auth.handlers.auth_user_handler import (
 )
 from application.auth.handlers.code_to_token_handler import CodeToTokenHandler
 from application.auth.token_types import Fingerprint
+from presentation.web_api.utils import render_auth_code_url
 
 auth_router = APIRouter(route_class=DishkaRoute, tags=["auth"])
 # jinja_loader = PackageLoader("presentation.web_api.registration")
@@ -28,7 +29,7 @@ async def login(
     handler: FromDishka[AuthenticateUserHandler],
 ) -> RedirectResponse:
     auth_code = await handler.handle(command)
-    redirect_url = f"{command.redirect_url}?code={auth_code}&state=xyz"
+    redirect_url = render_auth_code_url(command.redirect_url, auth_code)
     return RedirectResponse(url=redirect_url, status_code=HTTP_307_TEMPORARY_REDIRECT)
 
 
@@ -39,7 +40,6 @@ async def code_to_token(
     command: CodeToTokenCommand,
 ) -> RedirectResponse:
     access_token, refresh_token = await handler.handle(command, fingerprint)
-
     response = RedirectResponse(f"{command.redirect_url}?state=xyz")
     response.set_cookie(
         key="access_token",

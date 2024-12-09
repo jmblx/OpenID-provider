@@ -16,6 +16,7 @@ from domain.exceptions.auth import (
 )
 from domain.exceptions.user import UserAlreadyExistsError
 from presentation.web_api.responses import ErrorResponse
+from presentation.web_api.utils import render_auth_code_url
 
 reg_router = APIRouter(route_class=DishkaRoute, tags=["reg"])
 
@@ -40,5 +41,5 @@ async def registration(
     command: RegisterUserCommand,
 ) -> RedirectResponse:
     auth_code = await handler.handle(command)
-    redirect_url = f"{command.redirect_url}?code={auth_code}&state=xyz"
+    redirect_url = render_auth_code_url(command.redirect_url, auth_code)
     return RedirectResponse(url=redirect_url, status_code=307)

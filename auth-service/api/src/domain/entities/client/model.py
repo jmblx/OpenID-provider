@@ -42,7 +42,9 @@ class Client:
         allowed_redirect_urls: "AllowedRedirectUrls",
         redirect_url: ClientRedirectUrl,
     ) -> None:
-        if redirect_url.value not in allowed_redirect_urls.value:
+        for allowed_redirect_url in allowed_redirect_urls.value:
+            if redirect_url.value in allowed_redirect_url:
+                return
             raise InvalidRedirectURLError(
                 redirect_url=redirect_url.value
             )
