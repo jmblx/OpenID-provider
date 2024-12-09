@@ -48,3 +48,9 @@ class Client:
             raise InvalidRedirectURLError(
                 redirect_url=redirect_url.value
             )
+
+    def rename(self, name: str) -> None:
+        self.name = ClientName(name)
+
+    def add_allowed_redirect_url(self, allowed_redirect_urls: str) -> None:
+        self.allowed_redirect_urls.value.append(ClientRedirectUrl(allowed_redirect_urls).value)
