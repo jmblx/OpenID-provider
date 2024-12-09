@@ -11,7 +11,7 @@ class InvalidUrlError(DomainError):
 
     @property
     def title(self) -> str:
-        return f"Client not found {self.details}"
+        return f"Client not found. Deatails: {self.details}"
 
 @dataclass(eq=False)
 class ClientNotFound(DomainError):

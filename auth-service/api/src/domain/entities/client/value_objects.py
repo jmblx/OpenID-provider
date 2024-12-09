@@ -37,13 +37,7 @@ class ClientName:
 
 
 def check_is_valid_url(url: str) -> None:
-    url_pattern = re.compile(
-        r"^(https?://)?"
-        r"([a-zA-Z0-9.-]+(\.[a-zA-Z]{2,})?)"
-        r"(:\d{1,5})?"
-        r"(/[-a-zA-Z0-9()@:%_\+.~#?&/=]*)?$"
-    )
-    if not url_pattern.match(url):
+    if "://" not in url:
         raise InvalidUrlError("Invalid URL")
 
 
