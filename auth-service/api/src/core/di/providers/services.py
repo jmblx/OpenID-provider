@@ -9,7 +9,7 @@ from application.auth.services.auth_code import AuthorizationCodeStorage
 from application.auth.services.pkce import PKCEService
 from application.client.service import ClientService
 from domain.common.services.pwd_service import PasswordHasher
-from domain.services.storage.storage_service import StorageServiceInterface
+# from domain.services.storage.storage_service import StorageServiceInterface
 from infrastructure.external_services.storage.minio_service import MinIOService
 from infrastructure.services.auth.auth_code import (
     RedisAuthorizationCodeStorage,
@@ -32,9 +32,9 @@ class ServiceProvider(Provider):
     #     self, user_repo: UserRepository
     # ) -> UserService:
     #     return UserServiceImpl(user_repo)
-    storage_service = provide(
-        MinIOService, scope=Scope.REQUEST, provides=StorageServiceInterface
-    )
+    # storage_service = provide(
+    #     MinIOService, scope=Scope.REQUEST, provides=StorageServiceInterface
+    # )
     ph = provide(
         lambda _: PasswordHasherImpl(argon2.PasswordHasher()),
         scope=Scope.REQUEST,
