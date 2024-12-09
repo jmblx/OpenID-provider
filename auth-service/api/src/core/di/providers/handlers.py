@@ -11,6 +11,7 @@ from application.client.handlers.register_client_hadler import (
 from application.auth.handlers.register_user_handler import (
     RegisterUserHandler,
 )
+from application.client.handlers.rename_client import RenameClientCommandHandler
 from application.client.queries.client_queries import ClientAuthValidationQueryHandler
 from application.role.handlers.create_role_handler import CreateRoleHandler
 
@@ -30,5 +31,5 @@ class HandlerProvider(Provider):
     revoke_tokens_handler = provide(RevokeTokensHandler, scope=Scope.REQUEST)
     refresh_tokens_handler = provide(RefreshTokensHandler, scope=Scope.REQUEST)
     client_auth_validation_query_handler = provide(ClientAuthValidationQueryHandler, scope=Scope.REQUEST)
-    rename_client_command_handler = provide(ClientAuthValidationQueryHandler, scope=Scope.REQUEST)
+    rename_client_command_handler = provide(RenameClientCommandHandler, scope=Scope.REQUEST)
     add_allowed_redirect_url_command_handler = provide(AddAllowedRedirectUrlCommandHandler, scope=Scope.REQUEST)
