@@ -23,6 +23,8 @@ services:
       - 6379
     networks:
       - custom
+    volumes:
+      - redis-data:/data   # Используем volume для сохранения данных Redis
 
   fastapi_app:
     env_file:
@@ -30,7 +32,7 @@ services:
     build:
       context: api
       dockerfile: Dockerfile.webapi
-    command: [ "/fastapi_app/docker/app.sh" ]
+    command: ["/fastapi_app/docker/app.sh"]
     expose:
       - 8000
     networks:
@@ -84,3 +86,4 @@ networks:
 
 volumes:
   db-data:
+  redis-data:
