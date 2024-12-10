@@ -170,7 +170,7 @@
             </a>
         </div>
     </div>
-    <script>
+<script>
     document.addEventListener('DOMContentLoaded', async function() {
         const urlParams = new URLSearchParams(window.location.search);
 
@@ -224,14 +224,20 @@
                     body: JSON.stringify(payload)
                 });
 
-                // Если сервер отправляет редирект (status 307)
-                if (response.status === 307) {
-                    // Получаем редирект URL из заголовка Location
-                    const redirectUrl = response.headers.get('Location');
+                if (response.status === 201) {
+                    // Получаем redirect_url из тела ответа
+                    const responseData = await response.json();
+                    let redirectUrl = responseData.redirect_url;
+
+                    // Проверяем, является ли URL абсолютным
+                    if (!redirectUrl.startsWith('http') && !redirectUrl.includes('://')) {
+                        // Добавляем кастомную схему для абсолютного URL
+                        redirectUrl = new URL(redirectUrl).toString();
+                    }
+
                     // Перенаправляем пользователя
                     window.location.href = redirectUrl;
                 } else {
-                    // Если ошибка, показываем сообщение
                     const errorData = await response.json();
                     alert(`Ошибка регистрации: ${errorData.detail || 'Неизвестная ошибка'}`);
                 }
@@ -240,7 +246,7 @@
             }
         });
     });
+</script>
 
-    </script>
 </body>
 </html>
