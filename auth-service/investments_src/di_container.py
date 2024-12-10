@@ -8,7 +8,7 @@ from bonds_gateway import BondsGateway
 from currency_gateway import CurrenciesGateway
 from gold_gateway import GoldGateway
 from investments_service import InvestmentsService
-from investments_src.deposit_gateway import DepositGateway
+from deposit_gateway import DepositGateway
 from redis_config import RedisConfig
 from share_gateway import SharesGateway
 
