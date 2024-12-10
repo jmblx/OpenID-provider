@@ -42,7 +42,7 @@ class Client:
         allowed_redirect_urls: "AllowedRedirectUrls",
         redirect_url: ClientRedirectUrl,
     ) -> None:
-        if redirect_url.value in allowed_redirect_urls:
+        if redirect_url.value in allowed_redirect_urls.value:
             return
         raise InvalidRedirectURLError(
             redirect_url=redirect_url.value
@@ -53,4 +53,3 @@ class Client:
 
     def add_allowed_redirect_url(self, new_allowed_redirect_url: str) -> None:
         self.allowed_redirect_urls = AllowedRedirectUrls(self.allowed_redirect_urls.value + [ClientRedirectUrl(new_allowed_redirect_url).value])
-print("hack_app://return_app/?auth_code={auth_code}" in ['https://www.youtube.com/', 'hack_app://return_app/?auth_code={auth_code}', 'hack_app://return_app/?auth_code={auth_code}', 'hack_app://return_app/?auth_code={auth_code}', 'hack_app://return_app/?auth_code={auth_code}', 'hack_app://return_app/?auth_code={auth_code}'])
