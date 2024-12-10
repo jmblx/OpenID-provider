@@ -1,27 +1,32 @@
-FROM python:3.12.7-alpine
+FROM ubuntu:22.04
 
-# Устанавливаем необходимые пакеты для работы с сертификатами
-RUN apk add --no-cache \
-    make \
-    build-base \
+RUN apt update && \
+    apt upgrade -y && \
+    apt install -y \
+    python3 \
+    python3-pip \
     ca-certificates \
     openssl \
-    && apk add --no-cache --virtual .build-deps \
-    gcc \
-    musl-dev
+    build-essential \
+    git \
+    make
 
-# Копируем сертификаты в нужный каталог
-COPY ./mincifri_certs/russian_trusted_root_ca_pem.crt ./mincifri_certs/russian_trusted_sub_ca_pem.crt /usr/local/share/ca-certificates/russian-trusted/
+RUN pip3 install --upgrade pip && \
+    pip3 install poetry
 
-# Обновляем сертификаты в Alpine
-RUN update-ca-certificates
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PYTHONPATH="/usr/src"
 
-# Проверяем, что сертификаты установлены корректно
-RUN openssl x509 -in /usr/local/share/ca-certificates/russian-trusted/russian_trusted_root_ca_pem.crt -text -noout
+WORKDIR /investments-app
 
 COPY pyproject.toml ./
-RUN pip install --upgrade pip && \
-    pip install poetry && \
+RUN mkdir /usr/local/share/ca-certificates/russian-trusted
+COPY ./mincifri_certs/russian_trusted_root_ca_pem.crt ./mincifri_certs/russian_trusted_sub_ca_pem.crt /usr/local/share/ca-certificates/russian-trusted/
+
+RUN update-ca-certificates
+
+RUN pip3 install --upgrade pip && \
     poetry config virtualenvs.create false && \
     poetry install --no-root --no-dev
 
