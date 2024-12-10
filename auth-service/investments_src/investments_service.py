@@ -1,5 +1,4 @@
 import json
-
 import redis.asyncio as aioredis
 
 from bonds_gateway import BondsGateway
@@ -59,17 +58,18 @@ class InvestmentsService:
 
         existing_bonds = await self.get_existing_data_from_redis("bonds")
         existing_shares = await self.get_existing_data_from_redis("shares")
+
         all_data = {
-            "bonds": self.merge_data(existing_bonds, bonds),
-            "currencies": currencies,
-            "gold": gold,
-            "shares": self.merge_data(existing_shares, shares),
-            "deposits": deposits
+            "bonds": self.merge_and_calculate(existing_bonds, bonds),
+            "currencies": self.merge_and_calculate({}, currencies),
+            "gold": self.merge_and_calculate({}, gold),
+            "shares": self.merge_and_calculate(existing_shares, shares),
+            "deposits": deposits,
         }
 
         await self.redis.set("data", json.dumps(all_data))
 
-    def merge_data(self, existing_data, new_data):
+    def merge_and_calculate(self, existing_data, new_data):
         all_dates = list({**existing_data, **new_data}.keys())[-7:]
         merged_data = {}
         for date in all_dates:
@@ -78,4 +78,31 @@ class InvestmentsService:
             elif date in existing_data:
                 merged_data[date] = existing_data[date]
 
+        # Calculate percentage change and add to the most recent date
+        if merged_data:
+            first_date, last_date = all_dates[0], all_dates[-1]
+            for entity, details in merged_data[last_date].items():
+                first_price = self.extract_price(merged_data[first_date].get(entity, {}).get("price"))
+                last_price = self.extract_price(details.get("price"))
+                if first_price is not None and last_price is not None:
+                    percentage_change = self.calculate_percentage_change(first_price, last_price)
+                    details["percentage_change"] = f"{percentage_change:.2f}%"
+                else:
+                    details["percentage_change"] = "0.00%"
+
         return merged_data
+
+    @staticmethod
+    def extract_price(price):
+        if price is None:
+            return None
+        try:
+            return float(price.replace("\u20bd", "").replace(",", ""))
+        except ValueError:
+            return None
+
+    @staticmethod
+    def calculate_percentage_change(first_price, last_price):
+        if first_price == 0:
+            return 0
+        return ((last_price - first_price) / first_price) * 100
