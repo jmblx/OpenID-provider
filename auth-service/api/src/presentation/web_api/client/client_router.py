@@ -1,4 +1,5 @@
 from typing import Annotated
+from urllib.parse import unquote
 
 from dishka import FromDishka
 from dishka.integrations.fastapi import DishkaRoute
@@ -37,6 +38,7 @@ async def register_page(
         data: Annotated[ValidateClientRequest, Param()],
         handler: FromDishka[ClientAuthValidationQueryHandler],
 ) -> ORJSONResponse:
+    data.redirect_url = unquote(data.redirect_url)
     client_data: ClientAuthResponse = await handler.handle(data)
     return ORJSONResponse(client_data)
 
