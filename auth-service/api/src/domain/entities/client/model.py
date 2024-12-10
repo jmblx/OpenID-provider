@@ -44,12 +44,13 @@ class Client:
     ) -> None:
         if redirect_url.value in allowed_redirect_urls.value:
             return
-        raise InvalidRedirectURLError(
-            redirect_url=redirect_url.value
-        )
+        raise InvalidRedirectURLError(redirect_url=redirect_url.value)
 
     def rename(self, name: str) -> None:
         self.name = ClientName(name)
 
     def add_allowed_redirect_url(self, new_allowed_redirect_url: str) -> None:
-        self.allowed_redirect_urls = AllowedRedirectUrls(self.allowed_redirect_urls.value + [ClientRedirectUrl(new_allowed_redirect_url).value])
+        self.allowed_redirect_urls = AllowedRedirectUrls(
+            self.allowed_redirect_urls.value
+            + [ClientRedirectUrl(new_allowed_redirect_url).value]
+        )

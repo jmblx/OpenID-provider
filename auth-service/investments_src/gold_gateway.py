@@ -10,9 +10,11 @@ class GoldGateway:
 
     async def get_gold_prices(self, days: int) -> dict:
         """Получить данные о цене на золото за последние N дней."""
-        moscow_tz = pytz.timezone('Europe/Moscow')
-        end_date = datetime.now(moscow_tz).strftime('%d.%m.%Y')
-        start_date = (datetime.now(moscow_tz) - timedelta(days=days - 1)).strftime('%d.%m.%Y')
+        moscow_tz = pytz.timezone("Europe/Moscow")
+        end_date = datetime.now(moscow_tz).strftime("%d.%m.%Y")
+        start_date = (datetime.now(moscow_tz) - timedelta(days=days - 1)).strftime(
+            "%d.%m.%Y"
+        )
 
         base_url = "https://www.cbr.ru/hd_base/metall/metall_base_new/"
         query_params = (
@@ -27,20 +29,22 @@ class GoldGateway:
 
             text = await response.text()
             soup = BeautifulSoup(text, "lxml")
-            table = soup.find('table', class_='data')
+            table = soup.find("table", class_="data")
 
-            rows = table.find_all('tr')[1:]
+            rows = table.find_all("tr")[1:]
             gold_prices = {}
 
             for row in rows:
-                cells = row.find_all('td')
+                cells = row.find_all("td")
                 if cells:
                     date = cells[0].text.strip()
-                    price = float(cells[1].text.strip().replace(" ", "").replace(",", "."))
+                    price = float(
+                        cells[1].text.strip().replace(" ", "").replace(",", ".")
+                    )
                     gold_prices[date] = {"price": price}
 
             all_dates = [
-                (datetime.now(moscow_tz) - timedelta(days=i)).strftime('%d.%m.%Y')
+                (datetime.now(moscow_tz) - timedelta(days=i)).strftime("%d.%m.%Y")
                 for i in range(days)
             ]
 

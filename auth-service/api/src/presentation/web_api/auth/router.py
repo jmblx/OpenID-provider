@@ -21,6 +21,7 @@ auth_router = APIRouter(route_class=DishkaRoute, tags=["auth"])
 # jinja_loader = PackageLoader("presentation.web_api.registration")
 # templates = Jinja2Templates(directory="templates", loader=jinja_loader)
 
+
 @auth_router.post("/login")
 async def login(
     command: AuthenticateUserCommand,
@@ -28,7 +29,9 @@ async def login(
 ) -> ORJSONResponse:
     auth_code = await handler.handle(command)
     redirect_url = render_auth_code_url(command.redirect_url, auth_code)
-    return ORJSONResponse({"redirect_url": redirect_url}, status_code=status.HTTP_201_CREATED)
+    return ORJSONResponse(
+        {"redirect_url": redirect_url}, status_code=status.HTTP_201_CREATED
+    )
 
 
 @auth_router.post("/code-to-token")
@@ -38,7 +41,10 @@ async def code_to_token(
     command: CodeToTokenCommand,
 ) -> ORJSONResponse:
     access_token, refresh_token = await handler.handle(command, fingerprint)
-    response = ORJSONResponse({"access_token": access_token, "refresh_token": refresh_token}, status_code=status.HTTP_200_OK)
+    response = ORJSONResponse(
+        {"access_token": access_token, "refresh_token": refresh_token},
+        status_code=status.HTTP_200_OK,
+    )
     response.set_cookie(
         key="access_token",
         value=access_token,

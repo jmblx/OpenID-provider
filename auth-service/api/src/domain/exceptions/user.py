@@ -29,6 +29,7 @@ class UserNotFoundByEmailError(DomainError):
     def title(self) -> str:
         return f"{self.email} doesn't exists."
 
+
 @dataclass(eq=False)
 class UnauthenticatedUserError(DomainError):
     @property

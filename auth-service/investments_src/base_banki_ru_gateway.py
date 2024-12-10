@@ -13,7 +13,9 @@ class BaseBankiRuGateway:
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:133.0) Gecko/20100101 Firefox/133.0"
         }
 
-    async def get_entities_prices(self, tracked_entities: list[str] = None) -> dict[str, dict]:
+    async def get_entities_prices(
+        self, tracked_entities: list[str] = None
+    ) -> dict[str, dict]:
         tasks = [self.parse_current_entity(entity) for entity in tracked_entities]
         results = await asyncio.gather(*tasks, return_exceptions=True)
 
@@ -32,7 +34,9 @@ class BaseBankiRuGateway:
         url = f"{self.base_url}{entity}"
         for attempt in range(retries):
             try:
-                async with self.session.get(url, headers=self.headers, allow_redirects=True) as response:
+                async with self.session.get(
+                    url, headers=self.headers, allow_redirects=True
+                ) as response:
                     if response.status != 200:
                         raise Exception(f"Bad response status: {response.status}")
 
@@ -57,12 +61,16 @@ class BaseBankiRuGateway:
             name = container.find("h1", {"data-test": "investment-security-title"})
             name = name.text.replace("купить онлайн", "").strip() if name else "Unknown"
 
-            price = container.find("div", {"data-test": "investment-item-price-block__price"})
+            price = container.find(
+                "div", {"data-test": "investment-item-price-block__price"}
+            )
             price = price.text.strip() if price else None
 
             sector = container.find("div", {"class": "OBKaV"}).text.strip()
 
-            country = soup.find("div", {"data-test": "investment-security-issuer-sector"})
+            country = soup.find(
+                "div", {"data-test": "investment-security-issuer-sector"}
+            )
             country = country.find_next_sibling("div").text.strip() if country else None
 
             exchange = self.extract_exchange(soup)
@@ -72,7 +80,7 @@ class BaseBankiRuGateway:
                     "price": price,
                     "sector": sector,
                     "country": country.replace("Страна: ", "") if country else None,
-                    "exchange": exchange
+                    "exchange": exchange,
                 }
             }
 

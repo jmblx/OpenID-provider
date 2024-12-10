@@ -8,6 +8,7 @@ from bonds_gateway import BondsGateway
 from currency_gateway import CurrenciesGateway
 from gold_gateway import GoldGateway
 from investments_service import InvestmentsService
+from investments_src.deposit_gateway import DepositGateway
 from redis_config import RedisConfig
 from share_gateway import SharesGateway
 
@@ -40,9 +41,13 @@ class GatewayProvider(Provider):
     bonds_gate = provide(BondsGateway, scope=Scope.REQUEST)
     currencies_gate = provide(CurrenciesGateway, scope=Scope.REQUEST)
     gold_gate = provide(GoldGateway, scope=Scope.REQUEST)
+    deposit_gate = provide(DepositGateway, scope=Scope.REQUEST)
 
 
 class ServiceProvider(Provider):
     investments_service = provide(InvestmentsService, scope=Scope.REQUEST)
 
-container = make_async_container(RedisProvider(), AsyncHTTPSession(), GatewayProvider(), ServiceProvider())
+
+container = make_async_container(
+    RedisProvider(), AsyncHTTPSession(), GatewayProvider(), ServiceProvider()
+)

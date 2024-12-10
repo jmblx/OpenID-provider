@@ -12,5 +12,6 @@ class ClientAuthData:
 
 class ClientReader(ABC):
     @abstractmethod
-    async def read_for_auth_page(self, client_id: ClientID) -> ClientAuthData | None: ...
-
+    async def read_for_auth_page(
+        self, client_id: ClientID
+    ) -> ClientAuthData | None: ...

@@ -36,9 +36,7 @@ class UserRepositoryImpl(UserRepository):
         if user:
             await self.session.delete(user)
 
-    async def by_fields_with_clients(
-        self, fields: IdentificationFields
-    ) -> User | None:
+    async def by_fields_with_clients(self, fields: IdentificationFields) -> User | None:
         query = select(User).options(joinedload(User.clients))
 
         for field, value in fields.items():

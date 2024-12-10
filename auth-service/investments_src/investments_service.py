@@ -5,15 +5,25 @@ import redis.asyncio as aioredis
 from bonds_gateway import BondsGateway
 from currency_gateway import CurrenciesGateway
 from gold_gateway import GoldGateway
+from investments_src.deposit_gateway import DepositGateway
 from share_gateway import SharesGateway
 
 
 class InvestmentsService:
-    def __init__(self, bonds_gate: BondsGateway, currency_gate: CurrenciesGateway, gold_gate: GoldGateway, share_gate: SharesGateway, redis: aioredis.Redis):
+    def __init__(
+        self,
+        bonds_gate: BondsGateway,
+        currency_gate: CurrenciesGateway,
+        gold_gate: GoldGateway,
+        share_gate: SharesGateway,
+        deposit_gateway: DepositGateway,
+        redis: aioredis.Redis,
+    ):
         self.bonds_gateway = bonds_gate
         self.currency_gateway = currency_gate
         self.gold_gateway = gold_gate
         self.share_gateway = share_gate
+        self.deposit_gateway = deposit_gateway
         self.redis = redis
 
     async def get_existing_data_from_redis(self, key):
@@ -24,22 +34,37 @@ class InvestmentsService:
 
     async def collect_all_data(self):
         bonds = await self.bonds_gateway.get_entities_prices(
-            tracked_entities=["RU000A1038V6", "RU000A106565", "RU000A108P61", "RU000A104ZK2", "RU000A102KN2"]
+            tracked_entities=[
+                "RU000A1038V6",
+                "RU000A106565",
+                "RU000A108P61",
+                "RU000A104ZK2",
+                "RU000A102KN2",
+            ]
         )
-        currencies = await self.currency_gateway.get_currencies_for_last_days(7, ["USD", "AED", "GEL"])
+        currencies = await self.currency_gateway.get_currencies_for_last_days(
+            7, ["USD", "AED", "GEL"]
+        )
         gold = await self.gold_gateway.get_gold_prices(7)
         shares = await self.share_gateway.get_entities_prices(
-            tracked_entities=["aeroflot_AFLT", "detskiymir_DSKY", "lenta_LENT", "sberbankp_SBERP", "RussNeft_RNFT"]
+            tracked_entities=[
+                "aeroflot_AFLT",
+                "detskiymir_DSKY",
+                "lenta_LENT",
+                "sberbankp_SBERP",
+                "RussNeft_RNFT",
+            ]
         )
+        deposits = self.deposit_gateway.get_deposits()
 
         existing_bonds = await self.get_existing_data_from_redis("bonds")
         existing_shares = await self.get_existing_data_from_redis("shares")
-
         all_data = {
             "bonds": self.merge_data(existing_bonds, bonds),
             "currencies": currencies,
             "gold": gold,
-            "shares": self.merge_data(existing_shares, shares)
+            "shares": self.merge_data(existing_shares, shares),
+            "deposits": deposits
         }
 
         await self.redis.set("data", json.dumps(all_data))

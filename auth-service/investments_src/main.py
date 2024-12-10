@@ -9,5 +9,6 @@ async def main():
         investments_service: InvestmentsService = await ioc.get(InvestmentsService)
         await investments_service.collect_all_data()
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     asyncio.run(main())

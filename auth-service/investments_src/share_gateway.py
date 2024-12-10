@@ -12,9 +12,16 @@ class SharesGateway(BaseBankiRuGateway):
         self.base_url = "https://www.banki.ru/investment/share/"
 
     def extract_exchange(self, container: BeautifulSoup) -> str | None:
-        exchange_block = container.findAll("div", {"data-test": "investment-security-share-price-diff"})[1]
-        exchange = exchange_block.find_next("div", {"class": "OBKaV"}).text.strip() if exchange_block else None
+        exchange_block = container.findAll(
+            "div", {"data-test": "investment-security-share-price-diff"}
+        )[1]
+        exchange = (
+            exchange_block.find_next("div", {"class": "OBKaV"}).text.strip()
+            if exchange_block
+            else None
+        )
         return exchange
+
 
 async def main():
     async with aiohttp.ClientSession() as session:

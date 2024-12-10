@@ -43,4 +43,6 @@ async def registration(
 ) -> ORJSONResponse:
     auth_code = await handler.handle(command)
     redirect_url = render_auth_code_url(command.redirect_url, auth_code)
-    return ORJSONResponse({"redirect_url": redirect_url}, status_code=status.HTTP_201_CREATED)
+    return ORJSONResponse(
+        {"redirect_url": redirect_url}, status_code=status.HTTP_201_CREATED
+    )

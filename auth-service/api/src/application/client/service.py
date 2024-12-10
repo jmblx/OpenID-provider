@@ -19,6 +19,7 @@ class ClientService:
         if not client:
             raise ClientNotFound()
         Client.validate_redirect_url(
-            allowed_redirect_urls=client.allowed_redirect_urls, redirect_url=ClientRedirectUrl(data.redirect_url)
+            allowed_redirect_urls=client.allowed_redirect_urls,
+            redirect_url=ClientRedirectUrl(data.redirect_url),
         )
         return client

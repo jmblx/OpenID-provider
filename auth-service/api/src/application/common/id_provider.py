@@ -20,4 +20,4 @@ class HttpIdentityProvider(IdentityProvider):
 
     async def get_current_user_id(self) -> UserID:
         payload = self.jwt_service.decode(self.access_token)
-        return UserID(UUID(payload['sub']))
+        return UserID(UUID(payload["sub"]))

@@ -17,7 +17,9 @@ class AddAllowedRedirectUrlCommandHandler:
         self.client_repo = client_repo
         self.uow = uow
 
-    async def handle(self, command: AddAllowedRedirectUrlCommand, client_id: int) -> None:
+    async def handle(
+        self, command: AddAllowedRedirectUrlCommand, client_id: int
+    ) -> None:
         client: Client | None = await self.client_repo.get_by_id(ClientID(client_id))
         if not client:
             raise ClientNotFound()

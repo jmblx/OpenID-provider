@@ -6,7 +6,9 @@ from infrastructure.external_services.investments.service import InvestmentsServ
 
 
 class InvestmentsQueryHandler:
-    def __init__(self, id_provider: IdentityProvider, investments_service: InvestmentsService):
+    def __init__(
+        self, id_provider: IdentityProvider, investments_service: InvestmentsService
+    ):
         self.id_provider = id_provider
         self.investments_service = investments_service
 
