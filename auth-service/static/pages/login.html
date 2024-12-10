@@ -227,7 +227,12 @@
                             redirectUrl = new URL(redirectUrl).toString();
                         }
 
-                    window.open(redirectUrl, '_self');
+                    const a = document.createElement('a');
+                    a.href = redirectUrl;
+                    a.style.display = 'none';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
 
                     } else {
                         const errorData = await response.json();
