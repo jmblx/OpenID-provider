@@ -70,6 +70,3 @@ async def main():
         needed_codes = ["USD", "AED", "GEL"]
         currencies = await gateway.get_currencies_for_last_days(7, needed_codes)
         print(currencies)
-
-
-asyncio.run(main())

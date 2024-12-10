@@ -2,10 +2,10 @@ import json
 
 import redis.asyncio as aioredis
 
-from investments_src.bonds_gateway import BondsGateway
-from investments_src.currency_gateway import CurrenciesGateway
-from investments_src.gold_gateway import GoldGateway
-from investments_src.share_gateway import SharesGateway
+from bonds_gateway import BondsGateway
+from currency_gateway import CurrenciesGateway
+from gold_gateway import GoldGateway
+from share_gateway import SharesGateway
 
 
 class InvestmentsService:

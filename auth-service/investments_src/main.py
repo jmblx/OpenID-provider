@@ -1,7 +1,7 @@
 import asyncio
 
-from investments_src.di_container import container
-from investments_src.investments_service import InvestmentsService
+from di_container import container
+from investments_service import InvestmentsService
 
 
 async def main():

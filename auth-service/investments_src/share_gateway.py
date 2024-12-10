@@ -3,7 +3,7 @@ import asyncio
 import aiohttp
 from bs4 import BeautifulSoup
 
-from investments_src.base_banki_ru_gateway import BaseBankiRuGateway
+from base_banki_ru_gateway import BaseBankiRuGateway
 
 
 class SharesGateway(BaseBankiRuGateway):

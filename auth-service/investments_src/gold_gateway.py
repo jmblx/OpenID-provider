@@ -2,7 +2,6 @@ from datetime import datetime, timedelta
 import pytz
 from bs4 import BeautifulSoup
 import aiohttp
-import asyncio
 
 
 class GoldGateway:
@@ -40,7 +39,6 @@ class GoldGateway:
                     price = float(cells[1].text.strip().replace(" ", "").replace(",", "."))
                     gold_prices[date] = {"price": price}
 
-            # Заполняем отсутствующие дни последней известной ценой
             all_dates = [
                 (datetime.now(moscow_tz) - timedelta(days=i)).strftime('%d.%m.%Y')
                 for i in range(days)
@@ -61,6 +59,3 @@ async def main():
         gateway = GoldGateway(session)
         gold_prices = await gateway.get_gold_prices(7)
         print(gold_prices)
-
-
-asyncio.run(main())
