@@ -42,15 +42,15 @@ class Client:
         allowed_redirect_urls: "AllowedRedirectUrls",
         redirect_url: ClientRedirectUrl,
     ) -> None:
-        for allowed_redirect_url in allowed_redirect_urls.value:
-            if redirect_url.value in allowed_redirect_url.replace("/{auth_code}", "") or redirect_url.value in allowed_redirect_url:
-                return
-            raise InvalidRedirectURLError(
-                redirect_url=redirect_url.value
-            )
+        if redirect_url.value in allowed_redirect_urls:
+            return
+        raise InvalidRedirectURLError(
+            redirect_url=redirect_url.value
+        )
 
     def rename(self, name: str) -> None:
         self.name = ClientName(name)
 
     def add_allowed_redirect_url(self, new_allowed_redirect_url: str) -> None:
         self.allowed_redirect_urls = AllowedRedirectUrls(self.allowed_redirect_urls.value + [ClientRedirectUrl(new_allowed_redirect_url).value])
+print("hack_app://return_app/?auth_code={auth_code}" in ['https://www.youtube.com/', 'hack_app://return_app/?auth_code={auth_code}', 'hack_app://return_app/?auth_code={auth_code}', 'hack_app://return_app/?auth_code={auth_code}', 'hack_app://return_app/?auth_code={auth_code}', 'hack_app://return_app/?auth_code={auth_code}'])
