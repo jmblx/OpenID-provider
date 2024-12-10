@@ -7,6 +7,7 @@ from dishka import Provider, provide, Scope, make_async_container
 from bonds_gateway import BondsGateway
 from currency_gateway import CurrenciesGateway
 from gold_gateway import GoldGateway
+from investments_src.investments_service import InvestmentsService
 from redis_config import RedisConfig
 from share_gateway import SharesGateway
 
@@ -41,4 +42,7 @@ class GatewayProvider(Provider):
     gold_gate = provide(GoldGateway, scope=Scope.REQUEST)
 
 
-container = make_async_container(RedisProvider(), AsyncHTTPSession(), GatewayProvider())
+class ServiceProvider(Provider):
+    investments_service = provide(InvestmentsService, scope=Scope.REQUEST)
+
+container = make_async_container(RedisProvider(), AsyncHTTPSession(), GatewayProvider(), ServiceProvider())
