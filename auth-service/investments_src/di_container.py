@@ -31,7 +31,7 @@ class RedisProvider(Provider):
 class AsyncHTTPSession(Provider):
     @provide(scope=Scope.REQUEST, provides=aiohttp.ClientSession)
     async def provide_session(self) -> AsyncIterable[aiohttp.ClientSession]:
-        async with aiohttp.ClientSession as session:
+        async with aiohttp.ClientSession() as session:
             yield session
 
 
