@@ -40,9 +40,9 @@ async def code_to_token(
     handler: FromDishka[CodeToTokenHandler],
     fingerprint: FromDishka[Fingerprint],
     command: CodeToTokenCommand,
-) -> RedirectResponse:
+) -> ORJSONResponse:
     access_token, refresh_token = await handler.handle(command, fingerprint)
-    response = RedirectResponse(f"{command.redirect_url}?state=xyz")
+    response = ORJSONResponse({"access_token": access_token, "refresh_token": refresh_token}, status_code=status.HTTP_200_OK)
     response.set_cookie(
         key="access_token",
         value=access_token,
