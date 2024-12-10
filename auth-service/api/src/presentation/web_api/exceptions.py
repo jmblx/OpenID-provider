@@ -15,7 +15,7 @@ from domain.exceptions.auth import (
 )
 from domain.exceptions.user import (
     UserAlreadyExistsError,
-    UserNotFoundByIdError,
+    UserNotFoundByIdError, UnauthenticatedUserError,
 )
 from presentation.web_api.responses import ErrorData, ErrorResponse
 
@@ -42,6 +42,7 @@ def setup_exception_handlers(app: FastAPI):
     app.add_exception_handler(
         UserNotFoundByIdError, error_handler(status.HTTP_409_CONFLICT)
     )
+    app.add_exception_handler(UnauthenticatedUserError, error_handler(status.HTTP_401_UNAUTHORIZED))
     app.add_exception_handler(Exception, unknown_exception_handler)
 
 

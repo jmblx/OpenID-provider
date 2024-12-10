@@ -13,6 +13,7 @@ from application.auth.handlers.register_user_handler import (
 )
 from application.client.handlers.rename_client import RenameClientCommandHandler
 from application.client.queries.client_queries import ClientAuthValidationQueryHandler
+from application.investments.queries import InvestmentsQueryHandler
 from application.role.handlers.create_role_handler import CreateRoleHandler
 
 
@@ -33,3 +34,4 @@ class HandlerProvider(Provider):
     client_auth_validation_query_handler = provide(ClientAuthValidationQueryHandler, scope=Scope.REQUEST)
     rename_client_command_handler = provide(RenameClientCommandHandler, scope=Scope.REQUEST)
     add_allowed_redirect_url_command_handler = provide(AddAllowedRedirectUrlCommandHandler, scope=Scope.REQUEST)
+    get_investments_query_handler = provide(InvestmentsQueryHandler, scope=Scope.REQUEST)

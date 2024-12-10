@@ -14,6 +14,7 @@ from core.di.container import container
 from presentation.web_api.auth.router import auth_router
 from presentation.web_api.client.client_router import client_router
 from presentation.web_api.exceptions import setup_exception_handlers
+from presentation.web_api.investments.router import inv_router
 from presentation.web_api.registration.router import reg_router
 from presentation.web_api.role.router import role_router
 from presentation.web_api.token_manage.router import token_manage_router
@@ -42,6 +43,7 @@ app.include_router(client_router)
 app.include_router(auth_router)
 app.include_router(role_router)
 app.include_router(token_manage_router)
+app.include_router(inv_router)
 setup_exception_handlers(app)
 
 
