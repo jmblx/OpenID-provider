@@ -228,7 +228,8 @@
                         }
 
                         // Перенаправляем пользователя
-                        window.location.href = redirectUrl;
+                        window.location.assign(redirectUrl);
+
                     } else {
                         const errorData = await response.json();
                         alert(`Ошибка входа: ${errorData.detail || 'Неизвестная ошибка'}`);
