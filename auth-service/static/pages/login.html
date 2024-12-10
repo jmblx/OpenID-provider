@@ -161,7 +161,7 @@
             </a>
         </div>
     </div>
-    <script>
+<script>
     document.addEventListener('DOMContentLoaded', async function() {
         const urlParams = new URLSearchParams(window.location.search);
         const params = {};
@@ -217,9 +217,12 @@
                     body: JSON.stringify(payload)
                 });
 
-                if (response.status === 307) {
-                    // Получаем URL для редиректа и перенаправляем пользователя
-                    const redirectUrl = response.headers.get('Location');
+                if (response.status === 201) { // Убедитесь, что статус соответствует вашему API
+                    // Получаем redirect_url из тела ответа
+                    const responseData = await response.json();
+                    const redirectUrl = responseData.redirect_url;
+
+                    // Перенаправляем пользователя
                     window.location.href = redirectUrl;
                 } else {
                     const errorData = await response.json();
@@ -230,6 +233,7 @@
             }
         });
     });
-    </script>
+</script>
+
 </body>
 </html>
