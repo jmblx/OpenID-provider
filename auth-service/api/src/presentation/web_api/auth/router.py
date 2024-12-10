@@ -4,7 +4,9 @@ from dishka import FromDishka
 from dishka.integrations.fastapi import DishkaRoute
 from fastapi import APIRouter
 from fastapi.params import Param
+from fastapi.responses import ORJSONResponse
 from jinja2 import PackageLoader
+from starlette import status
 from starlette.requests import Request
 from starlette.responses import RedirectResponse
 from starlette.status import HTTP_307_TEMPORARY_REDIRECT
@@ -30,7 +32,7 @@ async def login(
 ) -> RedirectResponse:
     auth_code = await handler.handle(command)
     redirect_url = render_auth_code_url(command.redirect_url, auth_code)
-    return RedirectResponse(url=redirect_url, status_code=HTTP_307_TEMPORARY_REDIRECT)
+    return ORJSONResponse({"redirect_url": redirect_url}, status_code=status.HTTP_201_CREATED)
 
 
 @auth_router.post("/code-to-token")
