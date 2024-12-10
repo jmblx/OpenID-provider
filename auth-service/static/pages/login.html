@@ -161,79 +161,78 @@
             </a>
         </div>
     </div>
-<script>
-    document.addEventListener('DOMContentLoaded', async function() {
-        const urlParams = new URLSearchParams(window.location.search);
-        const params = {};
+    <script>
+        document.addEventListener('DOMContentLoaded', async function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const params = {};
 
-        for (let [key, value] of urlParams.entries()) {
-            params[key] = value;
-        }
-
-        // Загрузка данных клиента с API
-        try {
-            const clientResponse = await fetch(`/api/client/auth?client_id=${params.client_id}&redirect_url=${params.redirect_url}`);
-            if (clientResponse.ok) {
-                const clientData = await clientResponse.json();
-                document.getElementById('client-name').innerText = clientData.client_name;
-            } else {
-                document.getElementById('client-name').innerText = "Не удалось загрузить данные клиента";
+            for (let [key, value] of urlParams.entries()) {
+                params[key] = value;
             }
-        } catch (error) {
-            document.getElementById('client-name').innerText = "Ошибка загрузки данных клиента";
-        }
 
-        // Формируем ссылку для регистрации с параметрами
-        const regLink = document.getElementById('reg-link');
-        const regUrl = new URL('/pages/reg.html', window.location.origin);
-
-        Object.keys(params).forEach(key => {
-            regUrl.searchParams.append(key, params[key]);
-        });
-
-        regLink.href = regUrl.toString();
-
-        // Отправка данных для логина
-        document.getElementById('loginButton').addEventListener('click', async function () {
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-
-            const payload = {
-                email: email,
-                password: password,
-                code_verifier: params.code_verifier,
-                code_challenge_method: params.code_challenge_method,
-                client_id: params.client_id,
-                redirect_url: params.redirect_url,
-                scopes: {"bob": "1111"}
-            };
-
+            // Загрузка данных клиента с API
             try {
-                const response = await fetch('/api/login', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(payload)
-                });
-
-                if (response.status === 201) { // Убедитесь, что статус соответствует вашему API
-                    // Получаем redirect_url из тела ответа
-                    const responseData = await response.json();
-                    const redirectUrl = responseData.redirect_url;
-
-                    // Перенаправляем пользователя
-                    window.location.href = redirectUrl;
+                const clientResponse = await fetch(`/api/client/auth?client_id=${params.client_id}&redirect_url=${params.redirect_url}`);
+                if (clientResponse.ok) {
+                    const clientData = await clientResponse.json();
+                    document.getElementById('client-name').innerText = clientData.client_name;
                 } else {
-                    const errorData = await response.json();
-                    alert(`Ошибка входа: ${errorData.detail || 'Неизвестная ошибка'}`);
+                    document.getElementById('client-name').innerText = "Не удалось загрузить данные клиента";
                 }
             } catch (error) {
-                alert(`Ошибка отправки запроса: ${error.message}`);
+                document.getElementById('client-name').innerText = "Ошибка загрузки данных клиента";
             }
-        });
-    });
-</script>
 
+            // Формируем ссылку для регистрации с параметрами
+            const regLink = document.getElementById('reg-link');
+            const regUrl = new URL('/pages/reg.html', window.location.origin);
+
+            Object.keys(params).forEach(key => {
+                regUrl.searchParams.append(key, params[key]);
+            });
+
+            regLink.href = regUrl.toString();
+
+            // Отправка данных для логина
+            document.getElementById('loginButton').addEventListener('click', async function () {
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
+
+                const payload = {
+                    email: email,
+                    password: password,
+                    code_verifier: params.code_verifier,
+                    code_challenge_method: params.code_challenge_method,
+                    client_id: params.client_id,
+                    redirect_url: params.redirect_url,
+                    scopes: {"bob": "1111"}
+                };
+
+                try {
+                    const response = await fetch('/api/login', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (response.status === 201) { // Убедитесь, что статус соответствует вашему API
+                        // Получаем redirect_url из тела ответа
+                        const responseData = await response.json();
+                        const redirectUrl = responseData.redirect_url;
+
+                        // Перенаправляем пользователя
+                        window.location.href = redirectUrl;
+                    } else {
+                        const errorData = await response.json();
+                        alert(`Ошибка входа: ${errorData.detail || 'Неизвестная ошибка'}`);
+                    }
+                } catch (error) {
+                    alert(`Ошибка отправки запроса: ${error.message}`);
+                }
+            });
+        });
+    </script>
 </body>
 </html>
