@@ -7,10 +7,6 @@ from fastapi.params import Param
 from fastapi.responses import ORJSONResponse
 from jinja2 import PackageLoader
 from starlette import status
-from starlette.requests import Request
-from starlette.responses import RedirectResponse
-from starlette.status import HTTP_307_TEMPORARY_REDIRECT
-from starlette.templating import Jinja2Templates
 
 from application.auth.commands.auth_user_command import AuthenticateUserCommand
 from application.auth.commands.code_to_token_command import CodeToTokenCommand
