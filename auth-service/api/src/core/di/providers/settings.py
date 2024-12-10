@@ -1,5 +1,6 @@
 from dishka import Provider, Scope, provide
 
+from investments_src.predict.config import GigaChatSettings
 from infrastructure.external_services.storage.config import MinIOConfig
 from infrastructure.services.auth.config import JWTSettings
 
