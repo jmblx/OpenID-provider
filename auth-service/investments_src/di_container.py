@@ -12,6 +12,7 @@ from investments_service import InvestmentsService
 from deposit_gateway import DepositGateway
 from news.news_gateway import NewsGateway
 from predict.config import GigaChatSettings
+from predict.gateway import PredictionGateway
 from redis_config import RedisConfig
 from share_gateway import SharesGateway
 
@@ -53,6 +54,7 @@ class GatewayProvider(Provider):
     deposit_gate = provide(DepositGateway, scope=Scope.REQUEST)
     news_gate = provide(NewsGateway, scope=Scope.REQUEST)
     giga_chat = provide(GigaChat, scope=Scope.REQUEST)
+    prediction_gate = provide(PredictionGateway, scope=Scope.REQUEST)
 
 
 class ServiceProvider(Provider):
