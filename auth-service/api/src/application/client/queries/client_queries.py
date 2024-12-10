@@ -19,7 +19,7 @@ class ClientAuthValidationQueryHandler:
         client_data = await self.client_reader.read_for_auth_page(ClientID(query.client_id))
         if not client_data:
             raise ClientNotFound()
-        await Client.validate_redirect_url(
+        Client.validate_redirect_url(
             allowed_redirect_urls=AllowedRedirectUrls(client_data.allowed_redirect_urls), redirect_url=ClientRedirectUrl(query.redirect_url)
         )
         return {"client_name": client_data.client_name}
