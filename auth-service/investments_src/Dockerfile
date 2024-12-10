@@ -10,23 +10,14 @@ RUN apk add --no-cache \
     gcc \
     musl-dev
 
-ENV PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONUNBUFFERED=1 \
-    PYTHONPATH=/usr/src
-
-WORKDIR /investments-app
-
-COPY pyproject.toml ./
-RUN pip install --upgrade pip \
-    && pip install poetry \
-    && poetry config virtualenvs.create false \
-    && poetry install --no-root --no-dev
-
-COPY . .
-
+# Копируем сертификаты в нужный каталог
 COPY ./mincifri_certs/russian_trusted_root_ca_pem.crt ./mincifri_certs/russian_trusted_sub_ca_pem.crt /usr/local/share/ca-certificates/russian-trusted/
 
+# Обновляем сертификаты в Alpine
 RUN update-ca-certificates
+
+# Проверяем, что сертификаты установлены корректно
+RUN openssl x509 -in /usr/local/share/ca-certificates/russian-trusted/russian_trusted_root_ca_pem.crt -text -noout
 
 COPY pyproject.toml ./
 RUN pip install --upgrade pip && \
