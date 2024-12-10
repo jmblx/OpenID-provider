@@ -227,8 +227,7 @@
                             redirectUrl = new URL(redirectUrl).toString();
                         }
 
-                        // Перенаправляем пользователя
-                        window.location.assign(redirectUrl);
+                    window.open(redirectUrl, '_self');
 
                     } else {
                         const errorData = await response.json();
