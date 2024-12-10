@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from uuid import UUID
 
 from application.auth.interfaces import jwt_service
 from application.auth.interfaces.jwt_service import JWTService
@@ -19,4 +20,4 @@ class HttpIdentityProvider(IdentityProvider):
 
     async def get_current_user_id(self) -> UserID:
         payload = self.jwt_service.decode(self.access_token)
-        return UserID(payload['sub'])
+        return UserID(UUID(payload['sub']))

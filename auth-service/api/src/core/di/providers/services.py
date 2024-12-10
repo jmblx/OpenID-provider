@@ -8,6 +8,7 @@ from application.auth.interfaces.white_list import TokenWhiteListService
 from application.auth.services.auth_code import AuthorizationCodeStorage
 from application.auth.services.pkce import PKCEService
 from application.client.service import ClientService
+from application.common.id_provider import IdentityProvider, HttpIdentityProvider
 from domain.common.services.pwd_service import PasswordHasher
 from infrastructure.external_services.investments.service import InvestmentsService
 # from domain.services.storage.storage_service import StorageServiceInterface
@@ -64,6 +65,7 @@ class ServiceProvider(Provider):
         provides=TokenWhiteListService,
     )
     client_service = provide(ClientService, scope=Scope.REQUEST)
+    identity_provider = provide(HttpIdentityProvider, scope=Scope.REQUEST, provides=IdentityProvider)
     investment_service = provide(InvestmentsService, scope=Scope.REQUEST)
     # reg_validation_service = provide(
     #     RegUserValidationService,

@@ -16,7 +16,7 @@ services:
   redis:
     image: redis:7
     container_name: redis_auth
-    command: --port 6379
+    command: ["redis-server", "--port", "6379", "--save", "60", "1", "--appendonly", "yes"]
     ports:
       - "6379:6379"
     expose:
@@ -24,7 +24,8 @@ services:
     networks:
       - custom
     volumes:
-      - redis-data:/data   # Используем volume для сохранения данных Redis
+      - redis-data:/data
+
 
   fastapi_app:
     env_file:
