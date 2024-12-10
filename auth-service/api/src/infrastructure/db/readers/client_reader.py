@@ -15,4 +15,4 @@ class ClientReaderImpl(ClientReader):
         query = select(client_table).where(client_table.c.id == client_id.value)
         result = await self.session.execute(query)
         client = result.mappings().first()
-        return ClientAuthData(client["name"], client["allowed_redirect_url"]) if client else None
+        return ClientAuthData(client["name"], client["allowed_redirect_urls"]) if client else None
