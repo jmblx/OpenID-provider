@@ -72,6 +72,8 @@ services:
       - custom
 
   investments_service:
+    env_file:
+      - investments_src/.env-prod
     build:
       context: ./investments_src
       dockerfile: Dockerfile
