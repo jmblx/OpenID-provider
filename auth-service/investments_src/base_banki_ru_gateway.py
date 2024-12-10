@@ -7,9 +7,8 @@ from bs4 import BeautifulSoup
 
 
 class BaseBankiRuGateway:
-    def __init__(self, session: aiohttp.ClientSession, base_url: str = None):
+    def __init__(self, session: aiohttp.ClientSession):
         self.session = session
-        self.base_url = base_url
         self.headers = {
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:133.0) Gecko/20100101 Firefox/133.0"
         }
