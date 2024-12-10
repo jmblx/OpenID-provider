@@ -41,6 +41,7 @@ class InvestmentsService:
         return {}
 
     async def collect_all_data(self):
+        # Собираем текущие данные
         bonds = await self.bonds_gateway.get_entities_prices(
             tracked_entities=[
                 "RU000A1038V6",
@@ -70,25 +71,27 @@ class InvestmentsService:
         deposits = self.deposit_gateway.get_deposits()
 
         existing_bonds = await self.get_existing_data_from_redis("bonds")
+        existing_currencies = await self.get_existing_data_from_redis("currencies")
+        existing_gold = await self.get_existing_data_from_redis("gold")
         existing_shares = await self.get_existing_data_from_redis("shares")
 
         news_data = await self.news_gateway.get_all_news()
 
         historical_data = {
             "bonds": existing_bonds,
-            "currencies": {},
-            "gold": {},
+            "currencies": existing_currencies,
+            "gold": existing_gold,
             "shares": existing_shares,
         }
 
-        self.logger.info("Requesting predictions based on news data")
+        self.logger.info("Requesting predictions based on news and historical data")
         predictions = self.prediction_gateway.get_predictions(news_data, historical_data)
 
         self.logger.info("Merging and calculating all data")
         all_data = {
             "bonds": self.merge_and_calculate(existing_bonds, bonds, predictions.get("bonds", {})),
-            "currencies": self.merge_and_calculate({}, currencies, predictions.get("currencies", {})),
-            "gold": self.merge_and_calculate({}, gold, predictions.get("gold", {})),
+            "currencies": self.merge_and_calculate(existing_currencies, currencies, predictions.get("currencies", {})),
+            "gold": self.merge_and_calculate(existing_gold, gold, predictions.get("gold", {})),
             "shares": self.merge_and_calculate(existing_shares, shares, predictions.get("shares", {})),
             "deposits": deposits,
         }
