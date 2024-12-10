@@ -56,7 +56,7 @@ class GatewayProvider(Provider):
 
 
 class ServiceProvider(Provider):
-    @provide
+    @provide(scope=Scope.REQUEST)
     def provide_giga_chat(self, giga_chat_settings: GigaChatSettings) -> GigaChat:
         return GigaChat(
             credentials=giga_chat_settings.credentials,
