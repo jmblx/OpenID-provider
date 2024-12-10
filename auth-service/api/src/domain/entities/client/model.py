@@ -53,5 +53,4 @@ class Client:
         self.name = ClientName(name)
 
     def add_allowed_redirect_url(self, new_allowed_redirect_url: str) -> None:
-        self.validate_redirect_url(new_allowed_redirect_url)
-        self.allowed_redirect_urls = AllowedRedirectUrls(self.allowed_redirect_urls.value + [new_allowed_redirect_url])
+        self.allowed_redirect_urls = AllowedRedirectUrls(self.allowed_redirect_urls.value + [ClientRedirectUrl(new_allowed_redirect_url).value])
