@@ -56,7 +56,7 @@ class GatewayProvider(Provider):
 
 
 class ServiceProvider(Provider):
-    @provide(scope=Scope.REQUEST)
+    @provide(scope=Scope.REQUEST, provides=GigaChat)
     def provide_giga_chat(self, giga_chat_settings: GigaChatSettings) -> GigaChat:
         return GigaChat(
             credentials=giga_chat_settings.credentials,
@@ -67,5 +67,5 @@ class ServiceProvider(Provider):
 
 
 container = make_async_container(
-    RedisProvider(), AsyncHTTPSession(), GatewayProvider(), ServiceProvider()
+    SettingsProvider(), RedisProvider(), AsyncHTTPSession(), GatewayProvider(), ServiceProvider()
 )
