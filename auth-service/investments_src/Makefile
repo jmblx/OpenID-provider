@@ -8,7 +8,7 @@ endif
 
 collect-data:
 ifeq ($(OS),windows)
-	python -m main.py
+	python -m main
 else
-	python3 -m main.py
+	python3 -m main
 endif
