@@ -22,7 +22,7 @@ class InvestmentsService:
             return json.loads(data)
         return {}
 
-    async def get_all_data(self):
+    async def collect_all_data(self):
         bonds = await self.bonds_gateway.get_entities_prices(
             tracked_entities=["RU000A1038V6", "RU000A106565", "RU000A108P61", "RU000A104ZK2", "RU000A102KN2"]
         )
