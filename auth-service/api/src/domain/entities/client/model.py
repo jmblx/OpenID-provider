@@ -38,7 +38,7 @@ class Client:
         return client
 
     @staticmethod
-    async def validate_redirect_url(
+    def validate_redirect_url(
         allowed_redirect_urls: "AllowedRedirectUrls",
         redirect_url: ClientRedirectUrl,
     ) -> None:
@@ -52,5 +52,6 @@ class Client:
     def rename(self, name: str) -> None:
         self.name = ClientName(name)
 
-    def add_allowed_redirect_url(self, allowed_redirect_urls: str) -> None:
-        self.allowed_redirect_urls.value.append(ClientRedirectUrl(allowed_redirect_urls).value)
+    def add_allowed_redirect_url(self, new_allowed_redirect_url: str) -> None:
+        self.validate_redirect_url(new_allowed_redirect_url)
+        self.allowed_redirect_urls = AllowedRedirectUrls(self.allowed_redirect_urls.value + [new_allowed_redirect_url])

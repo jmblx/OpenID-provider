@@ -20,7 +20,7 @@ client_table = sa.Table(
     sa.Column("id", sa.Integer, primary_key=True, autoincrement=True),
     sa.Column("name", sa.String, nullable=False),
     sa.Column("base_url", sa.String, nullable=False),
-    sa.Column("allowed_redirect_urls", ARRAY(sa.String), nullable=False),
+    sa.Column("new_allowed_redirect_url", ARRAY(sa.String), nullable=False),
     sa.Column(
         "type",
         sa.Enum(ClientTypeEnum, name="client_type_enum"),
@@ -35,7 +35,7 @@ mapper_registry.map_imperatively(
         "id": composite(ClientID, client_table.c.id),
         "name": composite(ClientName, client_table.c.name),
         "base_url": composite(ClientBaseUrl, client_table.c.base_url),
-        "allowed_redirect_urls": composite(
+        "new_allowed_redirect_url": composite(
             AllowedRedirectUrls, client_table.c.allowed_redirect_urls
         ),
         "type": composite(ClientType, client_table.c.type),

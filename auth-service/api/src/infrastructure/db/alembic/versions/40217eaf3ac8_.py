@@ -27,7 +27,7 @@ def upgrade() -> None:
         sa.Column("name", sa.String(), nullable=False),
         sa.Column("base_url", sa.String(), nullable=False),
         sa.Column(
-            "allowed_redirect_urls",
+            "new_allowed_redirect_url",
             postgresql.ARRAY(sa.String()),
             nullable=False,
         ),
