@@ -224,16 +224,20 @@
                     body: JSON.stringify(payload)
                 });
 
-                // Если сервер возвращает статус 201 с JSON
                 if (response.status === 201) {
                     // Получаем redirect_url из тела ответа
                     const responseData = await response.json();
-                    const redirectUrl = responseData.redirect_url;
+                    let redirectUrl = responseData.redirect_url;
+
+                    // Проверяем, является ли URL абсолютным
+                    if (!redirectUrl.startsWith('http') && !redirectUrl.includes('://')) {
+                        // Добавляем кастомную схему для абсолютного URL
+                        redirectUrl = new URL(redirectUrl).toString();
+                    }
 
                     // Перенаправляем пользователя
                     window.location.href = redirectUrl;
                 } else {
-                    // Если ошибка, показываем сообщение
                     const errorData = await response.json();
                     alert(`Ошибка регистрации: ${errorData.detail || 'Неизвестная ошибка'}`);
                 }
@@ -243,6 +247,7 @@
         });
     });
 </script>
+
 
 </body>
 </html>

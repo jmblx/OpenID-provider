@@ -205,7 +205,7 @@
                     code_challenge_method: params.code_challenge_method,
                     client_id: params.client_id,
                     redirect_url: params.redirect_url,
-                    scopes: {"bob": "1111"}
+                    scopes: { "bob": "1111" }
                 };
 
                 try {
@@ -220,7 +220,12 @@
                     if (response.status === 201) { // Убедитесь, что статус соответствует вашему API
                         // Получаем redirect_url из тела ответа
                         const responseData = await response.json();
-                        const redirectUrl = responseData.redirect_url;
+                        let redirectUrl = responseData.redirect_url;
+
+                        // Проверяем, является ли URL абсолютным
+                        if (!redirectUrl.startsWith('http') && !redirectUrl.includes('://')) {
+                            redirectUrl = new URL(redirectUrl).toString();
+                        }
 
                         // Перенаправляем пользователя
                         window.location.href = redirectUrl;
@@ -233,6 +238,7 @@
                 }
             });
         });
-    </script>
+</script>
+
 </body>
 </html>
