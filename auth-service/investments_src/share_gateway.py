@@ -7,8 +7,8 @@ from base_banki_ru_gateway import BaseBankiRuGateway
 
 
 class SharesGateway(BaseBankiRuGateway):
-    def __init__(self, session):
-        super().__init__(session)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self.base_url = "https://www.banki.ru/investment/share/"
 
     def extract_exchange(self, container: BeautifulSoup) -> str | None:
