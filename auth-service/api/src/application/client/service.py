@@ -18,7 +18,7 @@ class ClientService:
         client = await self.client_repo.get_by_id(ClientID(data.client_id))
         if not client:
             raise ClientNotFound()
-        await Client.validate_redirect_url(
+        Client.validate_redirect_url(
             allowed_redirect_urls=client.allowed_redirect_urls, redirect_url=ClientRedirectUrl(data.redirect_url)
         )
         logger.info(self.allowed_redirect_urls.value)
