@@ -170,7 +170,7 @@
             </a>
         </div>
     </div>
-    <script>
+<script>
     document.addEventListener('DOMContentLoaded', async function() {
         const urlParams = new URLSearchParams(window.location.search);
 
@@ -224,10 +224,12 @@
                     body: JSON.stringify(payload)
                 });
 
-                // Если сервер отправляет редирект (status 307)
-                if (response.status === 307) {
-                    // Получаем редирект URL из заголовка Location
-                    const redirectUrl = response.headers.get('Location');
+                // Если сервер возвращает статус 201 с JSON
+                if (response.status === 201) {
+                    // Получаем redirect_url из тела ответа
+                    const responseData = await response.json();
+                    const redirectUrl = responseData.redirect_url;
+
                     // Перенаправляем пользователя
                     window.location.href = redirectUrl;
                 } else {
@@ -240,7 +242,7 @@
             }
         });
     });
+</script>
 
-    </script>
 </body>
 </html>
