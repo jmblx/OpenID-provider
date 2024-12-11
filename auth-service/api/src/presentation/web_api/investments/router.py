@@ -6,6 +6,7 @@ from starlette.status import HTTP_200_OK
 
 from application.investments.buy_investment_handler import BuyInvestmentHandler, BuyItemCommand
 from application.investments.queries import InvestmentsQueryHandler
+from application.investments.sell_investment_handler import SellInvestmentHandler, SellItemCommand
 from application.user.notification_query_handler import NotificationQueryHandler
 
 inv_router = APIRouter(route_class=DishkaRoute, tags=["investments"])
@@ -27,5 +28,11 @@ async def get_personalized_investments_notifications(handler: FromDishka[Notific
 
 @inv_router.post("/investments/buy")
 async def buy_investment(handler: FromDishka[BuyInvestmentHandler], command: BuyItemCommand) -> ORJSONResponse:
+    cur_balance = await handler.handle(command)
+    return ORJSONResponse({"updated_balance": cur_balance}, status_code=HTTP_200_OK)
+
+
+@inv_router.post("/investments/sell")
+async def sell_investment(handler: FromDishka[SellInvestmentHandler], command: SellItemCommand) -> ORJSONResponse:
     cur_balance = await handler.handle(command)
     return ORJSONResponse({"updated_balance": cur_balance}, status_code=HTTP_200_OK)
