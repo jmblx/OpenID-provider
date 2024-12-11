@@ -1,3 +1,5 @@
+from sqlalchemy import text
+
 from application.user.interfaces.reader import UserReader, UserStrategiesDTO, UserStrategyDTO
 
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -14,36 +16,65 @@ class UserReaderImpl(UserReader):
         self.session = session
 
     async def get_user_strategies_by_id(self, user_id: UserID) -> UserStrategiesDTO:
-        query = select(Strategy).join(
-            user_strategy_association_table
-        ).filter(
-            user_strategy_association_table.c.user_id == user_id.value
-        ).options(selectinload(Strategy.users))  # Загружаем ассоциированного пользователя
+        # Запрос для получения стратегий пользователя через ассоциативную таблицу
+        query = text("""
+            SELECT strategy.id, strategy.budget, strategy.days_duration,
+                   user_strategy_association.portfolio, 
+                   user_strategy_association.current_balance,
+                   user_strategy_association.start_date, 
+                   user_strategy_association.end_date
+            FROM strategy
+            JOIN user_strategy_association
+                ON strategy.id = user_strategy_association.strategy_id
+            WHERE user_strategy_association.user_id = :user_id
+        """)
 
-        result = await self.session.execute(query)
-        strategies = result.scalars().all()
+        result = await self.session.execute(query, {"user_id": user_id.value})
+        strategies = result.fetchall()
+
+        if not strategies:
+            raise ValueError(f"Стратегии для пользователя {user_id.value} не найдены.")
 
         # Заполняем DTO с данными по стратегиям
         user_strategies = []
         for strategy in strategies:
-            user_strategy = await self._get_user_strategy_association(strategy.id, user_id)
+            strategy_data = strategy  # В данной строке данные о стратегии
 
-            current_balance = strategy.calculate_balance(user_strategy.portfolio)  # Расчет баланса на основе портфеля
-
+            # Заполняем DTO для каждой стратегии
             user_strategies.append(UserStrategyDTO(
-                strategy_id=strategy.id,
-                budget=strategy.budget,
-                days_duration=strategy.days_duration,
-                portfolio=user_strategy.portfolio,
-                current_balance=current_balance,
-                start_date=user_strategy.start_date.strftime('%Y-%m-%d'),
-                end_date=user_strategy.end_date.strftime('%Y-%m-%d')
+                strategy_id=strategy_data[0],
+                budget=strategy_data[1],
+                days_duration=strategy_data[2],
+                portfolio=strategy_data[3],
+                current_balance=strategy_data[4],
+                start_date=strategy_data[5].strftime('%Y-%m-%d'),
+                end_date=strategy_data[6].strftime('%Y-%m-%d')
             ))
 
         return UserStrategiesDTO(user_id=user_id.value, strategies=user_strategies)
 
     async def _get_user_strategy_association(self, strategy_id: UUID, user_id: UserID):
-        query = select(user_strategy_association_table).filter_by(strategy_id=strategy_id, user_id=user_id.value)
-        result = await self.session.execute(query)
-        return result.scalars().first()
+        # Полный запрос для получения ассоциативной записи для пользователя и стратегии
+        query = text("""
+            SELECT user_strategy_association.id, 
+                   user_strategy_association.strategy_id, 
+                   user_strategy_association.user_id, 
+                   user_strategy_association.portfolio, 
+                   user_strategy_association.current_balance, 
+                   user_strategy_association.start_date, 
+                   user_strategy_association.end_date
+            FROM user_strategy_association
+            WHERE user_strategy_association.strategy_id = :strategy_id 
+              AND user_strategy_association.user_id = :user_id
+        """)
 
+        result = await self.session.execute(query, {"strategy_id": strategy_id, "user_id": user_id.value})
+
+        user_strategy = result.fetchall()
+
+        if not user_strategy:
+            raise ValueError(f"Association not found for user {user_id.value} and strategy {strategy_id}")
+
+        user_strategy = user_strategy[0]
+
+        return user_strategy
