@@ -23,7 +23,7 @@ class StrategyRepo:
         current_balance = strategy.calculate_balance(portfolio)
 
         stmt = insert(user_strategy_association_table).values(
-            user_id=user_id,
+            user_id=user_id.value,
             strategy_id=strategy.id,
             portfolio=portfolio,
             current_balance=current_balance,
