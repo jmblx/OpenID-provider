@@ -56,15 +56,27 @@ class StrategyReader:
         )
 
     async def _get_user_strategy_association(self, strategy_id: UUID, user_id: UserID):
-        query = select(user_strategy_association_table).where(and_(
+        query = select(
+            user_strategy_association_table.c.strategy_id,
+            user_strategy_association_table.c.user_id,
+            user_strategy_association_table.c.portfolio,
+            user_strategy_association_table.c.current_balance,
+            user_strategy_association_table.c.start_date,
+            user_strategy_association_table.c.end_date
+        ).where(and_(
             user_strategy_association_table.c.strategy_id == strategy_id,
             user_strategy_association_table.c.user_id == user_id.value
         ))
+
         result = await self.session.execute(query)
-        user_strategy = result.scalars().all()[0]
-        print(user_strategy)
+        user_strategy = result.scalars().first()
+
         if not user_strategy:
-            raise ValueError(f"User strategy association for user {user_id.value} and strategy {strategy_id} not found.")
+            raise ValueError(
+                f"User strategy association for user {user_id.value} and strategy {strategy_id} not found.")
+
+        print(f"User strategy data: {user_strategy}")
 
         return user_strategy
+
 
