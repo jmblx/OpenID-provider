@@ -58,13 +58,7 @@ class StrategyReader:
 
     async def _get_user_strategy_association(self, strategy_id: UUID, user_id: UserID):
         query = select(
-            user_strategy_association_table.c.id,  # если нужен id
-            user_strategy_association_table.c.strategy_id,
-            user_strategy_association_table.c.user_id,
-            user_strategy_association_table.c.portfolio,
-            user_strategy_association_table.c.current_balance,
-            user_strategy_association_table.c.start_date,
-            user_strategy_association_table.c.end_date
+            user_strategy_association_table,
         ).where(and_(
             user_strategy_association_table.c.strategy_id == strategy_id,
             user_strategy_association_table.c.user_id == user_id.value
@@ -72,22 +66,6 @@ class StrategyReader:
 
         result = await self.session.execute(query)
 
-        # Получаем все строки
-        user_strategy = result.fetchall()
-
-        # Если результат пустой, выбрасываем исключение
-        if not user_strategy:
-            raise ValueError(
-                f"User strategy association for user {user_id.value} and strategy {strategy_id} not found.")
-
-        # Теперь можно работать с результатом
-        user_strategy = user_strategy[0]  # Берем первую строку
-
-        # Проверяем, если portfolio None, то присваиваем пустой словарь
-        portfolio = user_strategy.portfolio
-        if portfolio is None:
-            portfolio = {}
-
-        print(f"User strategy data: {user_strategy}")
+        user_strategy = result.scalar()
 
         return user_strategy
