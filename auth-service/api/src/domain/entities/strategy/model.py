@@ -25,7 +25,9 @@ class Strategy:
     def calculate_balance(self, portfolio: dict) -> float:
         total_value = self.budget
 
-        for asset, amount in portfolio.items():
-            total_value += amount
-
+        for asset_type, assets in portfolio.items():
+            for asset in assets:
+                if 'quantity' in asset:
+                    total_value += asset['quantity']
         return total_value
+
