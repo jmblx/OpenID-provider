@@ -42,7 +42,6 @@ class StrategyReader:
             raise ValueError("Стратегия не найдена")
 
         user_strategy = await self._get_user_strategy_association(strategy_id, user_id)
-        print(user_strategy)
 
         current_balance = strategy.calculate_balance(user_strategy.portfolio)
 
@@ -53,8 +52,8 @@ class StrategyReader:
             portfolio=user_strategy.portfolio,
             user_id=user_id.value,
             current_balance=current_balance,
-            start_date=user_strategy.start_date.strftime('%d.%m.%Y'),  # в формате '05.12.2024'
-            end_date = user_strategy.end_date.strftime('%d.%m.%Y')  # в формате '06.12.2024'
+            start_date=user_strategy.start_date.strftime('%d.%m.%Y'),
+            end_date = user_strategy.end_date.strftime('%d.%m.%Y')
 
         )
 
@@ -72,10 +71,8 @@ class StrategyReader:
                      AND user_strategy_association.user_id = :user_id
                """)
 
-        # Выполнение запроса с параметрами
         result = await self.session.execute(query, {"strategy_id": strategy_id, "user_id": user_id.value})
 
-        # Извлечение результата
         user_strategy = result.fetchall()
 
         if not user_strategy:
@@ -84,10 +81,4 @@ class StrategyReader:
 
         user_strategy = user_strategy[0]
 
-        # Десериализация поля portfolio из строки JSON в Python-объект
-        portfolio = json.loads(user_strategy.portfolio) if isinstance(user_strategy.portfolio,
-                                                                      str) else user_strategy.portfolio
-
-        print(f"User strategy data: {user_strategy}, Portfolio: {portfolio}")
-        await asyncio.sleep(12)
         return user_strategy

@@ -13,10 +13,7 @@ class StrategyRepo:
     def __init__(self, session: AsyncSession):
         self.session = session
 
-
-
     async def save(self, strategy: Strategy, portfolio: dict, user_id: UserID) -> UUID:
-        # Убедимся, что portfolio передается как словарь
         self.session.add(strategy)
         await self.session.flush()
 
@@ -35,8 +32,7 @@ class StrategyRepo:
             in_process=True
         ).returning(user_strategy_association_table.c.id)
 
-        result = await self.session.execute(stmt)
-        strategy_association_id = result.scalar()  # Получаем id вставленной записи
+        await self.session.execute(stmt)
 
         return strategy.id
 
