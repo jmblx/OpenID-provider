@@ -19,11 +19,7 @@ class InvestmentsService:
         try:
             investments = await self.redis.get("data")
             investments_dict = json.loads(investments)
-            print(f"Получены данные инвестиций: {investments_dict}")
             return investments_dict
-        except Exception as e:
-            print(f"Ошибка при получении инвестиций из Redis: {e}")
-            raise
 
     def get_price_change_percentage(self, old_price: float, new_price: float) -> float:
         """Вычисляем процентное изменение цены"""
@@ -60,7 +56,7 @@ class InvestmentsService:
         notifications = []
         investments = await self.get_investments()
         today = datetime.today().strftime("%d.%m.%Y")
-        seven_days_ago = (datetime.today() - timedelta(days=7)).strftime("%d.%m.%Y")
+        seven_days_ago = (datetime.today() - timedelta(days=5)).strftime("%d.%m.%Y")
 
         print(f"Проверка изменений с {seven_days_ago} по {today}")
 

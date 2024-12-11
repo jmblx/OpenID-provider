@@ -14,13 +14,9 @@ class NotificationQueryHandler:
         user_strategies = await self.user_reader.get_user_strategies_by_id(user_id)
 
         notifications = []
+        data = await self.investments_service.get_investments()
 
         for strategy in user_strategies.strategies:
-            print("PFFFFFolio:", strategy.portfolio)
-            try:
-                notifications.extend(await self.investments_service.check_for_significant_changes(strategy.portfolio))
-                notifications.extend(await self.investments_service.check_strategy_end_date(strategy.end_date))
-            except Exception as e:
-                print(f"Ошибка при обработке стратегии {strategy.strategy_id}: {e}")
+            print(strategy)
 
         return notifications
