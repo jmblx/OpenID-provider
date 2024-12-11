@@ -16,6 +16,7 @@ class NotificationQueryHandler:
         notifications = []
 
         for strategy in user_strategies.strategies:
+            print("PFFFFFolio:", strategy.portfolio)
             try:
                 notifications.extend(await self.investments_service.check_for_significant_changes(strategy.portfolio))
                 notifications.extend(await self.investments_service.check_strategy_end_date(strategy.end_date))

@@ -28,14 +28,13 @@ class InvestmentsService:
         for investment_type, data in portfolio.items():
             if investment_type not in investments:
                 continue
-
+            print(investment_type, data)
             # Для каждого актива проверяем изменения
             for asset in data:
                 asset_name = asset["name"]
                 quantity = asset["quantity"]
                 price_history = investments[investment_type]
 
-                # Получаем цену на 7 дней назад и сегодняшнюю цену
                 if seven_days_ago in price_history and today in price_history:
                     old_price = float(price_history[seven_days_ago].get("price", 0).replace("₽", "").replace(",", "."))
                     new_price = float(price_history[today].get("price", 0).replace("₽", "").replace(",", "."))
@@ -44,13 +43,15 @@ class InvestmentsService:
                     if abs(price_change) >= threshold:
                         notifications.append(f"Актив {asset_name} изменил свою цену на {price_change:.2f}% за неделю (текущая цена: {new_price} ₽).")
 
-                # Также проверяем прогноз на будущие изменения
                 if today in price_history:
                     next_7_day_diff = price_history[today].get("next_7_day_diff_in_%", "0")
                     next_7_day_diff = float(next_7_day_diff.replace("%", ""))
                     if abs(next_7_day_diff) >= threshold:
                         notifications.append(f"Прогноз на актив {asset_name}: изменение цены на {next_7_day_diff:.2f}% за следующие 7 дней.")
-
+                try:
+                    print(today, price_history, next_7_day_diff, price_change)
+                except Exception as e:
+                    print(e)
         return notifications
 
     async def check_strategy_end_date(self, end_date: str) -> List[str]:
