@@ -1,3 +1,4 @@
+import json
 from datetime import date, timedelta
 from uuid import UUID
 
@@ -13,29 +14,28 @@ class StrategyRepo:
     def __init__(self, session: AsyncSession):
         self.session = session
 
-    from datetime import datetime, timedelta, date
-
     async def save(self, strategy: Strategy, portfolio: dict, user_id: UserID) -> UUID:
+        # Убедитесь, что portfolio - это словарь, а не строка.
+        # SQLAlchemy сам преобразует словарь в JSONB.
+        if isinstance(portfolio, str):
+            portfolio = json.loads(portfolio)  # Преобразуем строку JSON в объект Python
+
         self.session.add(strategy)
         await self.session.flush()
 
-        # Преобразуем текущую дату в объект datetime.date
         start_date = date.today()
+        end_date = start_date + timedelta(days=strategy.days_duration)
 
-        # Рассчитываем дату окончания и преобразуем её в объект datetime.date
-        end_date = date.today() + timedelta(days=strategy.days_duration)
-
-        # Рассчитываем текущий баланс
         current_balance = strategy.calculate_balance(portfolio)
 
-        # Выполняем вставку данных в таблицу
         stmt = insert(user_strategy_association_table).values(
             user_id=user_id.value,
             strategy_id=strategy.id,
-            portfolio=portfolio,
+            portfolio=portfolio,  # Передаем словарь, SQLAlchemy преобразует его в JSONB
             current_balance=current_balance,
-            start_date=start_date,  # Передаем как datetime.date
-            end_date=end_date,  # Передаем как datetime.date
+            start_date=start_date,
+            end_date=end_date,
+            in_process=True
         )
         await self.session.execute(stmt)
 
