@@ -5,6 +5,7 @@ from sqlalchemy import insert, update, and_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from domain.entities.strategy.model import Strategy
+from domain.entities.user.value_objects import UserID
 from infrastructure.db.models.secondary import user_strategy_association_table
 
 
@@ -12,7 +13,7 @@ class StrategyRepo:
     def __init__(self, session: AsyncSession):
         self.session = session
 
-    async def save(self, strategy: Strategy, portfolio: dict) -> UUID:
+    async def save(self, strategy: Strategy, portfolio: dict, user_id: UserID) -> UUID:
         self.session.add(strategy)
 
         start_date = date.today()
@@ -20,8 +21,6 @@ class StrategyRepo:
         end_date = start_date + timedelta(days=strategy.days_duration)
 
         current_balance = strategy.calculate_balance(portfolio)
-
-        user_id = strategy.users[0].id
 
         stmt = insert(user_strategy_association_table).values(
             user_id=user_id,
