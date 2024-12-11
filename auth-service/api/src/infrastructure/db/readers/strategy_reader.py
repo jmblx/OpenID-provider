@@ -43,19 +43,19 @@ class StrategyReader:
         user_strategy = await self._get_user_strategy_association(strategy_id, user_id)
         print(user_strategy)
 
-        # current_balance = strategy.calculate_balance(user_strategy.portfolio)
-        #
-        # return ReadStrategyDTO(
-        #     strategy_id=strategy.id,
-        #     budget=strategy.budget,
-        #     days_duration=strategy.days_duration,
-        #     portfolio=user_strategy.portfolio,
-        #     user_id=user_id.value,
-        #     current_balance=current_balance,
-        #     start_date=user_strategy.start_date.strftime('%d.%m.%Y'),  # в формате '05.12.2024'
-        #     end_date = user_strategy.end_date.strftime('%d.%m.%Y')  # в формате '06.12.2024'
-        #
-        # )
+        current_balance = strategy.calculate_balance(user_strategy.portfolio)
+
+        return ReadStrategyDTO(
+            strategy_id=strategy.id,
+            budget=strategy.budget,
+            days_duration=strategy.days_duration,
+            portfolio=user_strategy.portfolio,
+            user_id=user_id.value,
+            current_balance=current_balance,
+            start_date=user_strategy.start_date.strftime('%d.%m.%Y'),  # в формате '05.12.2024'
+            end_date = user_strategy.end_date.strftime('%d.%m.%Y')  # в формате '06.12.2024'
+
+        )
 
     async def _get_user_strategy_association(self, strategy_id: UUID, user_id: UserID):
         query = text("""
