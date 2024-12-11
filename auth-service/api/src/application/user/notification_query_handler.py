@@ -49,7 +49,7 @@ class NotificationQueryHandler:
                     print(f"Данных на сегодня для актива {key} нет. Пропускаем...")
                     continue  # Пропускаем, если нет данных на сегодняшнюю дату
 
-                if difference >= 3:
+                if difference >= 3 or difference <= -3:
                     print(f"Прошло {difference} дней, проверяем данные на целевую дату...")
 
                     if target_date.strftime("%d.%m.%Y") in c_d:
