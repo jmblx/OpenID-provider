@@ -30,8 +30,8 @@ class CreateNewStrategyHanlder:
 
         strategy = Strategy.create(command.budget, command.days_duration)
 
-        user = await self.user_repo.by_id(user_id)
-        strategy.add_user(user)
+        # user = await self.user_repo.by_id(user_id)
+        # strategy.add_user(user)
 
         strategy_id = await self.strategy_repo.save(strategy, command.portfolio, user_id)
         await self.uow.commit()
