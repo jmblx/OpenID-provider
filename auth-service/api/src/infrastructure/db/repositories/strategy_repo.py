@@ -17,9 +17,9 @@ class StrategyRepo:
         self.session.add(strategy)
         await self.session.flush()
 
-        start_date = date.today()
+        start_date = date.today().strftime('%d.%m.%Y')
 
-        end_date = start_date + timedelta(days=strategy.days_duration)
+        end_date = (date.today() + timedelta(days=strategy.days_duration)).strftime('%d.%m.%Y')
 
         current_balance = strategy.calculate_balance(portfolio)
 
