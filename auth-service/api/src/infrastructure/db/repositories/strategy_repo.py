@@ -13,23 +13,29 @@ class StrategyRepo:
     def __init__(self, session: AsyncSession):
         self.session = session
 
+    from datetime import datetime, timedelta, date
+
     async def save(self, strategy: Strategy, portfolio: dict, user_id: UserID) -> UUID:
         self.session.add(strategy)
         await self.session.flush()
 
-        start_date = date.today().strftime('%d.%m.%Y')
+        # Преобразуем текущую дату в объект datetime.date
+        start_date = date.today()
 
-        end_date = (date.today() + timedelta(days=strategy.days_duration)).strftime('%d.%m.%Y')
+        # Рассчитываем дату окончания и преобразуем её в объект datetime.date
+        end_date = date.today() + timedelta(days=strategy.days_duration)
 
+        # Рассчитываем текущий баланс
         current_balance = strategy.calculate_balance(portfolio)
 
+        # Выполняем вставку данных в таблицу
         stmt = insert(user_strategy_association_table).values(
             user_id=user_id.value,
             strategy_id=strategy.id,
             portfolio=portfolio,
             current_balance=current_balance,
-            start_date=start_date,
-            end_date=end_date,
+            start_date=start_date,  # Передаем как datetime.date
+            end_date=end_date,  # Передаем как datetime.date
         )
         await self.session.execute(stmt)
 
