@@ -1,3 +1,4 @@
+import asyncio
 import json
 from dataclasses import dataclass
 from uuid import UUID
@@ -88,4 +89,5 @@ class StrategyReader:
                                                                       str) else user_strategy.portfolio
 
         print(f"User strategy data: {user_strategy}, Portfolio: {portfolio}")
+        await asyncio.sleep(12)
         return user_strategy
