@@ -10,7 +10,7 @@ from domain.entities.user.value_objects import Email, UserID
 
 class IdentityProvider(ABC):
     @abstractmethod
-    async def get_current_user_id(self) -> UserID: ...
+    def get_current_user_id(self) -> UserID: ...
 
 
 class HttpIdentityProvider(IdentityProvider):
@@ -18,6 +18,6 @@ class HttpIdentityProvider(IdentityProvider):
         self.access_token = access_token
         self.jwt_service = jwt_service
 
-    async def get_current_user_id(self) -> UserID:
+    def get_current_user_id(self) -> UserID:
         payload = self.jwt_service.decode(self.access_token)
         return UserID(UUID(payload["sub"]))

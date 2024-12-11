@@ -17,6 +17,7 @@ from presentation.web_api.exceptions import setup_exception_handlers
 from presentation.web_api.investments.router import inv_router
 from presentation.web_api.registration.router import reg_router
 from presentation.web_api.role.router import role_router
+from presentation.web_api.strategy.router import strategy_router
 from presentation.web_api.token_manage.router import token_manage_router
 
 
@@ -44,6 +45,7 @@ app.include_router(auth_router)
 app.include_router(role_router)
 app.include_router(token_manage_router)
 app.include_router(inv_router)
+app.include_router(strategy_router)
 setup_exception_handlers(app)
 
 

@@ -8,14 +8,12 @@ from sqlalchemy import (
     UUID as SQLAlchemyUUID,
 )
 from sqlalchemy.orm import relationship, composite
-import uuid
 
-from domain.entities.client.value_objects import ClientID
 from domain.entities.role.value_objects import RoleID
 from domain.entities.user.model import User
 from domain.entities.user.value_objects import UserID, Email, HashedPassword
 from infrastructure.db.models.registry import mapper_registry
-from infrastructure.db.models.secondary import user_client_association_table
+from infrastructure.db.models.secondary import user_client_association_table, user_strategy_association_table
 
 user_table = Table(
     "user",
@@ -43,6 +41,11 @@ mapper_registry.map_imperatively(
             back_populates="users",
             uselist=True,
         ),
+        "strategies": relationship(
+        "Strategy",
+            secondary=user_strategy_association_table,
+            back_populates="users",
+        )
     },
     column_prefix="_",
 )

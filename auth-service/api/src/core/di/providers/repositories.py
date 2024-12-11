@@ -7,6 +7,7 @@ from infrastructure.db.repositories.client_repo_impl import (
     ClientRepositoryImpl,
 )
 from infrastructure.db.repositories.role_repository import RoleRepositoryImpl
+from infrastructure.db.repositories.strategy_repo import StrategyRepo
 from infrastructure.db.repositories.user_repo_impl import UserRepositoryImpl
 
 
@@ -20,3 +21,4 @@ class RepositoriesProvider(Provider):
     role_repo = provide(
         RoleRepositoryImpl, scope=Scope.REQUEST, provides=RoleRepository
     )
+    strategy_repo = provide(StrategyRepo, scope=Scope.REQUEST)
