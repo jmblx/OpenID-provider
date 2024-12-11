@@ -72,16 +72,16 @@ services:
     networks:
       - custom
 
-#  investments_service:
-#    env_file:
-#      - investments_src/.env-prod
-#    build:
-#      context: ./investments_src
-#      dockerfile: Dockerfile
-#    container_name: investments_service
-#    networks:
-#      - custom
-#    command: ["/bin/sh", "-c", "while true; do make collect-data; sleep 3600; done"]
+  investments_service:
+    env_file:
+      - investments_src/.env-prod
+    build:
+      context: ./investments_src
+      dockerfile: Dockerfile
+    container_name: investments_service
+    networks:
+      - custom
+    command: ["/bin/sh", "-c", "while true; do make collect-data; sleep 3600; done"]
 
 networks:
   custom:
