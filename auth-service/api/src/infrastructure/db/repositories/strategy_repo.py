@@ -44,7 +44,7 @@ class StrategyRepo:
             in_process=True
         ).returning(user_strategy_association_table.c.id)
 
-        await self.session.execute(stmt)
+        result = await self.session.execute(stmt)
         return strategy.id
 
     async def get_by_id(self, id: UUID) -> Strategy | None:
