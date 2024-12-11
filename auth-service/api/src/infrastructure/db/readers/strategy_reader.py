@@ -58,13 +58,13 @@ class StrategyReader:
     async def _get_user_strategy_association(self, strategy_id: UUID, user_id: UserID):
         query = select(user_strategy_association_table).where(and_(
             user_strategy_association_table.c.strategy_id == strategy_id,
-            user_strategy_association_table.c.user_id == user_id
+            user_strategy_association_table.c.user_id == user_id.value
         ))
         result = await self.session.execute(query)
         user_strategy = result.scalars().first()
 
         if not user_strategy:
-            raise ValueError(f"User strategy association for user {user_id} and strategy {strategy_id} not found.")
+            raise ValueError(f"User strategy association for user {user_id.value} and strategy {strategy_id} not found.")
 
         return user_strategy
 
