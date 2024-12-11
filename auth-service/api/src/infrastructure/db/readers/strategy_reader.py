@@ -58,14 +58,12 @@ class StrategyReader:
 
     async def _get_user_strategy_association(self, strategy_id: UUID, user_id: UserID):
         query = select(
-            user_strategy_association_table,
+            user_strategy_association_table
         ).where(and_(
             user_strategy_association_table.c.strategy_id == strategy_id,
             user_strategy_association_table.c.user_id == user_id.value
         ))
 
-        result = await self.session.execute(query)
+        result = await self.session.scalar(query)
 
-        user_strategy = result.scalar()
-
-        return user_strategy
+        return result
