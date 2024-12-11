@@ -1,4 +1,3 @@
-import json
 from datetime import date, timedelta
 from uuid import UUID
 
@@ -15,27 +14,22 @@ class StrategyRepo:
         self.session = session
 
     async def save(self, strategy: Strategy, portfolio: dict, user_id: UserID) -> UUID:
-        # Убедитесь, что portfolio - это словарь, а не строка.
-        # SQLAlchemy сам преобразует словарь в JSONB.
-        if isinstance(portfolio, str):
-            portfolio = json.loads(portfolio)  # Преобразуем строку JSON в объект Python
-
         self.session.add(strategy)
         await self.session.flush()
 
         start_date = date.today()
-        end_date = start_date + timedelta(days=strategy.days_duration)
+
+        end_date = date.today() + timedelta(days=strategy.days_duration)
 
         current_balance = strategy.calculate_balance(portfolio)
-
+        print(portfolio)
         stmt = insert(user_strategy_association_table).values(
             user_id=user_id.value,
             strategy_id=strategy.id,
-            portfolio=portfolio,  # Передаем словарь, SQLAlchemy преобразует его в JSONB
+            portfolio=portfolio,
             current_balance=current_balance,
             start_date=start_date,
             end_date=end_date,
-            in_process=True
         )
         await self.session.execute(stmt)
 
