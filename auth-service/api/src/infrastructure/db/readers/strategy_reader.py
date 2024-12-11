@@ -41,6 +41,7 @@ class StrategyReader:
             raise ValueError("Стратегия не найдена")
 
         user_strategy = await self._get_user_strategy_association(strategy_id, user_id)
+        print(user_strategy)
 
         current_balance = strategy.calculate_balance(user_strategy.portfolio)
 
@@ -58,12 +59,21 @@ class StrategyReader:
 
     async def _get_user_strategy_association(self, strategy_id: UUID, user_id: UserID):
         query = select(
-            user_strategy_association_table
+            user_strategy_association_table.c.id,
+            user_strategy_association_table.c.strategy_id,
+            user_strategy_association_table.c.user_id,
+            user_strategy_association_table.c.portfolio,
+            user_strategy_association_table.c.current_balance,
+            user_strategy_association_table.c.start_date,
+            user_strategy_association_table.c.end_date
         ).where(and_(
             user_strategy_association_table.c.strategy_id == strategy_id,
             user_strategy_association_table.c.user_id == user_id.value
         ))
 
-        result = await self.session.scalar(query)
-
-        return result
+        result = await self.session.execute(query)
+        user_strategy = result.fetchall()
+        # Получаем все строки
+        user_strategy = user_strategy[0]
+        print(user_strategy, "PORTF: ", user_strategy.portfolio)
+        return user_strategy
