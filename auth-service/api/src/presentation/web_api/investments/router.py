@@ -19,6 +19,6 @@ async def get_all_investments(
 
 
 @inv_router.get("/investments/notifications")
-async def get_all_investments_notifications(handler: FromDishka[NotificationQueryHandler]) -> ORJSONResponse:
+async def get_personalized_investments_notifications(handler: FromDishka[NotificationQueryHandler]) -> ORJSONResponse:
     notifications = await handler.handle()
     return ORJSONResponse({"notifications": notifications}, status_code=HTTP_200_OK)
