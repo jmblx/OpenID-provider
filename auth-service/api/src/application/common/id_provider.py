@@ -1,11 +1,9 @@
 from abc import ABC, abstractmethod
 from uuid import UUID
 
-from application.auth.interfaces import jwt_service
 from application.auth.interfaces.jwt_service import JWTService
-from application.auth.token_types import AccessToken, BaseToken
-from domain.entities.user.model import User
-from domain.entities.user.value_objects import Email, UserID
+from application.auth.token_types import AccessToken
+from domain.entities.user.value_objects import UserID
 
 
 class IdentityProvider(ABC):

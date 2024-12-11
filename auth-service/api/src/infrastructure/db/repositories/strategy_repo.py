@@ -2,13 +2,14 @@ from datetime import date, timedelta
 from uuid import UUID
 
 from sqlalchemy import insert
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from domain.entities.strategy.model import Strategy
 from infrastructure.db.models.secondary import user_strategy_association_table
 
 
 class StrategyRepo:
-    def __init__(self, session):
+    def __init__(self, session: AsyncSession):
         self.session = session
 
     async def save(self, strategy: Strategy, portfolio: dict) -> UUID:
