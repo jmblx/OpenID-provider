@@ -19,10 +19,10 @@ class InvestmentsService:
         try:
             investments = await self.redis.get("data")
             investments_dict = json.loads(investments)
-            logger.debug(f"Получены данные инвестиций: {investments_dict}")
+            print(f"Получены данные инвестиций: {investments_dict}")
             return investments_dict
         except Exception as e:
-            logger.error(f"Ошибка при получении инвестиций из Redis: {e}")
+            print(f"Ошибка при получении инвестиций из Redis: {e}")
             raise
 
     def get_price_change_percentage(self, old_price: float, new_price: float) -> float:
@@ -31,7 +31,7 @@ class InvestmentsService:
             logger.warning(f"Старая цена равна нулю, невозможно вычислить процентное изменение")
             return 0.0
         price_change = ((new_price - old_price) / old_price) * 100
-        logger.debug(f"Изменение цены: {price_change}% (старое: {old_price}, новое: {new_price})")
+        print(f"Изменение цены: {price_change}% (старое: {old_price}, новое: {new_price})")
         return price_change
 
     def parse_price(self, price_str: str) -> float:
@@ -39,20 +39,20 @@ class InvestmentsService:
         try:
             price_str = price_str.replace("₽", "").replace(",", ".").strip()
             parsed_price = float(price_str)
-            logger.debug(f"Цена преобразована: {price_str} -> {parsed_price}")
+            print(f"Цена преобразована: {price_str} -> {parsed_price}")
             return parsed_price
         except ValueError as e:
-            logger.error(f"Ошибка при преобразовании цены {price_str}: {e}")
+            print(f"Ошибка при преобразовании цены {price_str}: {e}")
             raise
 
     def parse_percentage(self, percentage_str: str) -> float:
         """Преобразует строку с процентом в число."""
         try:
             percentage = float(percentage_str.replace("%", "").strip())
-            logger.debug(f"Процент преобразован: {percentage_str} -> {percentage}")
+            print(f"Процент преобразован: {percentage_str} -> {percentage}")
             return percentage
         except ValueError as e:
-            logger.error(f"Ошибка при преобразовании процента {percentage_str}: {e}")
+            print(f"Ошибка при преобразовании процента {percentage_str}: {e}")
             raise
 
     async def check_for_significant_changes(self, portfolio: dict, threshold: float = 5.0) -> List[str]:
@@ -62,7 +62,7 @@ class InvestmentsService:
         today = datetime.today().strftime("%d.%m.%Y")
         seven_days_ago = (datetime.today() - timedelta(days=7)).strftime("%d.%m.%Y")
 
-        logger.debug(f"Проверка изменений с {seven_days_ago} по {today}")
+        print(f"Проверка изменений с {seven_days_ago} по {today}")
 
         for investment_type, data in portfolio.items():
             if investment_type not in investments:
@@ -82,7 +82,7 @@ class InvestmentsService:
                         old_price = self.parse_price(old_price_str)
                         new_price = self.parse_price(new_price_str)
                     except ValueError:
-                        logger.error(f"Невозможно обработать цены для актива {asset_name}. Пропускаем.")
+                        print(f"Невозможно обработать цены для актива {asset_name}. Пропускаем.")
                         continue
 
                     price_change = self.get_price_change_percentage(old_price, new_price)
@@ -92,7 +92,7 @@ class InvestmentsService:
                             f"Актив {asset_name} изменил свою цену на {price_change:.2f}% за неделю (текущая цена: {new_price} ₽).")
                         logger.info(f"Уведомление: {asset_name} изменил свою цену на {price_change:.2f}% за неделю.")
                     else:
-                        logger.debug(f"Изменение цены для {asset_name} менее {threshold}%: {price_change:.2f}%")
+                        print(f"Изменение цены для {asset_name} менее {threshold}%: {price_change:.2f}%")
                 else:
                     logger.warning(f"Нет данных за последние 7 дней для актива {asset_name}.")
 
@@ -105,7 +105,7 @@ class InvestmentsService:
                         logger.info(
                             f"Уведомление: прогноз на {asset_name} изменится на {next_7_day_diff:.2f}% за следующие 7 дней.")
                     else:
-                        logger.debug(
+                        print(
                             f"Прогноз изменения цены для {asset_name} менее {threshold}%: {next_7_day_diff:.2f}%")
 
         return notifications
@@ -116,13 +116,13 @@ class InvestmentsService:
         today = datetime.today().date()
         end_date = datetime.strptime(end_date, "%Y-%m-%d").date()
 
-        logger.debug(f"Проверка окончания стратегии. Сегодня: {today}, дата окончания: {end_date}")
+        print(f"Проверка окончания стратегии. Сегодня: {today}, дата окончания: {end_date}")
 
         if end_date - today <= timedelta(days=7):
             notifications.append("Стратегия заканчивается через 7 дней или меньше. Убедитесь, что вы готовы.")
             logger.info("Стратегия заканчивается через 7 дней или меньше.")
         else:
-            logger.debug("До окончания стратегии больше 7 дней.")
+            print("До окончания стратегии больше 7 дней.")
 
         return notifications
 
@@ -130,23 +130,23 @@ class InvestmentsService:
         investments = await self.get_investments()
         today = date.today().strftime("%d.%m.%Y")
 
-        logger.debug(f"Получение цены для актива {asset_name} типа {asset_type} на дату {today}")
+        print(f"Получение цены для актива {asset_name} типа {asset_type} на дату {today}")
 
         if asset_type not in investments:
-            logger.error(f"Неизвестный тип актива: {asset_type}")
+            print(f"Неизвестный тип актива: {asset_type}")
             raise ValueError(f"Неизвестный тип актива: {asset_type}")
 
         asset_data = investments[asset_type]
         if today not in asset_data:
-            logger.error(f"Данные по дате {today} не найдены для актива {asset_name}")
+            print(f"Данные по дате {today} не найдены для актива {asset_name}")
             raise ValueError(f"Данные по дате {today} не найдены для актива {asset_name}")
 
         asset_price_data = asset_data[today]
         if asset_name not in asset_price_data:
-            logger.error(f"Цена для актива {asset_name} не найдена на дату {today}")
+            print(f"Цена для актива {asset_name} не найдена на дату {today}")
             raise ValueError(f"Цена для актива {asset_name} не найдена на дату {today}")
 
         price = asset_price_data[asset_name]["price"]
         price = float(price.replace("₽", "").replace(",", "."))
-        logger.debug(f"Цена для {asset_name} на {today}: {price} ₽")
+        print(f"Цена для {asset_name} на {today}: {price} ₽")
         return price
