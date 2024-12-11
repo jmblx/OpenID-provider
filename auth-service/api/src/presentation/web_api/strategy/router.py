@@ -19,5 +19,5 @@ async def add_strategy(handler: FromDishka[CreateNewStrategyHanlder], command: C
 
 
 @strategy_router.get("/strategy/{strategy_id}")
-async def get_strategy(strategy_id: UUID, handler: FromDishka[StrategyQueryHandler]) -> ReadStrategyDTO:
+async def get_strategy(strategy_id: UUID, handler: FromDishka[StrategyQueryHandler]) -> None:
     return await handler.handle(strategy_id)
