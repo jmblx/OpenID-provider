@@ -15,10 +15,13 @@ from application.auth.handlers.register_user_handler import (
 )
 from application.client.handlers.rename_client import RenameClientCommandHandler
 from application.client.queries.client_queries import ClientAuthValidationQueryHandler
+from application.investments.buy_investment_handler import BuyInvestmentHandler
 from application.investments.queries import InvestmentsQueryHandler
+from application.investments.sell_investment_handler import SellInvestmentHandler
 from application.role.handlers.create_role_handler import CreateRoleHandler
 from application.strategy.create_new_hanlder import CreateNewStrategyHanlder
 from application.strategy.strategy_query_handler import StrategyQueryHandler
+from application.user.notification_query_handler import NotificationQueryHandler
 
 
 class HandlerProvider(Provider):
@@ -49,3 +52,6 @@ class HandlerProvider(Provider):
     )
     create_new_strategy_hanlder = provide(CreateNewStrategyHanlder, scope=Scope.REQUEST)
     read_strategy_hanlder = provide(StrategyQueryHandler, scope=Scope.REQUEST)
+    sell_investment_handler = provide(SellInvestmentHandler, scope=Scope.REQUEST)
+    buy_investment_handler = provide(BuyInvestmentHandler, scope=Scope.REQUEST)
+    notification_query_handler = provide(NotificationQueryHandler, scope=Scope.REQUEST)

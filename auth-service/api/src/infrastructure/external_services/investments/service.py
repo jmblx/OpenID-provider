@@ -1,8 +1,8 @@
 import json
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 from typing import List, Dict
-import logging
 
+import pytz
 import redis.asyncio as aioredis
 
 class InvestmentsService:
@@ -63,3 +63,27 @@ class InvestmentsService:
 
         return notifications
 
+    async def get_price_by_date_and_name(self, asset_type: str, asset_name: str) -> float:
+        investments = await self.get_investments()
+
+        # Получаем текущую дату по Москве
+        today = date.today().strftime("%d.%m.%Y")
+
+        if asset_type not in investments:
+            raise ValueError(f"Неизвестный тип актива: {asset_type}")
+
+        asset_data = investments[asset_type]
+
+        if today not in asset_data:
+            raise ValueError(f"Данные по дате {today} не найдены для актива {asset_name}")
+
+        asset_price_data = asset_data[today]
+
+        if asset_name not in asset_price_data:
+            raise ValueError(f"Цена для актива {asset_name} не найдена на дату {today}")
+
+        price = asset_price_data[asset_name]["price"]
+
+        price = float(price.replace("₽", "").replace(",", "."))
+
+        return price

@@ -34,5 +34,5 @@ class CreateNewStrategyHanlder:
         strategy.add_user(user)
 
         strategy_id = await self.strategy_repo.save(strategy, command.portfolio)
-
+        await self.uow.commit()
         return strategy_id

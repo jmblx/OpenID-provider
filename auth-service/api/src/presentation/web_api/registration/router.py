@@ -2,10 +2,7 @@ from dishka import FromDishka
 from dishka.integrations.fastapi import DishkaRoute
 from fastapi import APIRouter
 from fastapi.responses import ORJSONResponse
-from jinja2 import PackageLoader
 from starlette import status
-from starlette.responses import RedirectResponse
-from starlette.templating import Jinja2Templates
 
 from application.auth.commands.register_user_command import RegisterUserCommand
 from application.auth.handlers.register_user_handler import (
