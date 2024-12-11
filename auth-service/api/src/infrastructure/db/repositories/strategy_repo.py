@@ -15,6 +15,7 @@ class StrategyRepo:
 
     async def save(self, strategy: Strategy, portfolio: dict, user_id: UserID) -> UUID:
         self.session.add(strategy)
+        await self.session.flush()
 
         start_date = date.today()
 
