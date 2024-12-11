@@ -43,7 +43,6 @@ class UserReaderImpl(UserReader):
         return UserStrategiesDTO(user_id=user_id.value, strategies=user_strategies)
 
     async def _get_user_strategy_association(self, strategy_id: UUID, user_id: UserID):
-        # Запрос для получения ассоциативной записи для пользователя и стратегии
         query = select(user_strategy_association_table).filter_by(strategy_id=strategy_id, user_id=user_id.value)
         result = await self.session.execute(query)
         return result.scalars().first()
