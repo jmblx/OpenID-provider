@@ -61,8 +61,8 @@ class StrategyReader:
             user_strategy_association_table.c.user_id == user_id.value
         ))
         result = await self.session.execute(query)
-        user_strategy = result.scalars().first()
-
+        user_strategy = result.scalars().all()[0]
+        print(user_strategy)
         if not user_strategy:
             raise ValueError(f"User strategy association for user {user_id.value} and strategy {strategy_id} not found.")
 
