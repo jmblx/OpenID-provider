@@ -86,14 +86,18 @@ class InvestmentsService:
         print(news_data, historical_data)
         # predictions = self.prediction_gateway.get_predictions(news_data, historical_data)
         prompt = self.prediction_gateway.get_predictions(news_data, historical_data)
-        all_data = {
-            "bonds": self.merge_and_calculate(existing_bonds, bonds, predictions.get("bonds", {})),
-            "currencies": self.merge_and_calculate(existing_currencies, currencies, predictions.get("currencies", {})),
-            "gold": self.merge_and_calculate(existing_gold, gold, predictions.get("gold", {})),
-            "shares": self.merge_and_calculate(existing_shares, shares, predictions.get("shares", {})),
-            "deposits": deposits,
-        }
-
+        # all_data =
+        # print(prompt)
+        # # predictions =
+        # all_data = {
+        #     "bonds": self.merge_and_calculate(existing_bonds, bonds, predictions.get("bonds", {})),
+        #     "currencies": self.merge_and_calculate(existing_currencies, currencies, predictions.get("currencies", {})),
+        #     "gold": self.merge_and_calculate(existing_gold, gold, predictions.get("gold", {})),
+        #     "shares": self.merge_and_calculate(existing_shares, shares, predictions.get("shares", {})),
+        #     "deposits": deposits,
+        # }
+        with open("res.json", 'r') as json_file:
+            all_data = json.load(json_file)
         await self.redis.set("data", json.dumps(all_data))
 
     def merge_and_calculate(self, existing_data, new_data, predicted_data):

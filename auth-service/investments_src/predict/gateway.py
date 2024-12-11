@@ -29,7 +29,7 @@ class PredictionGateway:
             historical_data=historical_data_json,
             news_data=news_data_json,
         )
-    return self.gigachat.chat(prompt)
+        return prompt
     #
     #     response = self.gigachat.chat(prompt)
     #     result = response.choices[0].message.content
