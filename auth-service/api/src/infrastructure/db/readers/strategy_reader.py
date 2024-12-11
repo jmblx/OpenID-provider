@@ -2,7 +2,7 @@ import json
 from dataclasses import dataclass
 from uuid import UUID
 
-from sqlalchemy import select, and_
+from sqlalchemy import select, and_, text
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -58,22 +58,34 @@ class StrategyReader:
         # )
 
     async def _get_user_strategy_association(self, strategy_id: UUID, user_id: UserID):
-        query = select(
-            user_strategy_association_table.c.id,
-            user_strategy_association_table.c.strategy_id,
-            user_strategy_association_table.c.user_id,
-            user_strategy_association_table.c.portfolio,
-            user_strategy_association_table.c.current_balance,
-            user_strategy_association_table.c.start_date,
-            user_strategy_association_table.c.end_date
-        ).where(and_(
-            user_strategy_association_table.c.strategy_id == strategy_id,
-            user_strategy_association_table.c.user_id == user_id.value
-        ))
+        query = text("""
+                   SELECT user_strategy_association.id, 
+                          user_strategy_association.strategy_id, 
+                          user_strategy_association.user_id, 
+                          user_strategy_association.portfolio, 
+                          user_strategy_association.current_balance, 
+                          user_strategy_association.start_date, 
+                          user_strategy_association.end_date
+                   FROM user_strategy_association
+                   WHERE user_strategy_association.strategy_id = :strategy_id 
+                     AND user_strategy_association.user_id = :user_id
+               """)
 
-        result = await self.session.execute(query)
+        # Выполнение запроса с параметрами
+        result = await self.session.execute(query, {"strategy_id": strategy_id, "user_id": user_id.value})
+
+        # Извлечение результата
         user_strategy = result.fetchall()
-        # Получаем все строки
+
+        if not user_strategy:
+            raise ValueError(
+                f"User strategy association for user {user_id.value} and strategy {strategy_id} not found.")
+
         user_strategy = user_strategy[0]
-        print(user_strategy, "PORTF: ", user_strategy.portfolio)
+
+        # Десериализация поля portfolio из строки JSON в Python-объект
+        portfolio = json.loads(user_strategy.portfolio) if isinstance(user_strategy.portfolio,
+                                                                      str) else user_strategy.portfolio
+
+        print(f"User strategy data: {user_strategy}, Portfolio: {portfolio}")
         return user_strategy
