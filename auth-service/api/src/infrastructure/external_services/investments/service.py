@@ -1,7 +1,9 @@
 import json
+from datetime import datetime, timedelta
+from typing import List, Dict
+import logging
 
 import redis.asyncio as aioredis
-
 
 class InvestmentsService:
     def __init__(self, redis: aioredis.Redis):
@@ -10,3 +12,54 @@ class InvestmentsService:
     async def get_investments(self) -> dict[str, dict]:
         investments = await self.redis.get("data")
         return json.loads(investments)
+
+    def get_price_change_percentage(self, old_price: float, new_price: float) -> float:
+        """Вычисляем процентное изменение цены"""
+        return ((new_price - old_price) / old_price) * 100
+
+    async def check_for_significant_changes(self, portfolio: dict, threshold: float = 5.0) -> List[str]:
+        """Проверка изменений в портфеле за последние 7 дней"""
+        notifications = []
+        investments = await self.get_investments()
+        today = datetime.today().strftime("%d.%m.%Y")
+        seven_days_ago = (datetime.today() - timedelta(days=7)).strftime("%d.%m.%Y")
+
+        # Проверяем акции, облигации, валюты и золото
+        for investment_type, data in portfolio.items():
+            if investment_type not in investments:
+                continue
+
+            # Для каждого актива проверяем изменения
+            for asset in data:
+                asset_name = asset["name"]
+                quantity = asset["quantity"]
+                price_history = investments[investment_type]
+
+                # Получаем цену на 7 дней назад и сегодняшнюю цену
+                if seven_days_ago in price_history and today in price_history:
+                    old_price = float(price_history[seven_days_ago].get("price", 0).replace("₽", "").replace(",", "."))
+                    new_price = float(price_history[today].get("price", 0).replace("₽", "").replace(",", "."))
+                    price_change = self.get_price_change_percentage(old_price, new_price)
+
+                    if abs(price_change) >= threshold:
+                        notifications.append(f"Актив {asset_name} изменил свою цену на {price_change:.2f}% за неделю (текущая цена: {new_price} ₽).")
+
+                # Также проверяем прогноз на будущие изменения
+                if today in price_history:
+                    next_7_day_diff = price_history[today].get("next_7_day_diff_in_%", "0")
+                    next_7_day_diff = float(next_7_day_diff.replace("%", ""))
+                    if abs(next_7_day_diff) >= threshold:
+                        notifications.append(f"Прогноз на актив {asset_name}: изменение цены на {next_7_day_diff:.2f}% за следующие 7 дней.")
+
+        return notifications
+
+    async def check_strategy_end_date(self, end_date: str) -> List[str]:
+        """Проверка, если до окончания стратегии осталось менее 7 дней"""
+        notifications = []
+        today = datetime.today().date()
+        end_date = datetime.strptime(end_date, "%Y-%m-%d").date()
+        if end_date - today <= timedelta(days=7):
+            notifications.append("Стратегия заканчивается через 7 дней или меньше. Убедитесь, что вы готовы.")
+
+        return notifications
+
