@@ -13,24 +13,27 @@ class StrategyRepo:
     def __init__(self, session: AsyncSession):
         self.session = session
 
+
     async def save(self, strategy: Strategy, portfolio: dict, user_id: UserID) -> UUID:
+        # Убедимся, что portfolio передается как словарь
         self.session.add(strategy)
         await self.session.flush()
 
         start_date = date.today()
-
-        end_date = date.today() + timedelta(days=strategy.days_duration)
+        end_date = start_date + timedelta(days=strategy.days_duration)
 
         current_balance = strategy.calculate_balance(portfolio)
-        print(portfolio)
+
         stmt = insert(user_strategy_association_table).values(
             user_id=user_id.value,
             strategy_id=strategy.id,
-            portfolio=portfolio,
+            portfolio=portfolio,  # Передаем как словарь
             current_balance=current_balance,
             start_date=start_date,
             end_date=end_date,
-        )
+            in_process=True
+        ).returning(user_strategy_association_table.c.id)
+
         await self.session.execute(stmt)
 
         return strategy.id
