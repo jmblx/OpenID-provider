@@ -18,6 +18,7 @@ from application.client.queries.client_queries import ClientAuthValidationQueryH
 from application.investments.queries import InvestmentsQueryHandler
 from application.role.handlers.create_role_handler import CreateRoleHandler
 from application.strategy.create_new_hanlder import CreateNewStrategyHanlder
+from application.strategy.strategy_query_handler import StrategyQueryHandler
 
 
 class HandlerProvider(Provider):
@@ -47,3 +48,4 @@ class HandlerProvider(Provider):
         InvestmentsQueryHandler, scope=Scope.REQUEST
     )
     create_new_strategy_hanlder = provide(CreateNewStrategyHanlder, scope=Scope.REQUEST)
+    read_strategy_hanlder = provide(StrategyQueryHandler, scope=Scope.REQUEST)

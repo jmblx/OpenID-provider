@@ -6,6 +6,7 @@ from application.common.id_provider import IdentityProvider
 from application.common.uow import Uow
 from application.user.interfaces.repo import UserRepository
 from domain.entities.strategy.model import Strategy
+from domain.exceptions.user import UnauthenticatedUserError
 from infrastructure.db.repositories.strategy_repo import StrategyRepo
 
 @dataclass
@@ -24,6 +25,8 @@ class CreateNewStrategyHanlder:
 
     async def handle(self, command: CreateNewStrategyCommand) -> UUID:
         user_id = self.idp.get_current_user_id()
+        if not user_id:
+            raise UnauthenticatedUserError()
 
         strategy = Strategy.create(command.budget, command.days_duration)
 
