@@ -1,3 +1,4 @@
+import json
 from dataclasses import dataclass
 from uuid import UUID
 
@@ -82,10 +83,11 @@ class StrategyReader:
         # Теперь можно работать с результатом
         user_strategy = user_strategy[0]  # Берем первую строку
 
-        # Выводим для отладки
+        # Проверяем, если portfolio None, то присваиваем пустой словарь
+        portfolio = user_strategy.portfolio
+        if portfolio is None:
+            portfolio = {}
+
         print(f"User strategy data: {user_strategy}")
 
         return user_strategy
-
-
-
