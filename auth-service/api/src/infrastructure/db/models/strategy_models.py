@@ -1,3 +1,5 @@
+import uuid
+
 from sqlalchemy import (
     Table,
     Column,
@@ -13,7 +15,7 @@ from infrastructure.db.models.secondary import user_strategy_association_table
 strategy_table = Table(
     'strategy',
     mapper_registry.metadata,
-Column("id", SQLAlchemyUUID(as_uuid=True), primary_key=True),
+Column("id", SQLAlchemyUUID(as_uuid=True), primary_key=True, default=uuid.uuid4),
     Column("budget", Float, nullable=False),
     Column("days_duration", Integer, nullable=False),
 )
