@@ -8,7 +8,7 @@ class PredictionGateway:
         self.gigachat = gigachat
 
     def get_predictions(self, news: dict[str, list[str]], historical_data: dict) -> dict:
-        # Формируем промпт для модели
+    #     # Формируем промпт для модели
         prompt_template = """
     У нас есть исторические данные по следующим типам активов: bonds (облигации), currencies (валюты), gold (золото), shares (акции). Также есть аналитика последних 7 дней и информация о политических и экономических новостях. На основе этой информации нужно сделать прогноз цен на следующие 7 дней.
 
@@ -29,17 +29,16 @@ class PredictionGateway:
             historical_data=historical_data_json,
             news_data=news_data_json,
         )
+    return self.gigachat.chat(prompt)
+    #
+    #     response = self.gigachat.chat(prompt)
+    #     result = response.choices[0].message.content
+    #
+    #     try:
+    #         predictions = json.loads(result)
+    #     except json.JSONDecodeError:
+    #         raise ValueError("Ошибка парсинга ответа модели GigaChat")
 
-        # Отправляем запрос в модель
-        response = self.gigachat.chat(prompt)
-        result = response.choices[0].message.content
-
-        # Преобразуем текстовый ответ в словарь
-        try:
-            predictions = json.loads(result)
-        except json.JSONDecodeError:
-            raise ValueError("Ошибка парсинга ответа модели GigaChat")
-
-        return predictions
+        return
 
 

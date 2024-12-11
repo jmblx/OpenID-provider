@@ -41,7 +41,6 @@ class InvestmentsService:
         return {}
 
     async def collect_all_data(self):
-        # Собираем текущие данные
         bonds = await self.bonds_gateway.get_entities_prices(
             tracked_entities=[
                 "RU000A1038V6",
@@ -84,10 +83,9 @@ class InvestmentsService:
             "shares": existing_shares,
         }
 
-        self.logger.info("Requesting predictions based on news and historical data")
-        predictions = self.prediction_gateway.get_predictions(news_data, historical_data)
-
-        self.logger.info("Merging and calculating all data")
+        print(news_data, historical_data)
+        # predictions = self.prediction_gateway.get_predictions(news_data, historical_data)
+        prompt = self.prediction_gateway.get_predictions(news_data, historical_data)
         all_data = {
             "bonds": self.merge_and_calculate(existing_bonds, bonds, predictions.get("bonds", {})),
             "currencies": self.merge_and_calculate(existing_currencies, currencies, predictions.get("currencies", {})),
@@ -96,11 +94,9 @@ class InvestmentsService:
             "deposits": deposits,
         }
 
-        self.logger.info("Saving merged data to Redis")
         await self.redis.set("data", json.dumps(all_data))
 
     def merge_and_calculate(self, existing_data, new_data, predicted_data):
-        self.logger.info("Merging data from existing, new, and predictions")
         all_dates = list({**existing_data, **new_data, **predicted_data}.keys())[-7:]
         merged_data = {}
 
