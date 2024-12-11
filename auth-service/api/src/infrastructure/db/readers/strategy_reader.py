@@ -50,8 +50,9 @@ class StrategyReader:
             portfolio=user_strategy.portfolio,
             user_id=user_id.value,
             current_balance=current_balance,
-            start_date=user_strategy.start_date.strftime('%Y-%m-%d'),
-            end_date=user_strategy.end_date.strftime('%Y-%m-%d')
+            start_date=user_strategy.start_date.strftime('%d.%m.%Y'),  # в формате '05.12.2024'
+            end_date = user_strategy.end_date.strftime('%d.%m.%Y')  # в формате '06.12.2024'
+
         )
 
     async def _get_user_strategy_association(self, strategy_id: UUID, user_id: UserID):
