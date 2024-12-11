@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from uuid import UUID
 
-from sqlalchemy import select
+from sqlalchemy import select, and_
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -55,6 +55,6 @@ class StrategyReader:
         )
 
     async def _get_user_strategy_association(self, strategy_id: UUID, user_id: UserID):
-        query = select(user_strategy_association_table).where(strategy_id=strategy_id, user_id=user_id)
+        query = select(user_strategy_association_table).where(and_(strategy_id==strategy_id, user_id==user_id))
         result = await self.session.execute(query)
         return result.scalars().first()
