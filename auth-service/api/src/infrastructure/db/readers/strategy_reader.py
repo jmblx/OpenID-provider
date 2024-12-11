@@ -57,6 +57,7 @@ class StrategyReader:
 
     async def _get_user_strategy_association(self, strategy_id: UUID, user_id: UserID):
         query = select(
+            user_strategy_association_table.c.id,  # если нужен id
             user_strategy_association_table.c.strategy_id,
             user_strategy_association_table.c.user_id,
             user_strategy_association_table.c.portfolio,
@@ -69,14 +70,22 @@ class StrategyReader:
         ))
 
         result = await self.session.execute(query)
-        user_strategy = result.scalars().first()
 
+        # Получаем все строки
+        user_strategy = result.fetchall()
+
+        # Если результат пустой, выбрасываем исключение
         if not user_strategy:
             raise ValueError(
                 f"User strategy association for user {user_id.value} and strategy {strategy_id} not found.")
 
+        # Теперь можно работать с результатом
+        user_strategy = user_strategy[0]  # Берем первую строку
+
+        # Выводим для отладки
         print(f"User strategy data: {user_strategy}")
 
         return user_strategy
+
 
 
