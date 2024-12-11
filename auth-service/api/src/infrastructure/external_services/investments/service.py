@@ -17,6 +17,15 @@ class InvestmentsService:
         """Вычисляем процентное изменение цены"""
         return ((new_price - old_price) / old_price) * 100
 
+    def parse_price(self, price_str: str) -> float:
+        """Преобразует строку с ценой в число (удаляет валюту и заменяет запятую на точку)."""
+        price_str = price_str.replace("₽", "").replace(",", ".").strip()
+        return float(price_str)
+
+    def parse_percentage(self, percentage_str: str) -> float:
+        """Преобразует строку с процентом в число."""
+        return float(percentage_str.replace("%", "").strip())
+
     async def check_for_significant_changes(self, portfolio: dict, threshold: float = 5.0) -> List[str]:
         """Проверка изменений в портфеле за последние 7 дней"""
         notifications = []
@@ -24,30 +33,34 @@ class InvestmentsService:
         today = datetime.today().strftime("%d.%m.%Y")
         seven_days_ago = (datetime.today() - timedelta(days=7)).strftime("%d.%m.%Y")
 
-        # Проверяем акции, облигации, валюты и золото
         for investment_type, data in portfolio.items():
             if investment_type not in investments:
                 continue
             print(investment_type, data)
-            # Для каждого актива проверяем изменения
             for asset in data:
                 asset_name = asset["name"]
                 quantity = asset["quantity"]
                 price_history = investments[investment_type]
 
                 if seven_days_ago in price_history and today in price_history:
-                    old_price = float(price_history[seven_days_ago].get("price", 0).replace("₽", "").replace(",", "."))
-                    new_price = float(price_history[today].get("price", 0).replace("₽", "").replace(",", "."))
+                    old_price_str = price_history[seven_days_ago].get("price", "0")
+                    new_price_str = price_history[today].get("price", "0")
+
+                    old_price = self.parse_price(old_price_str)
+                    new_price = self.parse_price(new_price_str)
+
                     price_change = self.get_price_change_percentage(old_price, new_price)
 
                     if abs(price_change) >= threshold:
-                        notifications.append(f"Актив {asset_name} изменил свою цену на {price_change:.2f}% за неделю (текущая цена: {new_price} ₽).")
+                        notifications.append(
+                            f"Актив {asset_name} изменил свою цену на {price_change:.2f}% за неделю (текущая цена: {new_price} ₽).")
 
                 if today in price_history:
-                    next_7_day_diff = price_history[today].get("next_7_day_diff_in_%", "0")
-                    next_7_day_diff = float(next_7_day_diff.replace("%", ""))
+                    next_7_day_diff_str = price_history[today].get("next_7_day_diff_in_%", "0")
+                    next_7_day_diff = self.parse_percentage(next_7_day_diff_str)
                     if abs(next_7_day_diff) >= threshold:
-                        notifications.append(f"Прогноз на актив {asset_name}: изменение цены на {next_7_day_diff:.2f}% за следующие 7 дней.")
+                        notifications.append(
+                            f"Прогноз на актив {asset_name}: изменение цены на {next_7_day_diff:.2f}% за следующие 7 дней.")
                 try:
                     print(today, price_history, next_7_day_diff, price_change)
                 except Exception as e:
@@ -66,25 +79,16 @@ class InvestmentsService:
 
     async def get_price_by_date_and_name(self, asset_type: str, asset_name: str) -> float:
         investments = await self.get_investments()
-
         # Получаем текущую дату по Москве
         today = date.today().strftime("%d.%m.%Y")
-
         if asset_type not in investments:
             raise ValueError(f"Неизвестный тип актива: {asset_type}")
-
         asset_data = investments[asset_type]
-
         if today not in asset_data:
             raise ValueError(f"Данные по дате {today} не найдены для актива {asset_name}")
-
         asset_price_data = asset_data[today]
-
         if asset_name not in asset_price_data:
             raise ValueError(f"Цена для актива {asset_name} не найдена на дату {today}")
-
         price = asset_price_data[asset_name]["price"]
-
         price = float(price.replace("₽", "").replace(",", "."))
-
         return price
