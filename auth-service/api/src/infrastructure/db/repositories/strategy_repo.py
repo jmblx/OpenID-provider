@@ -14,6 +14,18 @@ class StrategyRepo:
         self.session = session
 
     async def save(self, strategy: Strategy, portfolio: dict, user_id: UserID) -> UUID:
+        # Проверяем, существует ли ассоциация с таким strategy_id и user_id
+        stmt = select(user_strategy_association_table).filter(
+            user_strategy_association_table.c.strategy_id == strategy.id,
+            user_strategy_association_table.c.user_id == user_id.value
+        )
+        result = await self.session.execute(stmt)
+        existing_association = result.scalars().first()
+
+        if existing_association:
+            return existing_association.id  # Возвращаем существующий ID, если ассоциация уже существует
+
+        # Если ассоциации нет, создаем новую
         self.session.add(strategy)
         await self.session.flush()
 
@@ -25,7 +37,7 @@ class StrategyRepo:
         stmt = insert(user_strategy_association_table).values(
             user_id=user_id.value,
             strategy_id=strategy.id,
-            portfolio=portfolio,  # Передаем как словарь
+            portfolio=portfolio,  # Портфель передается как словарь
             current_balance=current_balance,
             start_date=start_date,
             end_date=end_date,
@@ -33,7 +45,6 @@ class StrategyRepo:
         ).returning(user_strategy_association_table.c.id)
 
         await self.session.execute(stmt)
-
         return strategy.id
 
     async def get_by_id(self, id: UUID) -> Strategy | None:
