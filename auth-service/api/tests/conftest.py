@@ -17,11 +17,12 @@ from sqlalchemy.ext.asyncio import (
 )
 from sqlalchemy.orm.exc import ObjectDeletedError
 
+from domain.entities.user.model import User
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../src")))
 
 from api.tests.config import TEST_DATABASE_URI
 from core.di.container import container
-from infrastructure.db.models import User
 from domain.common.services.pwd_service import PasswordHasher
 from presentation.web_api.main import app
 
@@ -112,13 +113,9 @@ async def mock_user(async_session: AsyncSession) -> User:
         hash_service = await ioc.get(PasswordHasher)
 
         user_mock = User(
-            first_name="iojввввв",
-            last_name="emвgyrвввв",
             role_id=4,
             email="aaaddd@b.b",
             hashed_password=hash_service.hash_password("b1b1b1b1"),
-            is_active=True,
-            is_verified=False,
         )
 
     async_session.add(user_mock)

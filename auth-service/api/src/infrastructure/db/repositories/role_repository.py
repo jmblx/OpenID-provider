@@ -1,6 +1,6 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from application.role.interfaces.repo import RoleRepository
+from application.common.interfaces.role_repo import RoleRepository
 from domain.entities.role.model import Role
 from domain.entities.role.value_objects import RoleID
 

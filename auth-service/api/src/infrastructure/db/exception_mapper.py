@@ -4,7 +4,7 @@ from typing import Any, ParamSpec, TypeVar
 
 from sqlalchemy.exc import SQLAlchemyError
 
-from application.common.exceptions import RepoError
+from application.common.base_exceptions import RepoError
 
 Param = ParamSpec("Param")
 ReturnType = TypeVar("ReturnType")

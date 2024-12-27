@@ -84,18 +84,16 @@ class InvestmentsService:
         }
 
         print(news_data, historical_data)
-        # predictions = self.prediction_gateway.get_predictions(news_data, historical_data)
+        predictions = self.prediction_gateway.get_predictions(news_data, historical_data)
         prompt = self.prediction_gateway.get_predictions(news_data, historical_data)
-        # all_data =
-        # print(prompt)
-        # # predictions =
-        # all_data = {
-        #     "bonds": self.merge_and_calculate(existing_bonds, bonds, predictions.get("bonds", {})),
-        #     "currencies": self.merge_and_calculate(existing_currencies, currencies, predictions.get("currencies", {})),
-        #     "gold": self.merge_and_calculate(existing_gold, gold, predictions.get("gold", {})),
-        #     "shares": self.merge_and_calculate(existing_shares, shares, predictions.get("shares", {})),
-        #     "deposits": deposits,
-        # }
+        # predictions =
+        all_data = {
+            "bonds": self.merge_and_calculate(existing_bonds, bonds, predictions.get("bonds", {})),
+            "currencies": self.merge_and_calculate(existing_currencies, currencies, predictions.get("currencies", {})),
+            "gold": self.merge_and_calculate(existing_gold, gold, predictions.get("gold", {})),
+            "shares": self.merge_and_calculate(existing_shares, shares, predictions.get("shares", {})),
+            "deposits": deposits,
+        }
         with open("res.json", 'r') as json_file:
             all_data = json.load(json_file)
         await self.redis.set("data", json.dumps(all_data))
@@ -125,7 +123,6 @@ class InvestmentsService:
                 else:
                     details["percentage_change"] = "0.00%"
 
-                # Add predicted change if available
                 if "predicted_price" in details:
                     predicted_price = self.extract_price(details["predicted_price"])
                     if predicted_price is not None and last_price is not None:

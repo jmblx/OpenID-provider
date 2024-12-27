@@ -1,7 +1,7 @@
 import redis.asyncio as aioredis
 import orjson
 from typing import Optional
-from application.auth.services.auth_code import (
+from application.common.services.auth_code import (
     AuthorizationCodeStorage,
     AuthCodeData,
 )

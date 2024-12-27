@@ -1,17 +1,8 @@
-from domain.common.exceptions.base import AppError
+from dataclasses import dataclass
+
+from application.common.base_exceptions import ApplicationError
 
 
-class ApplicationError(AppError):
-    """Base Application Exception."""
-
-    @property
-    def title(self) -> str:
-        return "An application error occurred"
-
-
-class UnexpectedError(ApplicationError):
-    pass
-
-
-class RepoError(UnexpectedError):
-    pass
+@dataclass(eq=False)
+class FingerprintMismatchException(ApplicationError):
+    ...

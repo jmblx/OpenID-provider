@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from domain.entities.client.value_objects import ClientID
 from infrastructure.db.models import client_table
-from application.client.reader import ClientReader, ClientAuthData
+from application.common.interfaces.client_reader import ClientReader, ClientAuthData
 
 
 class ClientReaderImpl(ClientReader):

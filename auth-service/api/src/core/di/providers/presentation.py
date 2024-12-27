@@ -1,8 +1,7 @@
 from dishka import Provider, provide, Scope
 from fastapi import Request
 
-from application.auth.handlers.refresh_tokens_handler import RefreshTokensHandler
-from application.auth.token_types import Fingerprint, RefreshToken, AccessToken
+from application.common.token_types import Fingerprint, RefreshToken, AccessToken
 
 
 class PresentationProvider(Provider):

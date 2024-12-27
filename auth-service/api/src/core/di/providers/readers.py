@@ -1,10 +1,10 @@
 from dishka import Provider, provide, Scope
 
-from application.user.interfaces.reader import UserReader
+from application.common.interfaces.user_reader import UserReader
 from infrastructure.db.readers.client_reader import ClientReaderImpl
 from infrastructure.db.readers.strategy_reader import StrategyReader
 from infrastructure.db.readers.user_reader import UserReaderImpl
-from application.client.reader import ClientReader
+from application.common.interfaces.client_reader import ClientReader
 
 
 class ReaderProvider(Provider):

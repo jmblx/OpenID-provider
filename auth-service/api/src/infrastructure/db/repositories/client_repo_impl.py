@@ -1,7 +1,7 @@
 from sqlalchemy import select, and_
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from application.client.interfaces.repo import ClientRepository
+from application.common.interfaces.client_repo import ClientRepository
 from application.dtos.client import ClientCreateDTO
 from domain.entities.client.model import Client
 from domain.entities.client.value_objects import ClientID

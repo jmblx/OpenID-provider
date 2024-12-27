@@ -1,8 +1,8 @@
 from abc import ABC, abstractmethod
 from uuid import UUID
 
-from application.auth.interfaces.jwt_service import JWTService
-from application.auth.token_types import AccessToken
+from application.common.interfaces.jwt_service import JWTService
+from application.common.token_types import AccessToken
 from domain.entities.user.value_objects import UserID
 
 

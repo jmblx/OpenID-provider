@@ -1,13 +1,8 @@
-from operator import and_
-from typing import cast
-from uuid import UUID
-
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from sqlalchemy.orm import joinedload
 
-from application.user.dto.user import UserCreateOutputDTO
-from application.user.interfaces.repo import UserRepository, IdentificationFields
+from application.common.interfaces.user_repo import UserRepository, IdentificationFields
 from domain.entities.user.model import User
 from domain.entities.user.value_objects import UserID, Email
 from infrastructure.db.exception_mapper import exception_mapper
@@ -36,7 +31,7 @@ class UserRepositoryImpl(UserRepository):
         if user:
             await self.session.delete(user)
 
-    async def by_fields_with_clients(self, fields: IdentificationFields) -> User | None:
+    async def get_by_fields_with_clients(self, fields: IdentificationFields) -> User | None:
         query = select(User).options(joinedload(User.clients))
 
         for field, value in fields.items():
@@ -46,10 +41,10 @@ class UserRepositoryImpl(UserRepository):
         result = await self.session.execute(query)
         return result.scalars().first()
 
-    async def by_id(self, user_id: UserID) -> User | None:
+    async def get_by_id(self, user_id: UserID) -> User | None:
         return await self.session.get(User, user_id)
 
-    async def by_email(self, email: Email) -> User | None:
+    async def get_by_email(self, email: Email) -> User | None:
         query = select(User).where(User.email == email)
         result = await self.session.execute(query)
         user = result.scalar_one_or_none()

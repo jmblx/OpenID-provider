@@ -8,6 +8,7 @@ from starlette import status
 from starlette.requests import Request
 from starlette.status import HTTP_500_INTERNAL_SERVER_ERROR
 
+from application.common.exceptions import FingerprintMismatchException
 from domain.common.exceptions.base import AppError
 from domain.exceptions.auth import (
     InvalidRedirectURLError,
@@ -34,6 +35,7 @@ def setup_exception_handlers(app: FastAPI):
     app.add_exception_handler(
         InvalidRedirectURLError, error_handler(status.HTTP_400_BAD_REQUEST)
     )
+    app.add_exception_handler(FingerprintMismatchException, error_handler(status.HTTP_401_UNAUTHORIZED))
     app.add_exception_handler(
         InvalidClientError, error_handler(status.HTTP_400_BAD_REQUEST)
     )

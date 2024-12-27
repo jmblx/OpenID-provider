@@ -3,21 +3,21 @@ from uuid import UUID
 
 from fastapi import HTTPException
 
-from application.auth.services.pkce import (
+from application.common.exceptions import FingerprintMismatchException
+from application.common.interfaces.http_auth import HttpAuthService
+from application.common.interfaces.jwt_service import JWTService
+from application.common.interfaces.white_list import TokenWhiteListService
+from application.common.services.pkce import (
     PKCEService,
 )
-from application.auth.token_types import Fingerprint, AccessToken, RefreshToken
-from application.auth.interfaces.jwt_service import JWTService
-from application.auth.interfaces.token_creation import TokenCreationService
-from application.auth.interfaces.http_auth import HttpAuthService
-from application.auth.interfaces.white_list import TokenWhiteListService
-from application.user.interfaces.reader import UserReader
-from application.user.interfaces.repo import UserRepository
+from application.common.token_types import Fingerprint, AccessToken, RefreshToken, Payload
+from application.common.interfaces.token_creation import TokenCreationService
+from application.common.interfaces.user_repo import UserRepository
 from domain.entities.user.model import User
 from domain.entities.user.value_objects import Email, RawPassword, UserID
 from domain.common.services.pwd_service import PasswordHasher
 from infrastructure.services.auth.config import JWTSettings
-from application.auth.services.auth_code import (
+from application.common.services.auth_code import (
     AuthorizationCodeStorage,
 )
 
@@ -50,22 +50,20 @@ class HttpAuthServiceImpl(HttpAuthService):
     async def _token_to_user(
         self, refresh_token: RefreshToken, fingerprint: Fingerprint
     ) -> User:
-        payload = self.jwt_service.decode(refresh_token)
-        logger.info(f"payload: {payload}")
-        jti = payload["jti"]
+        jti = self._get_token_jti(refresh_token)
         token_data = await self.token_whitelist_service.get_refresh_token_data(jti)
         logger.info("tokend data: %s, jti: %s", token_data, jti)
         if not token_data or token_data.fingerprint != fingerprint:
             raise HTTPException(
                 status_code=401, detail="Invalid refresh token or fingerprint"
             )
-        user: User = await self.user_service.by_id(token_data.user_id)  # type: ignore
+        user: User = await self.user_service.get_by_id(token_data.user_id)  # type: ignore
         return user
 
     async def authenticate_user(
         self, email: Email, password: RawPassword, fingerprint: Fingerprint
     ) -> tuple[AccessToken, RefreshToken]:
-        user = await self.user_repository.by_email(email)
+        user = await self.user_repository.get_by_email(email)
         if not user:
             raise HTTPException(status_code=401, detail="Invalid credentials")
         self.hash_service.check_password(password, user.hashed_password)
@@ -77,10 +75,21 @@ class HttpAuthServiceImpl(HttpAuthService):
         user = await self._token_to_user(refresh_token, fingerprint)
         return await self._create_and_save_tokens(user, fingerprint)
 
-    async def revoke(self, refresh_token: RefreshToken) -> None:
+    def _get_token_jti(self, refresh_token: RefreshToken) -> UUID:
         payload = self.jwt_service.decode(refresh_token)
-        jti = payload["jti"]
+        return payload["jti"]
+
+    async def revoke(self, refresh_token: RefreshToken) -> None:
+        jti = self._get_token_jti(refresh_token)
         await self.token_whitelist_service.remove_token(jti)
+
+    async def invalidate_other_tokens(self, refresh_token: RefreshToken, fingerprint: Fingerprint) -> None:
+        payload: Payload = self.jwt_service.decode(refresh_token)
+        jti = payload["jti"]
+        if not await self.token_whitelist_service.is_fingerprint_matching(jti, fingerprint):
+            raise FingerprintMismatchException()
+        user_id: UUID = payload["sub"] # type: ignore
+        await self.token_whitelist_service.remove_tokens_except_current(jti, user_id)
 
     async def refresh_access_token(
         self, refresh_token: RefreshToken, fingerprint: Fingerprint
@@ -106,7 +115,7 @@ class HttpAuthServiceImpl(HttpAuthService):
         if not self._validate_pkce(code_challenger, real_code_challenger):
             raise HTTPException(status_code=400, detail="Invalid PKCE")
 
-        user = await self.user_repository.by_id(UserID(UUID(auth_code_data["user_id"])))
+        user = await self.user_repository.get_by_id(UserID(UUID(auth_code_data["user_id"])))
         if not user:
             raise HTTPException(status_code=404, detail="User not found")
 

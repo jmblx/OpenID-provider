@@ -1,10 +1,11 @@
 import logging
-from typing import Optional, Any
+from typing import Optional
 from uuid import UUID
 
 from redis.asyncio import Redis
-from application.auth.interfaces.white_list import TokenWhiteListService
-from application.auth.token_types import RefreshTokenWithData, RefreshTokenData
+
+from application.common.interfaces.white_list import TokenWhiteListService
+from application.common.token_types import RefreshTokenWithData, RefreshTokenData
 
 logger = logging.getLogger(__name__)
 
@@ -26,7 +27,7 @@ class TokenWhiteListServiceImpl(TokenWhiteListService):
             "created_at": refresh_token_data.created_at.isoformat(),
         }
 
-    async def remove_token_by_jti(self, jti: UUID) -> None:
+    async def _remove_token_by_jti(self, jti: UUID) -> None:
         """Удаляет токен из всех связанных ключей."""
         token_data = await self.get_refresh_token_data(jti)
         if not token_data:
@@ -41,6 +42,45 @@ class TokenWhiteListServiceImpl(TokenWhiteListService):
         await self.redis.delete(f"refresh_token_index:{user_id}:{fingerprint}")
         logger.info("Удалён токен с jti %s из всех связанных ключей.", jti)
 
+    async def is_fingerprint_matching(self, jti: UUID, fingerprint: str) -> bool:
+        """
+        Проверяет, совпадает ли переданный fingerprint с fingerprint токена по его jti.
+
+        :param jti: UUID токена.
+        :param fingerprint: Проверяемый fingerprint.
+        :return: True, если fingerprint совпадает, иначе False.
+        """
+        token_data = await self.redis.hgetall(f"refresh_token:{jti}")
+        if not token_data:
+            logger.warning("Токен с jti: %s не найден", jti)
+            return False
+
+        stored_fingerprint = token_data.get("fingerprint")
+        if stored_fingerprint is None:
+            logger.warning("Fingerprint отсутствует в данных токена с jti: %s", jti)
+            return False
+
+        return stored_fingerprint == fingerprint
+
+    async def remove_tokens_except_current(self, jti: UUID, user_id: UUID) -> None:
+        """
+        Удаляет все токены для данного user_id, кроме указанного jti.
+
+        :param jti: UUID токена, который нужно оставить.
+        :param user_id: Идентификатор пользователя.
+        """
+        token_jtis = await self.redis.zrange(f"refresh_tokens:{user_id}", 0, -1)
+
+        tokens_to_remove = [token for token in token_jtis if token != str(jti)]
+
+        for token in tokens_to_remove:
+            await self._remove_token_by_jti(token)
+
+        if tokens_to_remove:
+            await self.redis.zrem(f"refresh_tokens:{user_id}", *tokens_to_remove)
+
+        logger.info("Удалены все токены, кроме jti: %s", jti)
+
     async def save_refresh_token(
         self, refresh_token_data: RefreshTokenWithData, limit: int
     ) -> None:
@@ -53,14 +93,14 @@ class TokenWhiteListServiceImpl(TokenWhiteListService):
         # Удаление существующего токена для данного user_id и fingerprint
         existing_jti = await self.get_existing_jti(user_id, fingerprint)
         if existing_jti:
-            await self.remove_token_by_jti(existing_jti)
+            await self._remove_token_by_jti(existing_jti)
 
         # Удаление самых старых токенов, если превышен лимит
         num_tokens = await self.redis.zcard(f"refresh_tokens:{user_id}")
         if num_tokens >= limit:
             oldest_jti_list = await self.redis.zrange(f"refresh_tokens:{user_id}", 0, 0)
             if oldest_jti_list:
-                await self.remove_token_by_jti(oldest_jti_list[0])
+                await self._remove_token_by_jti(oldest_jti_list[0])
 
         # Сохранение нового токена
         serialized_token_data = self._serialize_refresh_token_data(refresh_token_data)

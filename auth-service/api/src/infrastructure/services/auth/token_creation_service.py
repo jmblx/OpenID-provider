@@ -1,8 +1,8 @@
 from datetime import timedelta
 
-from application.auth.interfaces.jwt_service import JWTService
-from application.auth.interfaces.token_creation import TokenCreationService
-from application.auth.token_types import AccessToken, RefreshTokenWithData
+from application.common.interfaces.jwt_service import JWTService
+from application.common.interfaces.token_creation import TokenCreationService
+from application.common.token_types import AccessToken, RefreshTokenWithData
 from domain.entities.user.model import User
 from uuid import uuid4
 

@@ -1,11 +1,11 @@
 from datetime import datetime, timedelta
-from typing import TypedDict, cast, Any
+from typing import cast, Any
 
 import jwt
 from pytz import timezone
 
-from application.auth.interfaces.jwt_service import JWTService
-from application.auth.token_types import Payload, JwtToken, BaseToken
+from application.common.interfaces.jwt_service import JWTService
+from application.common.token_types import Payload, JwtToken, BaseToken
 from infrastructure.services.auth.config import JWTSettings
 
 

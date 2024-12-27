@@ -1,13 +1,9 @@
 from sqlalchemy import text
 
-from application.user.interfaces.reader import UserReader, UserStrategiesDTO, UserStrategyDTO
+from application.common.interfaces.user_reader import UserReader, UserStrategiesDTO, UserStrategyDTO
 
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.future import select
-from sqlalchemy.orm import selectinload
-from domain.entities.strategy.model import Strategy
 from domain.entities.user.value_objects import UserID
-from infrastructure.db.models.secondary import user_strategy_association_table
 from uuid import UUID
 
 

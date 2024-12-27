@@ -1,13 +1,13 @@
 import argon2
 from dishka import Provider, Scope, provide
 
-from application.auth.interfaces.http_auth import HttpAuthService
-from application.auth.interfaces.jwt_service import JWTService
-from application.auth.interfaces.token_creation import TokenCreationService
-from application.auth.interfaces.white_list import TokenWhiteListService
-from application.auth.services.auth_code import AuthorizationCodeStorage
-from application.auth.services.pkce import PKCEService
-from application.client.service import ClientService
+from application.common.interfaces.http_auth import HttpAuthService
+from application.common.interfaces.jwt_service import JWTService
+from application.common.interfaces.token_creation import TokenCreationService
+from application.common.interfaces.white_list import TokenWhiteListService
+from application.common.services.auth_code import AuthorizationCodeStorage
+from application.common.services.pkce import PKCEService
+from application.common.services.client_service import ClientService
 from application.common.id_provider import IdentityProvider, HttpIdentityProvider
 from domain.common.services.pwd_service import PasswordHasher
 from infrastructure.external_services.investments.service import InvestmentsService

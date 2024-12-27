@@ -19,7 +19,7 @@ endif
 
 # Docker цели
 up: check_docker
-	docker-compose up -d
+	docker-compose --profile grafana up -d
 
 build: check_docker
 	docker-compose build
