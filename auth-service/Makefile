@@ -18,13 +18,17 @@ else
 endif
 
 # Docker цели
-up: check_docker
-	docker-compose --profile grafana up -d
+#docker-compose --profile grafana up
+up:
+	docker-compose up --build
+
+up-m: check_docker
+	docker-compose --profile grafana --profile migration up
 
 build: check_docker
 	docker-compose build
 
-down: check_docker
+down:
 	docker-compose down
 
 up-non-log: check_docker
@@ -43,29 +47,27 @@ deps:
 	poetry install
 
 dbo:
-	cd api && \
+	cd auth_service && \
 	alembic revision --autogenerate && \
 #	alembic upgrade head
 
 
 downgrade:
-	cd api && \
+	cd auth_service && \
 	alembic downgrade -1
 
 uv:
-	cd api/src && \
-	uvicorn presentation.web_api.main:app --reload
-
+	cd auth_service/src && \
+	uvicorn presentation.web_auth_service.main:app --reload
 
 server-prod:
-	cd api/src && \
-	uvicorn presentation.web_api.main:app --reload
+	cd auth_service/src && \
+	uvicorn presentation.web_auth_service.main:app --reload
 
 nfy:
 	cd notification/ && \
 	python app.py
 
-# Очистка проекта
 clean:
 	poetry env remove python
 	find . -type d -name "__pycache__" -exec rm -rf {} +

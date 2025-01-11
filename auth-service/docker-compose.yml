@@ -43,49 +43,83 @@ services:
       - backend_service.redis.network
     volumes:
       - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
 
-  api:
-    container_name: backend_service.api
+  auth_service:
+    container_name: backend_service.auth_service
     env_file:
       - .env-prod
 #    build:
-#      context: api
-#      dockerfile: Dockerfile.webapi
-    image: backend_service.api
-    command: [ "sh", "/backend-service.api/docker/app.sh" ]
+#      context: auth_service
+#      dockerfile: Dockerfile
+    image: backend_service.auth_service
+    command: [ "sh", "/backend-service.auth_service/docker/serve.sh" ]
     expose:
       - 8000
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -fsSL http://localhost:8000/healthcheck" ]
+      interval: 10s
+      timeout: 60s
+      retries: 5
+      start_period: 10s
     networks:
       - backend_service.db.network
       - backend_service.redis.network
       - backend_service.grafana.network
+      - backend_service.nats.network
     depends_on:
       db:
         condition: service_healthy
+      redis:
+        condition: service_healthy
     ports:
       - "8000:8000"
-    logging: *default-logging
+#    logging: *default-logging
 
-#  db_migration:
-#    profiles: [ "migration" ]
-#    container_name: backend_service.db_migration
-##    image: backend_service
+  nats:
+    image: nats
+    ports:
+      - "8222:8222"
+      - "6222:6222"
+      - "4222:4222"
+    command: "--cluster_name NATS --cluster nats://0.0.0.0:6222 --http_port 8222 --port 4222"
+    networks:
+      - backend_service.nats.network
+
+  notification_app:
+    env_file:
+      - notification/.env-prod
+      - .env-prod # для удобства в этом файле первостепенно в проде скорее всего лучше по 1 файлу указывать
+    image: backend_service.notification_app
 #    build:
-#      context: api
-#      dockerfile: Dockerfile.webapi
-#    restart: on-failure
-#    depends_on:
-#      postgres:
-#        condition: service_healthy
-#    networks:
-#      - backend_service.db.network
-#    env_file:
-#      - api/.env-prod
-#    volumes:
-#      - ./config:/app/config:ro
-#      - ./alembic.ini:/app/alembic.ini:ro
-#      - ./src/infrastructure/db/migrations:/app/src/infrastructure/db/migrations:ro
-#    command: [ "python", "-m", "alembic", "upgrade", "head" ]
+#      context: notification/
+    command: [ "sh", "/notification_app/docker/app.sh" ]
+    networks:
+      - backend_service.nats.network
+    depends_on:
+      - nats
+
+  db_migration:
+    profiles: [ "migration" ]
+    container_name: backend_service.db_migration
+    image: backend_service.auth_service
+#    build:
+#      context: auth_service
+#      dockerfile: Dockerfile
+    restart: on-failure
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - backend_service.db.network
+    env_file:
+      - .env-prod
+    command: [ "sh", "/backend-service.auth_service/docker/migrate.sh" ]
 
 #  nginx:
 #    image: nginx:latest
@@ -101,7 +135,7 @@ services:
 #      - ./certbot/www:/var/www/certbot:rw
 #      - ./static:/usr/share/nginx/html
 #    depends_on:
-#      - backend_service.api
+#      - backend_service.auth_service
 #      - backend_service.db
 #      - redis
 #      - certbot
@@ -152,23 +186,23 @@ services:
       - backend_service.grafana.network
     logging: *default-logging
 
-  vector:
-    profiles: [ "grafana" ]
-    image: timberio/vector:0.29.1-alpine
-    container_name: backend_service.vector
-    hostname: backend_service.vector
-    restart: unless-stopped
-    expose:
-      - "8383"
-    networks:
-      - backend_service.grafana.network
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-      - ./vector/vector.toml:/etc/vector/vector.toml:ro
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
+#  vector:
+#    profiles: [ "grafana" ]
+#    image: timberio/vector:0.29.1-alpine
+#    container_name: backend_service.vector
+#    hostname: backend_service.vector
+#    restart: unless-stopped
+#    expose:
+#      - "8383"
+#    networks:
+#      - backend_service.grafana.network
+#    volumes:
+#      - /var/run/docker.sock:/var/run/docker.sock:ro
+#      - ./vector/vector.toml:/etc/vector/vector.toml:ro
+#    logging:
+#      driver: "json-file"
+#      options:
+#        max-size: "10m"
 
   prometheus:
     profiles: [ "grafana" ]
@@ -257,9 +291,11 @@ services:
       "
 
 networks:
-    backend_service.db.network: {}
-    backend_service.redis.network: {}
-    backend_service.grafana.network: {}
+  backend_service.db.network:
+      driver: bridge
+  backend_service.redis.network: {}
+  backend_service.grafana.network: {}
+  backend_service.nats.network: {}
 
 volumes:
   db-data:

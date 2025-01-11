@@ -1,7 +1,7 @@
 [sources.docker]
 type = "docker_logs"
 docker_host = "/var/run/docker.sock"
-include_containers = ["backend_service.api", "backend_service.db"]
+include_containers = ["backend_service.auth_service", "backend_service.db"]
 # include_images = [ "user_service.api" ]
 # include_labels = [ "com.example.vendor=user_service." ]
 
