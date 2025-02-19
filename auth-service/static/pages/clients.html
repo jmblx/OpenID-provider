@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Список клиентов</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        .client-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 10px;
+            margin: 10px;
+            text-align: center;
+            cursor: pointer;
+            background-color: #f9f9f9;
+            transition: background-color 0.3s;
+        }
+        .client-card:hover {
+            background-color: #e9ecef;
+        }
+    </style>
+</head>
+<body class="container mt-4">
+    <h1 class="text-center">Список клиентов</h1>
+    <div id="clients-container" class="row"></div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", async function () {
+            const clients = await fetchClients();
+            if (clients) renderClients(clients);
+        });
+
+        async function fetchClients() {
+            try {
+                const response = await fetch("/api/client/ids_data");
+                if (!response.ok) throw new Error("Ошибка загрузки данных");
+                return await response.json();
+            } catch (error) {
+                console.error(error);
+                alert("Не удалось загрузить список клиентов.");
+                return null;
+            }
+        }
+
+       function renderClients(clients) {
+            const container = document.getElementById("clients-container");
+            container.innerHTML = "";
+
+            Object.entries(clients).forEach(([id, data]) => {
+                const clientCard = document.createElement("div");
+                clientCard.classList.add("col-md-3", "client-card");
+                clientCard.textContent = data.name;
+                clientCard.onclick = () => window.location.href = `/pages/client.html?clientId=${id}`;
+                container.appendChild(clientCard);
+            });
+        }
+
+    </script>
+</body>
+</html>

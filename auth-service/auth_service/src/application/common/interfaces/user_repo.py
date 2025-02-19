@@ -1,18 +1,14 @@
 from abc import ABC, abstractmethod
 from typing import TypedDict
 
+from domain.entities.role.model import Role
 from domain.entities.user.model import User
-from domain.entities.user.value_objects import UserID, Email, HashedPassword
+from domain.entities.user.value_objects import UserID, Email
 
 
 class IdentificationFields(TypedDict, total=False):
     id: UserID | None
     email: Email | None
-
-
-class UserMutableFields(TypedDict, total=False):
-    avatar_path: str
-    hashed_password: HashedPassword
 
 
 class UserRepository(ABC):
@@ -41,6 +37,7 @@ class UserRepository(ABC):
         """Получить пользователя по email."""
         raise NotImplementedError
 
-    # @abstractmethod
-    # async def update_user_fields_by_id(self, user_id: UserID, upd_data: UserMutableFields):
-    #     pass
+    @abstractmethod
+    async def add_roles_to_user(
+        self, user_id: UserID, role_ids: list[int]
+    ) -> None: ...

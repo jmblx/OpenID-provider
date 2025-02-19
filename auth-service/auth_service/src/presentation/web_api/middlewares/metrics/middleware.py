@@ -18,13 +18,16 @@ from .labels import (
     EXCEPTIONS,
 )
 
+
 class PrometheusMiddleware:
     def __init__(self, app: ASGIApp, app_name: str = "FastAPI") -> None:
         self.app = app
         self.app_name = app_name
         INFO.labels(app_name=self.app_name).inc()
 
-    async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
+    async def __call__(
+        self, scope: Scope, receive: Receive, send: Send
+    ) -> None:
         if scope["type"] != "http":
             await self.app(scope, receive, send)
             return

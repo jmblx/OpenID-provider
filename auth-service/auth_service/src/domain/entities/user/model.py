@@ -2,6 +2,7 @@ from uuid import UUID, uuid4
 
 from domain.common.services.pwd_service import PasswordHasher
 from domain.entities.client.model import Client
+from domain.entities.role.model import Role
 from domain.entities.role.value_objects import RoleID, RoleBaseScopes
 from domain.entities.user.value_objects import (
     UserID,
@@ -19,19 +20,17 @@ from domain.exceptions.pwd_hasher import PasswordMismatchError
 @dataclass
 class User:
     id: UserID
-    role_id: RoleID
     email: Email
     hashed_password: HashedPassword
+    roles: list[Role] = field(default_factory=list)
     is_email_confirmed: bool = field(default=False)
     avatar_path: str = field(default=None)
-    permissions: RoleBaseScopes = field(init=False)
     clients: list[Client] = field(default_factory=list)
 
     @classmethod
     def create(
         cls,
         user_id: UUID,
-        role_id: int,
         email: str,
         raw_password: str,
         password_hasher: PasswordHasher,
@@ -40,7 +39,6 @@ class User:
     ) -> "User":
         return cls(
             id=UserID(user_id),
-            role_id=RoleID(role_id),
             email=Email(email),
             hashed_password=password_hasher.hash_password(
                 RawPassword(raw_password)
@@ -68,5 +66,5 @@ class User:
     def confirm_email(self) -> None:
         self.is_email_confirmed = True
 
-    def get_scopes(self) -> str:
-        return f"user_{self.id.value}:111"
+    def get_scopes(self) -> dict[str, str]:
+        return {"aaa": "1011"}

@@ -12,7 +12,7 @@ x-logging:
 
 services:
   db:
-    image: postgres:15
+    image: postgres:17
     container_name: backend_service.db
     command: -p 5432
     expose:
@@ -121,26 +121,26 @@ services:
       - .env-prod
     command: [ "sh", "/backend-service.auth_service/docker/migrate.sh" ]
 
-#  nginx:
-#    image: nginx:latest
-#    container_name: nginx_app
-#    ports:
-#      - "80:80"
-#      - "443:443"
-#    volumes:
-#      - ./nginx.conf:/etc/nginx/nginx.conf:ro
-#      - ./app/conf.d:/etc/nginx/conf.d
-#      - ./certbot/conf:/etc/letsencrypt
-#      - ./nginx-logs:/var/log/nginx
-#      - ./certbot/www:/var/www/certbot:rw
-#      - ./static:/usr/share/nginx/html
-#    depends_on:
-#      - backend_service.auth_service
-#      - backend_service.db
-#      - redis
+  nginx:
+    image: nginx:latest
+    container_name: nginx_app
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./app/conf.d:/etc/nginx/conf.d
+      - ./certbot/conf:/etc/letsencrypt
+      - ./nginx-logs:/var/log/nginx
+      - ./certbot/www:/var/www/certbot:rw
+      - ./static:/usr/share/nginx/html
+    depends_on:
+      - auth_service
+      - db
+      - redis
 #      - certbot
-#    networks:
-#      - backend_service.db.network
+    networks:
+      - backend_service.db.network
 
   grafana:
     profiles: [ "grafana" ]

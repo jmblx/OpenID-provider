@@ -1,3 +1,4 @@
+import secrets
 from abc import abstractmethod, ABC
 from typing import TypedDict
 from uuid import UUID
@@ -29,3 +30,6 @@ class EmailConfirmationServiceI(ABC):
     async def delete_confirmation_token(
         self, email_confirmation_token: str
     ) -> None: ...
+
+    def generate_email_confirmation_token(self):
+        secrets.token_urlsafe(32)

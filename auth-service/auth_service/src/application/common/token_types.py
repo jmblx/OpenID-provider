@@ -25,6 +25,12 @@ class Payload(TypedDict, total=False):
     jti: UUID
 
 
+class AccessTokenPayload(TypedDict):
+    sub: str
+    email: str
+    scopes: dict[str, str]
+
+
 class JwtToken(TypedDict):
     token: BaseToken
     created_at: datetime

@@ -8,7 +8,9 @@ from infrastructure.db.repositories.user_repo_impl import UserRepositoryImpl
 
 
 @pytest.mark.asyncio
-async def test_user_repo_update(async_session, real_user_repo: UserRepositoryImpl, user_in_db: User):
+async def test_user_repo_update(
+    async_session, real_user_repo: UserRepositoryImpl, user_in_db: User
+):
     new_user_email = Email("new_test_user_email@gmail.com")
     user_id = user_in_db.id
     user_in_db.email = new_user_email
@@ -19,7 +21,9 @@ async def test_user_repo_update(async_session, real_user_repo: UserRepositoryImp
 
 
 @pytest.mark.asyncio
-async def test_user_repo_add(async_session, real_user_repo: UserRepositoryImpl, new_user: User):
+async def test_user_repo_add(
+    async_session, real_user_repo: UserRepositoryImpl, new_user: User
+):
     real_user_repo.save(new_user)
     await async_session.commit()
     assert type(new_user.id.value) is UUID

@@ -3,7 +3,13 @@ from dataclasses import dataclass
 from domain.common.exceptions.base import DomainError
 
 
-class ClientNameLengthError(DomainError): ...
+@dataclass
+class ClientNameLengthError(DomainError):
+    details: str
+
+    @property
+    def title(self) -> str:
+        return f"{self.details}"
 
 
 @dataclass(eq=False)
@@ -12,7 +18,7 @@ class InvalidUrlError(DomainError):
 
     @property
     def title(self) -> str:
-        return f"Client not found. Deatails: {self.details}"
+        return f"{self.details}"
 
 
 @dataclass(eq=False)

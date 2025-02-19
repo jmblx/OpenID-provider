@@ -1,3 +1,4 @@
+import json
 from datetime import timedelta
 
 from application.common.interfaces.jwt_service import JWTService
@@ -16,10 +17,13 @@ class TokenCreationServiceImpl(TokenCreationService):
         self.jwt_service = jwt_service
         self.jwt_settings = jwt_settings
 
-    def create_access_token(self, user: User) -> AccessToken:
+    def create_access_token(
+        self, user: User, user_scopes: list[str], client_id: int
+    ) -> AccessToken:
         jwt_payload = {
             "sub": str(user.id.value),
-            "role_id": user.role_id.value,
+            "client_scopes": user_scopes,
+            "client_id": client_id,
             "jti": str(uuid4()),
         }
         encoded_token = self.jwt_service.encode(

@@ -12,7 +12,9 @@ class TokenCreationService(ABC):
     """Абстракция для создания токенов."""
 
     @abstractmethod
-    def create_access_token(self, user: User) -> AccessToken:
+    def create_access_token(
+        self, user: User, user_scopes: list[str], client_id: int
+    ) -> AccessToken:
         """Создание AccessToken."""
 
     @abstractmethod

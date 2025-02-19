@@ -1,11 +1,14 @@
 from dataclasses import dataclass
+from typing import NewType
 
 from domain.exceptions.role import InvalidPermissionsError
 
 
-@dataclass(frozen=True)
-class RoleID:
-    value: int
+# @dataclass(frozen=True)
+# class RoleID:
+#     value: int
+
+RoleID = NewType("RoleID", int)
 
 
 @dataclass(frozen=True)
@@ -129,3 +132,9 @@ class RoleBaseScopes:
         Возвращает словарь разрешений.
         """
         return self.value
+
+    def to_list(self) -> list[str]:
+        return [
+            f"{scope}:{bitmask:04b}"
+            for scope, bitmask in self.value.items()
+        ]

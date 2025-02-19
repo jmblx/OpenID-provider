@@ -48,7 +48,6 @@ class JWTServiceImpl(JWTService):
     def decode(self, token: BaseToken) -> Payload:
         """Декодирует JWT токен и возвращает его payload."""
         try:
-
             payload = jwt.decode(
                 token,
                 self.auth_settings.public_key,

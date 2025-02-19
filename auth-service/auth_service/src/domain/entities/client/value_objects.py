@@ -1,13 +1,15 @@
 import re
 from dataclasses import dataclass
 from enum import IntEnum
+from typing import NewType
 
 from domain.exceptions.client import ClientNameLengthError, InvalidUrlError
 
 
-@dataclass(frozen=True)
-class ClientID:
-    value: int
+# @dataclass(frozen=True)
+# class ClientID:
+#     value: int
+ClientID = NewType("ClientID", int)
 
 
 class ClientTypeEnum(IntEnum):

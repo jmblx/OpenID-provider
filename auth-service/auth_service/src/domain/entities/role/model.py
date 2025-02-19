@@ -14,13 +14,19 @@ class Role:
     name: RoleName
     base_scopes: RoleBaseScopes
     client_id: ClientID
+    is_base: bool
 
     @classmethod
     def create(
-        cls, name: str, base_scopes: dict[str, str], client_id: int
+        cls,
+        name: str,
+        base_scopes: dict[str, str],
+        client_id: int,
+        is_base: bool = False,
     ) -> "Role":
         return cls(
             name=RoleName(name),
             base_scopes=RoleBaseScopes.create(base_scopes),
             client_id=ClientID(client_id),
+            is_base=is_base,
         )

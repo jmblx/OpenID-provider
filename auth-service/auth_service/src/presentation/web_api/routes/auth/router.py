@@ -4,11 +4,11 @@ from fastapi import APIRouter
 from fastapi.responses import ORJSONResponse
 from starlette import status
 
-from application.auth.code_to_token.code_to_token_handler import (
+from application.auth.code_to_token_handler import (
     CodeToTokenHandler,
     CodeToTokenCommand,
 )
-from application.auth.login_user.auth_user_handler import (
+from application.auth.login_user_handler import (
     AuthenticateUserHandler,
     AuthenticateUserCommand,
 )
@@ -40,7 +40,8 @@ async def code_to_token(
 ) -> ORJSONResponse:
     access_token, refresh_token = await handler.handle(command, fingerprint)
     response = ORJSONResponse(
-        {"access_token": access_token, "refresh_token": refresh_token},
+        # {"access_token": access_token, "refresh_token": refresh_token},
+        {"status": "success"},
         status_code=status.HTTP_200_OK,
     )
     response.set_cookie(
@@ -48,8 +49,8 @@ async def code_to_token(
         value=access_token,
         httponly=True,
         secure=False,
-        max_age=60 * 60,
-        expires=60 * 60,
+        max_age=60 * 5,
+        expires=60 * 5,
         samesite="lax",
     )
 

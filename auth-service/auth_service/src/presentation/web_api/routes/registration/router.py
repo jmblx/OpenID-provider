@@ -4,7 +4,7 @@ from fastapi import APIRouter
 from fastapi.responses import ORJSONResponse
 from starlette import status
 
-from application.auth.register_user.register_user_handler import (
+from application.auth.register_user_handler import (
     RegisterUserHandler,
     RegisterUserCommand,
 )

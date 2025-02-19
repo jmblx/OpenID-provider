@@ -12,13 +12,13 @@ class InvalidPermissionsError(DomainError):
         return f"Invalid Permissions: {self.description}"
 
 
-# @dataclass(eq=False)
-# class InvalidRoleIDError(DomainError):
-#     role_id: int
-#
-#     @property
-#     def title(self) -> str:
-#         return f"Invalid Role ID: {self.role_id}"
+@dataclass(eq=False)
+class RoleNotFoundError(DomainError):
+
+    @property
+    def title(self) -> str:
+        return f"Roles not found (or not all found)"
+
 
 # @dataclass(eq=False)
 # class InvalidRoleNameError(DomainError):

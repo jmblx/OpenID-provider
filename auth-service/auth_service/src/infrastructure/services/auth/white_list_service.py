@@ -117,10 +117,10 @@ class TokenWhiteListServiceImpl(TokenWhiteListService):
             if oldest_jti_list:
                 await self._remove_token_by_jti(oldest_jti_list[0])
 
-        # Сохранение нового токена
         serialized_token_data = self._serialize_refresh_token_data(
             refresh_token_data
         )
+        logger.info("Ебнутый новый токен с данными: %s", serialized_token_data)
         await self.redis.hset(
             f"refresh_token:{jti}", mapping=serialized_token_data
         )

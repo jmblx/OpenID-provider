@@ -52,36 +52,6 @@ class HttpAuthServiceImpl(HttpAuthService):
         self.auth_code_storage = auth_code_storage
         self.pkce_service = pkce_service
 
-    async def _token_to_user(
-        self, refresh_token: RefreshToken, fingerprint: Fingerprint
-    ) -> User:
-        jti = self._get_token_jti(refresh_token)
-        token_data = await self.token_whitelist_service.get_refresh_token_data(
-            jti
-        )
-        logger.info("tokend data: %s, jti: %s", token_data, jti)
-        if not token_data or token_data.fingerprint != fingerprint:
-            raise HTTPException(
-                status_code=401, detail="Invalid refresh token or fingerprint"
-            )
-        user: User = await self.user_service.get_by_id(token_data.user_id)  # type: ignore
-        return user
-
-    async def authenticate_user(
-        self, email: Email, password: RawPassword, fingerprint: Fingerprint
-    ) -> tuple[AccessToken, RefreshToken]:
-        user = await self.user_repository.get_by_email(email)
-        if not user:
-            raise HTTPException(status_code=401, detail="Invalid credentials")
-        self.hash_service.check_password(password, user.hashed_password)
-        return await self.create_and_save_tokens(user, fingerprint)
-
-    async def refresh_tokens(
-        self, refresh_token: RefreshToken, fingerprint: Fingerprint
-    ) -> tuple[AccessToken, RefreshToken]:
-        user = await self._token_to_user(refresh_token, fingerprint)
-        return await self.create_and_save_tokens(user, fingerprint)
-
     def _get_token_jti(self, refresh_token: RefreshToken) -> UUID:
         payload = self.jwt_service.decode(refresh_token)
         return payload["jti"]
@@ -104,49 +74,50 @@ class HttpAuthServiceImpl(HttpAuthService):
             jti, user_id
         )
 
-    async def refresh_access_token(
-        self, refresh_token: RefreshToken, fingerprint: Fingerprint
-    ) -> AccessToken:
-        user = await self._token_to_user(refresh_token, fingerprint)
-        return self.token_creation_service.create_access_token(user)
-
-    async def authenticate_by_auth_code(
-        self,
-        auth_code: str,
-        redirect_url: str,
-        fingerprint: Fingerprint,
-        code_challenger: str,
-    ) -> tuple[AccessToken, RefreshToken]:
-        auth_code_data = await self.auth_code_storage.retrieve_auth_code_data(
-            auth_code
-        )
-        if not auth_code_data:
-            raise HTTPException(
-                status_code=400, detail="Invalid authorization code"
-            )
-
-        if auth_code_data["redirect_url"] != redirect_url:
-            raise HTTPException(status_code=400, detail="Invalid redirect URL")
-
-        real_code_challenger = auth_code_data["code_challenger"]
-        if not self._validate_pkce(code_challenger, real_code_challenger):
-            raise HTTPException(status_code=400, detail="Invalid PKCE")
-
-        user = await self.user_repository.get_by_id(
-            UserID(UUID(auth_code_data["user_id"]))
-        )
-        if not user:
-            raise HTTPException(status_code=404, detail="User not found")
-
-        tokens = await self.create_and_save_tokens(user, fingerprint)
-        await self.auth_code_storage.delete_auth_code_data(auth_code)
-        return tokens
+    # async def authenticate_by_auth_code(
+    #     self,
+    #     auth_code: str,
+    #     redirect_url: str,
+    #     fingerprint: Fingerprint,
+    #     code_challenger: str,
+    #     user_scopes: list[str],
+    # ) -> tuple[AccessToken, RefreshToken]:
+    #     auth_code_data = await self.auth_code_storage.retrieve_auth_code_data(
+    #         auth_code
+    #     )
+    #     if not auth_code_data:
+    #         raise HTTPException(
+    #             status_code=400, detail="Invalid authorization code"
+    #         )
+    #
+    #     if auth_code_data["redirect_url"] != redirect_url:
+    #         raise HTTPException(status_code=400, detail="Invalid redirect URL")
+    #
+    #     real_code_challenger = auth_code_data["code_challenger"]
+    #     if not self._validate_pkce(code_challenger, real_code_challenger):
+    #         raise HTTPException(status_code=400, detail="Invalid PKCE")
+    #
+    #     user = await self.user_repository.get_by_id(
+    #         UserID(UUID(auth_code_data["user_id"]))
+    #     )
+    #     if not user:
+    #         raise HTTPException(status_code=404, detail="User not found")
+    #
+    #     tokens = await self.create_and_save_tokens(user, fingerprint, client_id=int(auth_code_data["client_id"]), user_scopes=user_scopes)
+    #     await self.auth_code_storage.delete_auth_code_data(auth_code)
+    #     return tokens
 
     async def create_and_save_tokens(
-        self, user: User, fingerprint: Fingerprint
+        self,
+        user: User,
+        fingerprint: Fingerprint,
+        user_scopes: list[str],
+        client_id: int,
     ) -> tuple[AccessToken, RefreshToken]:
         """Создаёт и сохраняет токены."""
-        access_token = self.token_creation_service.create_access_token(user)
+        access_token = self.token_creation_service.create_access_token(
+            user, user_scopes, client_id
+        )
         refresh_token_data = (
             await self.token_creation_service.create_refresh_token(
                 user, fingerprint
@@ -157,8 +128,3 @@ class HttpAuthServiceImpl(HttpAuthService):
             self.jwt_settings.refresh_token_by_user_limit,
         )
         return access_token, refresh_token_data.token
-
-    def _validate_pkce(
-        self, user_code_challenger: str, real_code_challenger: str
-    ) -> bool:
-        return user_code_challenger == real_code_challenger

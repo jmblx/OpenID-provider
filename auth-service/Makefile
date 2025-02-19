@@ -23,7 +23,7 @@ up:
 	docker-compose up --build
 
 up-m: check_docker
-	docker-compose --profile grafana --profile migration up
+	docker-compose --profile migration up
 
 build: check_docker
 	docker-compose build

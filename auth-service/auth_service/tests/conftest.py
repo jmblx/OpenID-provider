@@ -42,9 +42,7 @@ os.environ["USE_NULLPOOL"] = "true"
 
 @pytest.fixture(scope="session")
 async def container():
-    container = make_async_container(
-        *prod_provders
-    )
+    container = make_async_container(*prod_provders)
     yield container
     await container.close()
 
@@ -53,11 +51,15 @@ async def container():
 def apply_migrations():
     current_working_directory = os.getcwd()
 
-    project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "../"))
+    project_root = os.path.abspath(
+        os.path.join(os.path.dirname(__file__), "../")
+    )
     os.chdir(project_root)
 
     try:
-        alembic_cfg = Config(os.path.join(os.path.dirname(__file__), "../alembic.ini"))
+        alembic_cfg = Config(
+            os.path.join(os.path.dirname(__file__), "../alembic.ini")
+        )
         alembic_cfg.set_main_option("sqlalchemy.url", TEST_DATABASE_URI)
         command.upgrade(alembic_cfg, "head")
     finally:
@@ -67,7 +69,9 @@ def apply_migrations():
 @pytest.fixture(scope="session")
 async def async_engine(container: AsyncContainer) -> AsyncEngine:
     os.environ["DATABASE_URI"] = TEST_DATABASE_URI
-    return create_async_engine(url=TEST_DATABASE_URI, echo=True, poolclass=NullPool)
+    return create_async_engine(
+        url=TEST_DATABASE_URI, echo=True, poolclass=NullPool
+    )
 
 
 @pytest.fixture(scope="session")
@@ -132,8 +136,14 @@ def static_entities() -> dict:
             "type": ClientTypeEnum.PUBLIC,
         },
         "roles": [
-            {"name": "Admin", "base_scopes": {"scope1": "1011", "scope2": "1011"}},
-            {"name": "User", "base_scopes": {"scope1": "0011", "scope2": "0111"}},
+            {
+                "name": "Admin",
+                "base_scopes": {"scope1": "1011", "scope2": "1011"},
+            },
+            {
+                "name": "User",
+                "base_scopes": {"scope1": "0011", "scope2": "0111"},
+            },
         ],
         "user": {
             "id": UUID("e768a26d-8984-4b65-8d3c-f9122cc6245e"),
@@ -202,7 +212,9 @@ async def client_in_db(async_session):
 @pytest.fixture
 async def user_in_db(async_session):
     """Фикстура для получения пользователя."""
-    return (await async_session.get(User, UserID(UUID("e768a26d-8984-4b65-8d3c-f9122cc6245e"))))
+    return await async_session.get(
+        User, UserID(UUID("e768a26d-8984-4b65-8d3c-f9122cc6245e"))
+    )
 
 
 @pytest.fixture(autouse=True)
@@ -224,7 +236,9 @@ async def auth_headers(mock_user: User, container) -> dict:
     """
     headers = {"Fingerprint": "3ccc784000c0c0c11cab8508dffaa578"}
     http_auth_service = await container.get(HttpAuthService)
-    access_token, refresh_token = http_auth_service.create_and_save_tokens(mock_user, Fingerprint("3ccc784000c0c0c11cab8508dffaa578"))
+    access_token, refresh_token = http_auth_service.create_and_save_tokens(
+        mock_user, Fingerprint("3ccc784000c0c0c11cab8508dffaa578")
+    )
 
     headers["Authorization"] = f"Bearer {access_token}"
     return headers
@@ -257,6 +271,7 @@ def nats_container():
     container.stop()
     container.remove()
 
+
 @pytest.fixture
 async def nats_client(container: AsyncContainer):
     nats_client = await container.get(Client)
@@ -266,6 +281,7 @@ async def nats_client(container: AsyncContainer):
 @pytest.fixture
 async def redis_client(container):
     import redis.asyncio as aioredis
+
     client = await container.get(aioredis.Redis)
     yield client
     await client.flushall()  # Очистить данные после теста

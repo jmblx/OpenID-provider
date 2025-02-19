@@ -18,7 +18,7 @@ class ClientRepositoryImpl(ClientRepository):
         """
         client = await self.session.merge(client)
         await self.session.flush()
-        return ClientCreateDTO(client_id=client.id.value)
+        return ClientCreateDTO(client_id=client.id)
 
     async def get_by_id(self, client_id: ClientID) -> Client | None:
         return await self.session.get(Client, client_id)
@@ -28,7 +28,7 @@ class ClientRepositoryImpl(ClientRepository):
         Удаляет клиента по его идентификатору.
         """
         query = select(client_table).where(
-            and_(client_table.c.id == client_id.value)
+            and_(client_table.c.id == client_id)
         )
         result = await self.session.execute(query)
         client = result.scalar_one_or_none()

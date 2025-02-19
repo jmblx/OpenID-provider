@@ -4,7 +4,7 @@ from fastapi import APIRouter
 from fastapi.responses import ORJSONResponse
 from starlette import status
 
-from application.user.confirm_email.handler import (
+from application.user.confirm_email_handler import (
     ConfirmEmailCommand,
     ConfirmEmailHandler,
 )

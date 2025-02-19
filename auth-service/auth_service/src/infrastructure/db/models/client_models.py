@@ -32,7 +32,7 @@ mapper_registry.map_imperatively(
     Client,
     client_table,
     properties={
-        "id": composite(ClientID, client_table.c.id),
+        "id": client_table.c.id,
         "name": composite(ClientName, client_table.c.name),
         "base_url": composite(ClientBaseUrl, client_table.c.base_url),
         "allowed_redirect_urls": composite(

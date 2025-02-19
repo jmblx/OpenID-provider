@@ -36,3 +36,6 @@ docker-compose up -d
 ```
 ## ER-диаграмма:
 ![ER Diagram](ER.jpg)
+
+
+[![Typing SVG](https://readme-typing-svg.herokuapp.com?color=%&lines=EGOR+YBICA)✨ Developer 2024 🎉](https://github.com/Zagidin)

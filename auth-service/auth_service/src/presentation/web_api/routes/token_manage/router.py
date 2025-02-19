@@ -6,18 +6,17 @@ from starlette import status
 from starlette.responses import Response
 from starlette.status import HTTP_200_OK
 
-from application.auth.invalidate_other_tokens.handler import (
+from application.auth.invalidate_other_tokens_handler import (
     InvalidateOtherTokensHandler,
     InvalidateOtherTokensCommand,
 )
-from application.auth.refresh_tokens.refresh_tokens_handler import (
+from application.auth.refresh_tokens_handler import (
     RefreshTokensHandler,
 )
-from application.auth.revoke_token.revoke_token_handler import (
+from application.auth.revoke_token_handler import (
     RevokeTokenHandler,
 )
 from application.common.token_types import RefreshToken, Fingerprint
-from presentation.web_api.routes.auth.router import auth_router
 
 token_manage_router = APIRouter(route_class=DishkaRoute, tags=["token-manage"])
 

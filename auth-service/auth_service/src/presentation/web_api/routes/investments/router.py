@@ -15,7 +15,7 @@ from application.user.sell_investments.sell_investment_handler import (
     SellInvestmentHandler,
     SellItemCommand,
 )
-from application.get_user_notifications.notification_query_handler import (
+from application.notification_query_handler import (
     NotificationQueryHandler,
 )
 
