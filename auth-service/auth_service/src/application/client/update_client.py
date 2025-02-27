@@ -3,8 +3,14 @@ from dataclasses import dataclass
 from application.common.interfaces.client_repo import ClientRepository
 from application.common.uow import Uow
 from domain.entities.client.model import Client
-from domain.entities.client.value_objects import ClientID, ClientTypeEnum, ClientName, ClientBaseUrl, \
-    AllowedRedirectUrls, ClientType
+from domain.entities.client.value_objects import (
+    ClientID,
+    ClientTypeEnum,
+    ClientName,
+    ClientBaseUrl,
+    AllowedRedirectUrls,
+    ClientType,
+)
 from domain.exceptions.client import ClientNotFound
 
 
@@ -22,31 +28,27 @@ class UpdateClientCommandHandler:
         self.client_repo = client_repo
         self.uow = uow
 
-    async def handle(
-        self, command: UpdateClientCommand
-    ) -> None:
+    async def handle(self, command: UpdateClientCommand) -> None:
         client: Client | None = await self.client_repo.get_by_id(
             ClientID(command.client_id)
         )
         if not client:
             raise ClientNotFound()
         updates = {
-            "name": (
-                ClientName(command.name)
-                if command.name
-                else None
-            ),
+            "name": (ClientName(command.name) if command.name else None),
             "base_url": (
-                ClientBaseUrl(command.base_url)
-                if command.base_url
-                else None
+                ClientBaseUrl(command.base_url) if command.base_url else None
             ),
             "allowed_redirect_urls": (
-                AllowedRedirectUrls(command.allowed_urls) if command.allowed_urls else None
+                AllowedRedirectUrls(command.allowed_urls)
+                if command.allowed_urls
+                else None
             ),
             "type": (
-                ClientType(command.client_type) if command.client_type else None
-            )
+                ClientType(command.client_type)
+                if command.client_type
+                else None
+            ),
         }
         for attr, value in updates.items():
             if value is not None:

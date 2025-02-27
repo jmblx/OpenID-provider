@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 from typing import Sequence
 
 from domain.entities.client.value_objects import ClientID
+from domain.entities.resource_server.value_objects import ResourceServerID
 from domain.entities.role.model import Role
 from domain.entities.role.value_objects import RoleID
 from domain.entities.user.value_objects import UserID
@@ -20,16 +21,16 @@ class RoleRepository(ABC):
     ) -> Sequence[Role]: ...
 
     @abstractmethod
-    async def get_roles_by_client_id(
+    async def get_roles_by_rs_id(
         self, client_id: ClientID, order_by_id: bool = False
     ) -> Sequence[Role]: ...
 
     @abstractmethod
-    async def get_base_client_roles(
+    async def get_base_rs_roles(
         self, client_id: ClientID
     ) -> list[Role]: ...
 
     @abstractmethod
-    async def get_user_roles_by_client_id(
-        self, user_id: UserID, client_id: ClientID
+    async def get_user_roles_by_rs_id(
+        self, user_id: UserID, rs_ids: Sequence[ResourceServerID]
     ) -> list[Role]: ...

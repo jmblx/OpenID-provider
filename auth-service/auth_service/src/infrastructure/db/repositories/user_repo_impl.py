@@ -1,17 +1,22 @@
+from typing import Sequence
+from uuid import UUID
+
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
+from sqlalchemy import select, insert, literal, cast
 import sqlalchemy.dialects.postgresql as sa_pg
 from sqlalchemy.orm import joinedload
+from sqlalchemy.dialects.postgresql import UUID as PG_UUID
 
 from application.common.interfaces.user_repo import (
     UserRepository,
     IdentificationFields,
 )
-from domain.entities.role.model import Role
+from domain.entities.resource_server.value_objects import ResourceServerID
 from domain.entities.user.model import User
 from domain.entities.user.value_objects import UserID, Email
 from infrastructure.db.exception_mapper import exception_mapper
-from infrastructure.db.models.secondary import user_role_association
+from infrastructure.db.models import role_table, rs_table
+from infrastructure.db.models.secondary import user_role_association, user_rs_association_table
 
 
 class UserRepositoryImpl(UserRepository):
@@ -70,4 +75,55 @@ class UserRepositoryImpl(UserRepository):
         )
 
         await self.session.execute(stmt)
-        await self.session.commit()
+
+    async def add_rs_to_user(
+            self, user_id: UserID, rs_ids: Sequence[ResourceServerID]
+    ) -> None:
+        user_uuid = user_id.value
+
+        existing_rs = await self.session.execute(
+            select(user_rs_association_table.c.rs_id)
+            .where(
+                user_rs_association_table.c.user_id == user_uuid,
+                user_rs_association_table.c.rs_id.in_(rs_ids),
+            )
+        )
+        existing_rs_ids = {row.rs_id for row in existing_rs}
+
+        new_rs_ids = set(rs_ids) - existing_rs_ids
+
+        if new_rs_ids:
+            await self.session.execute(
+                insert(user_rs_association_table).from_select(
+                    [user_rs_association_table.c.user_id, user_rs_association_table.c.rs_id],
+                    select(cast(user_uuid, PG_UUID), rs_table.c.id)  # Исправлено: PG_UUID вместо встроенного UUID
+                    .where(rs_table.c.id.in_(new_rs_ids))
+                )
+            )
+
+        existing_roles = await self.session.execute(
+            select(user_role_association.c.role_id)
+            .where(
+                user_role_association.c.user_id == user_uuid,
+                user_role_association.c.role_id.in_(
+                    select(role_table.c.id)
+                    .where(role_table.c.rs_id.in_(rs_ids), role_table.c.is_base.is_(True))
+                ),
+            )
+        )
+        existing_role_ids = {row.role_id for row in existing_roles}
+
+        new_roles = await self.session.execute(
+            select(role_table.c.id)
+            .where(role_table.c.rs_id.in_(rs_ids), role_table.c.is_base.is_(True))
+        )
+        new_role_ids = {row.id for row in new_roles} - existing_role_ids
+
+        if new_role_ids:
+            await self.session.execute(
+                insert(user_role_association).from_select(
+                    [user_role_association.c.user_id, user_role_association.c.role_id],
+                    select(cast(user_uuid, PG_UUID), role_table.c.id)  # Исправлено: PG_UUID вместо встроенного UUID
+                    .where(role_table.c.id.in_(new_role_ids))
+                )
+            )

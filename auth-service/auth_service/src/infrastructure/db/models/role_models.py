@@ -13,7 +13,7 @@ role_table = Table(
     Column("id", Integer, primary_key=True),
     Column("name", String, nullable=False),
     Column("base_scopes", JSONB, nullable=False),
-    Column("client_id", Integer, ForeignKey("client.id"), nullable=False),
+    Column("rs_id", Integer, ForeignKey("resource_server.id"), nullable=False),
     Column("is_base", Boolean, nullable=False),
 )
 
@@ -31,9 +31,9 @@ mapper_registry.map_imperatively(
             back_populates="roles",
             uselist=True,
         ),
-        "client_id": role_table.c.client_id,
-        "client": relationship(
-            "Client", back_populates="roles", uselist=False
+        "rs_id": role_table.c.rs_id,
+        "resource_server": relationship(
+            "ResourceServer", back_populates="roles", uselist=False
         ),
         "is_base": role_table.c.is_base,
     },

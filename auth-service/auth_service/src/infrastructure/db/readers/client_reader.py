@@ -49,25 +49,30 @@ class ClientReaderImpl(ClientReader):
             "allowed_redirect_urls": client.allowed_redirect_urls.value,
             "type": client.type.value,
         }
-        client_roles = await self.role_repo.get_roles_by_client_id(client_id, order_by_id=True)
-        if client_roles:
-            client_data["roles"] = [
-                typing.cast(
-                    RoleViewWithId,
-                    {
-                        "id": role.id,
-                        "name": role.name.value,
-                        "base_scopes": role.base_scopes.to_list(),
-                        "is_base": role.is_base,
-                    },
-                )
-                for role in client_roles
-            ]
+        # client_roles = await self.role_repo.get_roles_by_client_id(client_id, order_by_id=True)
+        # if client_roles:
+        #     client_data["roles"] = [
+        #         typing.cast(
+        #             RoleViewWithId,
+        #             {
+        #                 "id": role.id,
+        #                 "name": role.name.value,
+        #                 "base_scopes": role.base_scopes.to_list(),
+        #                 "is_base": role.is_base,
+        #             },
+        #         )
+        #         for role in client_roles
+        #     ]
         return client_data
 
-    async def read_all_clients_ids_data(self) -> dict[ClientID, ClientsIdsData]:
+    async def read_all_clients_ids_data(
+        self,
+    ) -> dict[ClientID, ClientsIdsData]:
         query = select(Client.id, Client.name)
         data = await self.session.execute(query)
         clients_data = data.mappings().all()
-        result = {client['id']: ClientsIdsData(name=client['name'].value) for client in clients_data}
+        result = {
+            client["id"]: ClientsIdsData(name=client["name"].value)
+            for client in clients_data
+        }
         return result

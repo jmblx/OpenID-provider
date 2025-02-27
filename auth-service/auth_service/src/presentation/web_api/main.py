@@ -16,6 +16,7 @@ from presentation.web_api.routes.auth.router import auth_router
 from presentation.web_api.routes.client.client_router import client_router
 from presentation.web_api.exceptions import setup_exception_handlers
 from presentation.web_api.routes.registration.router import reg_router
+from presentation.web_api.routes.resource_server.router import rs_router
 from presentation.web_api.routes.role.router import role_router
 from presentation.web_api.routes.token_manage.router import token_manage_router
 from presentation.web_api.routes.healthcheck.router import healthcheck_router
@@ -60,6 +61,7 @@ def create_app() -> FastAPI:
     app.include_router(email_conf_router)
     app.include_router(user_password_router)
     app.include_router(user_account_router)
+    app.include_router(rs_router)
     setup_exception_handlers(app)
     # setup_middlewares(app)
     return app

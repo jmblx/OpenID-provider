@@ -30,11 +30,7 @@ class UpdateRoleHandler:
                 if command.new_base_scopes
                 else None
             ),
-            "name": (
-                RoleName(command.new_name)
-                if command.new_name
-                else None
-            ),
+            "name": (RoleName(command.new_name) if command.new_name else None),
             "is_base": (
                 command.new_is_base if command.new_base_scopes else None
             ),

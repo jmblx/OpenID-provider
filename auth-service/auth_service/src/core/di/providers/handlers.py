@@ -1,23 +1,26 @@
 from dishka import provide, Provider, Scope
 
-from application.auth.code_to_token_handler import (
-    CodeToTokenHandler,
+from application.auth_as.login_user_auth_server import AuthenticateUserHandler
+# from application.bold_code.old_code_to_token_handler import (
+#     CodeToTokenHandler,
+# )
+from application.auth_as.identify_by_cookies_query import (
+    IdentifyByCookiesQueryHandler,
 )
-from application.auth.invalidate_other_tokens_handler import (
+from application.auth_as.invalidate_other_tokens_handler import (
     InvalidateOtherTokensHandler,
 )
-from application.auth.login_user_handler import (
-    AuthenticateUserHandler,
-)
-from application.auth.refresh_tokens_handler import (
+from application.auth_as.refresh_tokens_auth_server_handler import (
     RefreshTokensHandler,
 )
-from application.auth.register_user_handler import (
+from application.auth_as.register_user_auth_server_hander import (
     RegisterUserHandler,
 )
-from application.auth.revoke_token_handler import (
+from application.auth_as.revoke_token_handler import (
     RevokeTokenHandler,
 )
+from application.auth_for_client.code_to_token_handler import CodeToTokenHandler
+from application.auth_for_client.get_me_page_data_handler import GetMeDataHandler
 from application.client.add_allowed_url import (
     AddAllowedRedirectUrlCommandHandler,
 )
@@ -25,13 +28,17 @@ from application.client.client_queries import (
     ClientAuthValidationQueryHandler,
 )
 from application.client.get_all_clients import GetAllClientsIdsHandler
-from application.client.read_client_view_handler import ReadClientPageViewQueryHandler
+from application.client.read_client_view_handler import (
+    ReadClientPageViewQueryHandler,
+)
 from application.client.register_client_hadler import (
     RegisterClientHandler,
 )
 from application.client.update_client import (
     UpdateClientCommandHandler,
 )
+from application.resource_server.register_rs_handler import RegisterResourceServerHandler
+from application.resource_server.update_rs_handler import UpdateResourceServerHandler
 from application.role.create_role_handler import CreateRoleHandler
 from application.role.upd_role_command_handler import UpdateRoleHandler
 from application.user.add_role_to_user_handler import AddRoleToUserHandler
@@ -93,5 +100,15 @@ class HandlerProvider(Provider):
     add_role_to_user_handler = provide(
         AddRoleToUserHandler, scope=Scope.REQUEST
     )
-    read_client_page_view_handler = provide(ReadClientPageViewQueryHandler, scope=Scope.REQUEST)
-    get_all_clients_ids_handler = provide(GetAllClientsIdsHandler, scope=Scope.REQUEST)
+    read_client_page_view_handler = provide(
+        ReadClientPageViewQueryHandler, scope=Scope.REQUEST
+    )
+    get_all_clients_ids_handler = provide(
+        GetAllClientsIdsHandler, scope=Scope.REQUEST
+    )
+    identify_by_cookies_query_handler = provide(
+        IdentifyByCookiesQueryHandler, scope=Scope.REQUEST
+    )
+    register_resource_server_handler = provide(RegisterResourceServerHandler, scope=Scope.REQUEST)
+    update_resource_server_handler = provide(UpdateResourceServerHandler, scope=Scope.REQUEST)
+    get_client_resources_page_data_handler = provide(GetMeDataHandler, scope=Scope.REQUEST)

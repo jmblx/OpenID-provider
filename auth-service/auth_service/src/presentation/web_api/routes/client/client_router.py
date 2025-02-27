@@ -19,7 +19,10 @@ from application.client.client_queries import (
 )
 from application.client.get_all_clients import GetAllClientsIdsHandler
 from application.common.views.client_view import ClientsIdsData
-from application.client.read_client_view_handler import ReadClientPageViewQueryHandler, ReadClientPageViewQuery
+from application.client.read_client_view_handler import (
+    ReadClientPageViewQueryHandler,
+    ReadClientPageViewQuery,
+)
 from application.client.register_client_hadler import (
     RegisterClientHandler,
     RegisterClientCommand,
@@ -30,9 +33,13 @@ from application.client.update_client import (
 )
 from application.dtos.client import ClientCreateDTO
 from domain.entities.client.value_objects import ClientID
-from presentation.web_api.routes.client.models import ClientAuthResponseModel, ClientViewModel, UpdateClientModel
+from presentation.web_api.routes.client.models import (
+    ClientAuthResponseModel,
+    ClientViewModel,
+    UpdateClientModel,
+)
 
-client_router = APIRouter(prefix="/client", route_class=DishkaRoute)
+client_router = APIRouter(prefix="/client", route_class=DishkaRoute, tags=["client"])
 
 
 @client_router.post("/")
@@ -81,12 +88,18 @@ async def add_allowed_redirect_url(
 
 
 @client_router.get("/ids_data")
-async def get_client_ids(handler: FromDishka[GetAllClientsIdsHandler]) -> dict[ClientID, ClientsIdsData]:
+async def get_client_ids(
+    handler: FromDishka[GetAllClientsIdsHandler],
+) -> dict[ClientID, ClientsIdsData]:
     client_ids_data = await handler.handle()
     return client_ids_data
 
 
 @client_router.get("/{client_id}")
-async def get_client(client_id: int, handler: FromDishka[ReadClientPageViewQueryHandler]) -> ClientViewModel:
-    client_view = await handler.handle(ReadClientPageViewQuery(client_id=client_id))
+async def get_client(
+    client_id: int, handler: FromDishka[ReadClientPageViewQueryHandler]
+) -> ClientViewModel:
+    client_view = await handler.handle(
+        ReadClientPageViewQuery(client_id=client_id)
+    )
     return ClientViewModel(**client_view)

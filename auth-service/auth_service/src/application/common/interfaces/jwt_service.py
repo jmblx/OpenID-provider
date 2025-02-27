@@ -1,7 +1,10 @@
 from abc import ABC, abstractmethod
 from datetime import timedelta
+from uuid import UUID
 
-from application.common.token_types import JwtToken, Payload, BaseToken
+from application.common.auth_server_token_types import JwtToken, AuthServerAccessTokenPayload, BaseToken, \
+    RefreshTokenPayload
+from application.common.client_token_types import ClientAccessTokenPayload
 
 
 class JWTService(ABC):
@@ -10,12 +13,12 @@ class JWTService(ABC):
     @abstractmethod
     def encode(
         self,
-        payload: Payload,
+        payload: dict[str, int | str | UUID],
         expire_minutes: int | None = None,
         expire_timedelta: timedelta | None = None,
     ) -> JwtToken:
         """Создание JWT токена с заданным сроком действия."""
 
     @abstractmethod
-    def decode(self, token: BaseToken) -> Payload:
+    def decode(self, token: BaseToken) -> AuthServerAccessTokenPayload | ClientAccessTokenPayload:
         """Декодирование JWT токена."""

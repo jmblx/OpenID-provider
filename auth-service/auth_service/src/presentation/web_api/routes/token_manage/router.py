@@ -6,34 +6,33 @@ from starlette import status
 from starlette.responses import Response
 from starlette.status import HTTP_200_OK
 
-from application.auth.invalidate_other_tokens_handler import (
+from application.auth_as.invalidate_other_tokens_handler import (
     InvalidateOtherTokensHandler,
     InvalidateOtherTokensCommand,
 )
-from application.auth.refresh_tokens_handler import (
+from application.auth_as.refresh_tokens_auth_server_handler import (
     RefreshTokensHandler,
 )
-from application.auth.revoke_token_handler import (
+from application.auth_as.revoke_token_handler import (
     RevokeTokenHandler,
 )
-from application.common.token_types import RefreshToken, Fingerprint
+from application.common.auth_server_token_types import RefreshToken, Fingerprint
+from presentation.web_api.utils import set_auth_server_tokens
 
 token_manage_router = APIRouter(route_class=DishkaRoute, tags=["token-manage"])
 
 
 @token_manage_router.post("/refresh")
 async def refresh_token(
-    refresh_token: FromDishka[RefreshToken],
-    fingerprint: FromDishka[Fingerprint],
     handler: FromDishka[RefreshTokensHandler],
 ) -> ORJSONResponse:
-    access_token, new_refresh_token = await handler.handle(
-        refresh_token, fingerprint
+    tokens = await handler.handle()
+    response = ORJSONResponse(
+        # {"access_token": access_token, "refresh_token": refresh_token},
+        {"status": "success"},
+        status_code=status.HTTP_200_OK,
     )
-    response = ORJSONResponse({"detail": "Tokens refreshed successfully"})
-    response.set_cookie("refresh_token", new_refresh_token)
-    response.set_cookie("access_token", access_token)
-    response.status_code = HTTP_200_OK
+    set_auth_server_tokens(response, tokens)
     return response
 
 

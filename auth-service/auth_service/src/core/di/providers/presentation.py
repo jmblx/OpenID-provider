@@ -1,7 +1,7 @@
 from dishka import Provider, provide, Scope
 from fastapi import Request
 
-from application.common.token_types import (
+from application.common.auth_server_token_types import (
     Fingerprint,
     RefreshToken,
     AccessToken,

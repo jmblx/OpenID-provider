@@ -25,8 +25,8 @@ sys.path.insert(
 )
 
 from application.common.interfaces.user_repo import UserRepository
-from application.common.interfaces.http_auth import HttpAuthService
-from application.common.token_types import Fingerprint
+from application.common.interfaces.http_auth import HttpAuthServerService
+from application.common.auth_server_token_types import Fingerprint
 from domain.entities.client.model import Client
 from domain.entities.client.value_objects import ClientTypeEnum
 from domain.entities.role.model import Role
@@ -235,7 +235,7 @@ async def auth_headers(mock_user: User, container) -> dict:
     Фикстура для получения заголовков с авторизацией.
     """
     headers = {"Fingerprint": "3ccc784000c0c0c11cab8508dffaa578"}
-    http_auth_service = await container.get(HttpAuthService)
+    http_auth_service = await container.get(HttpAuthServerService)
     access_token, refresh_token = http_auth_service.create_and_save_tokens(
         mock_user, Fingerprint("3ccc784000c0c0c11cab8508dffaa578")
     )

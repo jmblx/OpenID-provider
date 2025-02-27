@@ -2,17 +2,17 @@ import logging
 from typing import Sequence
 
 import sqlalchemy as sa
+from sqlalchemy import and_, select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from application.common.interfaces.role_repo import RoleRepository
-from domain.entities.client.model import Client
-from domain.entities.client.value_objects import ClientID
+from domain.entities.resource_server.model import ResourceServer
+from domain.entities.resource_server.value_objects import ResourceServerID, ResourceServerType
 from domain.entities.role.model import Role
 from domain.entities.role.value_objects import RoleID
 from domain.entities.user.model import User
 from domain.entities.user.value_objects import UserID
 from infrastructure.db.models.secondary import user_role_association
-
 
 logger = logging.getLogger(__name__)
 
@@ -40,38 +40,43 @@ class RoleRepositoryImpl(RoleRepository):
         roles = result.scalars().all()
         return roles
 
-    async def get_roles_by_client_id(self, client_id: int, order_by_id: bool = False) -> Sequence[Role]:
-        query = sa.select(Role).where(Role.client_id == client_id)
+    async def get_roles_by_rs_id(
+        self, rs_id: int, order_by_id: bool = False
+    ) -> Sequence[Role]:
+        query = sa.select(Role).where(Role.rs_id == rs_id)
         if order_by_id:
             query = query.order_by(Role.id)
-        result = await self.session.execute(
-            query
-        )
+        result = await self.session.execute(query)
         roles = result.scalars().all()
         return roles
 
-    async def get_base_client_roles(self, client_id: ClientID) -> list[Role]:
+    async def get_base_rs_roles(self, rs_id: ResourceServerID) -> list[Role]:
         stmt = (
             sa.select(Role)
-            .where(Role.client_id == client_id)
+            .where(Role.rs_id == rs_id)
             .where(Role.is_base == True)
         )
         result = await self.session.execute(stmt)
         return result.scalars().all()
 
-    async def get_user_roles_by_client_id(
-        self, user_id: UserID, client_id: ClientID
+    async def get_user_roles_by_rs_id(
+            self, user_id: UserID, rs_ids: Sequence[ResourceServerID]
     ) -> list[Role]:
-        stmt = (
-            sa.select(Role)
-            .join(
-                user_role_association,
-                Role.id == user_role_association.c.role_id,
-            )
-            .join(User, user_role_association.c.user_id == User.__table__.c.id)
-            .join(Client, Role.client_id == Client.id)
-            .where(User.id == user_id)
-            .where(Client.id == int(client_id))
-        )
-        result = await self.session.execute(stmt)
-        return result.scalars().all()
+        stmt = text("""
+            SELECT r.* FROM role r
+            JOIN user_role_association ura ON r.id = ura.role_id
+            JOIN "user" u ON ura.user_id = u.id
+            JOIN resource_server rs ON r.rs_id = rs.id
+            WHERE u.id = :user_id
+              AND rs.id = ANY(:rs_ids)
+              AND rs.type = :rs_type
+        """)
+
+        result = await self.session.execute(stmt, {
+            "user_id": str(user_id.value),
+            "rs_ids": rs_ids,
+            "rs_type": ResourceServerType.RBAC_BY_AS.value,
+        })
+
+        return result.mappings().all()
+

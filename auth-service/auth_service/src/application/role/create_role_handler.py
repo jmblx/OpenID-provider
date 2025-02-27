@@ -10,7 +10,7 @@ from domain.entities.role.value_objects import RoleID
 class CreateRoleCommand:
     name: str
     base_scopes: dict[str, str]
-    client_id: int
+    rs_id: int
     is_base: bool = field(default=False)
 
 
@@ -23,7 +23,7 @@ class CreateRoleHandler:
         role = Role.create(
             name=command.name,
             base_scopes=command.base_scopes,
-            client_id=command.client_id,
+            rs_id=command.rs_id,
             is_base=command.is_base,
         )
         role_id: RoleID = await self.role_repo.save(role)

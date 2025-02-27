@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="2e403dcf-edce-498d-8ce1-0bd1cd208260" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/../auth-service/auth_service/src/application/auth/code_to_token_handler.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../auth-service/auth_service/src/application/auth/refresh_tokens_handler.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../auth-service/auth_service/src/application/role/upd_role_command_handler.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../auth-service/auth_service/src/application/user/add_role_to_user_handler.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../auth-service/static/pages/client.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../auth-service/static/pages/clients.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/.idea/auth-service.iml" beforeDir="false" afterPath="$PROJECT_DIR$/../auth-service/.idea/auth-service.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/Makefile" beforeDir="false" afterPath="$PROJECT_DIR$/../auth-service/Makefile" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/app/conf.d/app.conf" beforeDir="false" afterPath="$PROJECT_DIR$/../auth-service/app/conf.d/app.conf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/auth_service/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/../auth-service/auth_service/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/auth_service/src/application/auth/code_to_token/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/../auth-service/auth_service/src/application/auth/scopes_service.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/auth_service/src/application/auth/code_to_token/code_to_token_handler.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/auth_service/src/application/auth/invalidate_other_tokens/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/../auth-service/auth_service/src/application/client/get_all_clients.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/auth_service/src/application/auth/invalidate_other_tokens/handler.py" beforeDir="false" afterPath="$PROJECT_DIR$/../auth-service/auth_service/src/application/auth/invalidate_other_tokens_handler.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/auth_service/src/application/auth/login_user/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/../auth-service/auth_service/src/application/client/read_client_view_handler.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/auth_service/src/application/auth/login_user/auth_user_handler.py" beforeDir="false" afterPath="$PROJECT_DIR$/../auth-service/auth_service/src/application/auth/login_user_handler.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/auth_service/src/application/auth/refresh_tokens/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/../auth-service/auth_service/src/application/common/views/client_view.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/auth_service/src/application/auth/refresh_tokens/refresh_tokens_handler.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/auth_service/src/application/auth/register_user/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/../auth-service/auth_service/src/application/common/views/role_view.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/auth_service/src/application/auth/register_user/register_user_handler.py" beforeDir="false" afterPath="$PROJECT_DIR$/../auth-service/auth_service/src/application/auth/register_user_handler.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/auth_service/src/application/auth/revoke_token/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/../auth-service/auth_service/src/application/role/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/auth_service/src/application/auth/revoke_token/revoke_token_handler.py" beforeDir="false" afterPath="$PROJECT_DIR$/../auth-service/auth_service/src/application/auth/revoke_token_handler.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/auth_service/src/application/client/add_allowed_redirect_url/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/../auth-service/auth_service/src/application/user/user_service.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/auth_service/src/application/client/add_allowed_redirect_url/add_allowed_url.py" beforeDir="false" afterPath="$PROJECT_DIR$/../auth-service/auth_service/src/application/client/add_allowed_url.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/auth_service/src/application/client/get_client/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/../auth-service/auth_service/src/infrastructure/services/auth/scopes_service.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/auth_service/src/application/client/get_client/client_queries.py" beforeDir="false" afterPath="$PROJECT_DIR$/../auth-service/auth_service/src/application/client/client_queries.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/auth_service/src/application/client/register_client/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/../auth-service/auth_service/src/infrastructure/services/user/user_service.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/auth_service/src/application/client/register_client/register_client_hadler.py" beforeDir="false" afterPath="$PROJECT_DIR$/../auth-service/auth_service/src/application/client/register_client_hadler.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/auth_service/src/application/client/rename_client/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/../auth-service/auth_service/src/presentation/web_api/routes/role/schemas.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/auth_service/src/application/client/rename_client/rename_client.py" beforeDir="false" afterPath="$PROJECT_DIR$/../auth-service/auth_service/src/application/client/update_client.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/auth_service/src/application/common/id_provider.py" beforeDir="false" afterPath="$PROJECT_DIR$/../auth-service/auth_service/src/application/common/id_provider.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/auth_service/src/application/common/interfaces/client_reader.py" beforeDir="false" afterPath="$PROJECT_DIR$/../auth-service/auth_service/src/application/common/interfaces/client_reader.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/auth_service/src/application/common/interfaces/email_confirmation_service.py" beforeDir="false" afterPath="$PROJECT_DIR$/../auth-service/auth_service/src/application/common/interfaces/email_confirmation_service.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/auth_service/src/application/common/interfaces/http_auth.py" beforeDir="false" afterPath="$PROJECT_DIR$/../auth-service/auth_service/src/application/common/interfaces/http_auth.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/auth_service/src/application/common/interfaces/role_repo.py" beforeDir="false" afterPath="$PROJECT_DIR$/../auth-service/auth_service/src/application/common/interfaces/role_repo.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/auth_service/src/application/common/interfaces/token_creation.py" beforeDir="false" afterPath="$PROJECT_DIR$/../auth-service/auth_service/src/application/common/interfaces/token_creation.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/auth_service/src/application/common/interfaces/token_service.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/auth_service/src/application/common/interfaces/user_repo.py" beforeDir="false" afterPath="$PROJECT_DIR$/../auth-service/auth_service/src/application/common/interfaces/user_repo.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/auth_service/src/application/common/services/client_service.py" beforeDir="false" afterPath="$PROJECT_DIR$/../auth-service/auth_service/src/application/common/services/client_service.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/auth_service/src/application/common/token_types.py" beforeDir="false" afterPath="$PROJECT_DIR$/../auth-service/auth_service/src/application/common/token_types.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/auth_service/src/application/create_role/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/auth_service/src/application/create_role/create_role_handler.py" beforeDir="false" afterPath="$PROJECT_DIR$/../auth-service/auth_service/src/application/role/create_role_handler.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/auth_service/src/application/get_user_notifications/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/auth_service/src/application/get_user_notifications/notification_query_handler.py" beforeDir="false" afterPath="$PROJECT_DIR$/../auth-service/auth_service/src/application/notification_query_handler.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/auth_service/src/application/user/confirm_email/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/auth_service/src/application/user/confirm_email/handler.py" beforeDir="false" afterPath="$PROJECT_DIR$/../auth-service/auth_service/src/application/user/confirm_email_handler.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/auth_service/src/application/user/delete_account/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/auth_service/src/application/user/delete_account/handler.py" beforeDir="false" afterPath="$PROJECT_DIR$/../auth-service/auth_service/src/application/user/delete_user_handler.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/auth_service/src/application/user/set_user_avatar/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/auth_service/src/application/user/set_user_avatar/handler.py" beforeDir="false" afterPath="$PROJECT_DIR$/../auth-service/auth_service/src/application/user/set_user_avatar_handler.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/auth_service/src/constants.py" beforeDir="false" afterPath="$PROJECT_DIR$/../auth-service/auth_service/src/constants.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/auth_service/src/core/di/container.py" beforeDir="false" afterPath="$PROJECT_DIR$/../auth-service/auth_service/src/core/di/container.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/auth_service/src/core/di/providers/handlers.py" beforeDir="false" afterPath="$PROJECT_DIR$/../auth-service/auth_service/src/core/di/providers/handlers.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/auth_service/src/core/di/providers/readers.py" beforeDir="false" afterPath="$PROJECT_DIR$/../auth-service/auth_service/src/core/di/providers/readers.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/auth_service/src/core/di/providers/repositories.py" beforeDir="false" afterPath="$PROJECT_DIR$/../auth-service/auth_service/src/core/di/providers/repositories.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/auth_service/src/core/di/providers/services.py" beforeDir="false" afterPath="$PROJECT_DIR$/../auth-service/auth_service/src/core/di/providers/services.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/auth_service/src/domain/entities/client/value_objects.py" beforeDir="false" afterPath="$PROJECT_DIR$/../auth-service/auth_service/src/domain/entities/client/value_objects.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/auth_service/src/domain/entities/role/model.py" beforeDir="false" afterPath="$PROJECT_DIR$/../auth-service/auth_service/src/domain/entities/role/model.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/auth_service/src/domain/entities/role/value_objects.py" beforeDir="false" afterPath="$PROJECT_DIR$/../auth-service/auth_service/src/domain/entities/role/value_objects.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/auth_service/src/domain/entities/user/model.py" beforeDir="false" afterPath="$PROJECT_DIR$/../auth-service/auth_service/src/domain/entities/user/model.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/auth_service/src/domain/exceptions/client.py" beforeDir="false" afterPath="$PROJECT_DIR$/../auth-service/auth_service/src/domain/exceptions/client.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/auth_service/src/domain/exceptions/role.py" beforeDir="false" afterPath="$PROJECT_DIR$/../auth-service/auth_service/src/domain/exceptions/role.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/auth_service/src/infrastructure/db/alembic/versions/1eeff3c54354_.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/auth_service/src/infrastructure/db/alembic/versions/22cfdd0b1aea_.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/auth_service/src/infrastructure/db/alembic/versions/40217eaf3ac8_.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/auth_service/src/infrastructure/db/alembic/versions/41ae76fb4670_.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/auth_service/src/infrastructure/db/alembic/versions/48632ebf1ff4_.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/auth_service/src/infrastructure/db/alembic/versions/48a8ab6a6ece_.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/auth_service/src/infrastructure/db/alembic/versions/614d39e5d5ac_.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/auth_service/src/infrastructure/db/alembic/versions/615260cd9f7d_.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/auth_service/src/infrastructure/db/alembic/versions/6bc3bf95afc7_.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/auth_service/src/infrastructure/db/alembic/versions/743cedaa8fef_.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/auth_service/src/infrastructure/db/alembic/versions/800b014d369f_.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/auth_service/src/infrastructure/db/alembic/versions/944895a32c29_.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/auth_service/src/infrastructure/db/alembic/versions/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/auth_service/src/infrastructure/db/alembic/versions/ca7ffb4937a0_.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/auth_service/src/infrastructure/db/alembic/versions/cc458c10e7f0_.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/auth_service/src/infrastructure/db/models/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/../auth-service/auth_service/src/infrastructure/db/models/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/auth_service/src/infrastructure/db/models/client_models.py" beforeDir="false" afterPath="$PROJECT_DIR$/../auth-service/auth_service/src/infrastructure/db/models/client_models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/auth_service/src/infrastructure/db/models/role_models.py" beforeDir="false" afterPath="$PROJECT_DIR$/../auth-service/auth_service/src/infrastructure/db/models/role_models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/auth_service/src/infrastructure/db/models/secondary.py" beforeDir="false" afterPath="$PROJECT_DIR$/../auth-service/auth_service/src/infrastructure/db/models/secondary.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/auth_service/src/infrastructure/db/models/user_models.py" beforeDir="false" afterPath="$PROJECT_DIR$/../auth-service/auth_service/src/infrastructure/db/models/user_models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/auth_service/src/infrastructure/db/readers/client_reader.py" beforeDir="false" afterPath="$PROJECT_DIR$/../auth-service/auth_service/src/infrastructure/db/readers/client_reader.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/auth_service/src/infrastructure/db/repositories/client_repo_impl.py" beforeDir="false" afterPath="$PROJECT_DIR$/../auth-service/auth_service/src/infrastructure/db/repositories/client_repo_impl.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/auth_service/src/infrastructure/db/repositories/role_repository.py" beforeDir="false" afterPath="$PROJECT_DIR$/../auth-service/auth_service/src/infrastructure/db/repositories/role_repository.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/auth_service/src/infrastructure/db/repositories/user_repo_impl.py" beforeDir="false" afterPath="$PROJECT_DIR$/../auth-service/auth_service/src/infrastructure/db/repositories/user_repo_impl.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/auth_service/src/infrastructure/services/auth/http_auth_service.py" beforeDir="false" afterPath="$PROJECT_DIR$/../auth-service/auth_service/src/infrastructure/services/auth/http_auth_service.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/auth_service/src/infrastructure/services/auth/jwt_service.py" beforeDir="false" afterPath="$PROJECT_DIR$/../auth-service/auth_service/src/infrastructure/services/auth/jwt_service.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/auth_service/src/infrastructure/services/auth/token_creation_service.py" beforeDir="false" afterPath="$PROJECT_DIR$/../auth-service/auth_service/src/infrastructure/services/auth/token_creation_service.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/auth_service/src/infrastructure/services/auth/white_list_service.py" beforeDir="false" afterPath="$PROJECT_DIR$/../auth-service/auth_service/src/infrastructure/services/auth/white_list_service.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/auth_service/src/presentation/web_api/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/../auth-service/auth_service/src/presentation/web_api/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/auth_service/src/presentation/web_api/middlewares/metrics/middleware.py" beforeDir="false" afterPath="$PROJECT_DIR$/../auth-service/auth_service/src/presentation/web_api/middlewares/metrics/middleware.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/auth_service/src/presentation/web_api/routes/auth/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/../auth-service/auth_service/src/presentation/web_api/routes/auth/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/auth_service/src/presentation/web_api/routes/auth/router.py" beforeDir="false" afterPath="$PROJECT_DIR$/../auth-service/auth_service/src/presentation/web_api/routes/auth/router.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/auth_service/src/presentation/web_api/routes/client/client_router.py" beforeDir="false" afterPath="$PROJECT_DIR$/../auth-service/auth_service/src/presentation/web_api/routes/client/client_router.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/auth_service/src/presentation/web_api/routes/client/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/../auth-service/auth_service/src/presentation/web_api/routes/client/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/auth_service/src/presentation/web_api/routes/email_confirmation/router.py" beforeDir="false" afterPath="$PROJECT_DIR$/../auth-service/auth_service/src/presentation/web_api/routes/email_confirmation/router.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/auth_service/src/presentation/web_api/routes/investments/router.py" beforeDir="false" afterPath="$PROJECT_DIR$/../auth-service/auth_service/src/presentation/web_api/routes/investments/router.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/auth_service/src/presentation/web_api/routes/registration/router.py" beforeDir="false" afterPath="$PROJECT_DIR$/../auth-service/auth_service/src/presentation/web_api/routes/registration/router.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/auth_service/src/presentation/web_api/routes/role/router.py" beforeDir="false" afterPath="$PROJECT_DIR$/../auth-service/auth_service/src/presentation/web_api/routes/role/router.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/auth_service/src/presentation/web_api/routes/token_manage/router.py" beforeDir="false" afterPath="$PROJECT_DIR$/../auth-service/auth_service/src/presentation/web_api/routes/token_manage/router.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/auth_service/src/presentation/web_api/routes/user_account/router.py" beforeDir="false" afterPath="$PROJECT_DIR$/../auth-service/auth_service/src/presentation/web_api/routes/user_account/router.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/auth_service/tests/conftest.py" beforeDir="false" afterPath="$PROJECT_DIR$/../auth-service/auth_service/tests/conftest.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/auth_service/tests/unit/test_user_repo.py" beforeDir="false" afterPath="$PROJECT_DIR$/../auth-service/auth_service/tests/unit/test_user_repo.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/../auth-service/docker-compose.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/nginx.conf" beforeDir="false" afterPath="$PROJECT_DIR$/../auth-service/nginx.conf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/notification/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../auth-service/notification/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/resource_service/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/resource_service/core/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/resource_service/infra/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/resource_service/infra/log/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/resource_service/infra/log/main.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/resource_service/presentation/web_api/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/resource_service/presentation/web_api/config.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/resource_service/presentation/web_api/exceptions.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/resource_service/presentation/web_api/gunicorn/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/resource_service/presentation/web_api/gunicorn/app_options.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/resource_service/presentation/web_api/gunicorn/application.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/resource_service/presentation/web_api/gunicorn/config.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/resource_service/presentation/web_api/gunicorn/logger.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/resource_service/presentation/web_api/main.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/resource_service/presentation/web_api/middlewares/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/resource_service/presentation/web_api/middlewares/metrics/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/resource_service/presentation/web_api/middlewares/metrics/labels.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/resource_service/presentation/web_api/middlewares/metrics/middleware.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/resource_service/presentation/web_api/middlewares/metrics/utils.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/resource_service/presentation/web_api/responses.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/resource_service/presentation/web_api/routes/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth-service/resource_service/presentation/web_api/utils.py" beforeDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 3
+}</component>
+  <component name="ProjectId" id="2t2jImxVHQbjfVSK29vGh3Elqb7" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "git-widget-placeholder": "main",
+    "last_opened_file_path": "D:/vs/RKSI2024/recipe-server/user_profile_service",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-js-predefined-d6986cc7102b-e768b9ed790e-JavaScript-PY-243.21565.199" />
+        <option value="bundled-python-sdk-cab1f2013843-4ae2d6a61b08-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-243.21565.199" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="2e403dcf-edce-498d-8ce1-0bd1cd208260" name="Changes" comment="" />
+      <created>1739556985914</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1739556985914</updated>
+      <workItem from="1739556986952" duration="123000" />
+      <workItem from="1739558444467" duration="1000" />
+      <workItem from="1739615248312" duration="2217000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+</project>

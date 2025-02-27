@@ -11,7 +11,8 @@ from application.role.create_role_handler import (
     CreateRoleHandler,
 )
 from application.role.upd_role_command_handler import (
-    UpdateRoleHandler, UpdateRoleCommand,
+    UpdateRoleHandler,
+    UpdateRoleCommand,
 )
 from presentation.web_api.routes.role.schemas import UpdateRole
 

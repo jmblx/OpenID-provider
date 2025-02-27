@@ -2,8 +2,8 @@ from uuid import UUID, uuid4
 
 from domain.common.services.pwd_service import PasswordHasher
 from domain.entities.client.model import Client
+from domain.entities.resource_server.model import ResourceServer
 from domain.entities.role.model import Role
-from domain.entities.role.value_objects import RoleID, RoleBaseScopes
 from domain.entities.user.value_objects import (
     UserID,
     Email,
@@ -25,6 +25,7 @@ class User:
     roles: list[Role] = field(default_factory=list)
     is_email_confirmed: bool = field(default=False)
     avatar_path: str = field(default=None)
+    resource_servers: list[ResourceServer] = field(default_factory=list)
     clients: list[Client] = field(default_factory=list)
 
     @classmethod

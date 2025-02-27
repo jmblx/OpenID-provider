@@ -1,11 +1,14 @@
 from datetime import datetime, timedelta
 from typing import cast, Any
+from uuid import UUID
 
 import jwt
 from pytz import timezone
 
+from application.common.client_token_types import ClientAccessTokenPayload
 from application.common.interfaces.jwt_service import JWTService
-from application.common.token_types import Payload, JwtToken, BaseToken
+from application.common.auth_server_token_types import AuthServerAccessTokenPayload, JwtToken, BaseToken
+from domain.exceptions.auth import InvalidTokenError, TokenExpiredError
 from infrastructure.services.auth.config import JWTSettings
 
 
@@ -17,7 +20,7 @@ class JWTServiceImpl(JWTService):
 
     def encode(
         self,
-        payload: Payload,
+        payload: dict[str, int | str | UUID],
         expire_minutes: int | None = None,
         expire_timedelta: timedelta | None = None,
     ) -> JwtToken:
@@ -32,10 +35,8 @@ class JWTServiceImpl(JWTService):
                 minutes=expire_minutes
                 or self.auth_settings.access_token_expire_minutes
             )
-        payload["exp"] = expire
-        payload["iat"] = now
         token = jwt.encode(
-            cast(dict[str, Any], payload),
+            {**payload, "exp": expire, "iat": now},
             self.auth_settings.private_key,
             algorithm=self.auth_settings.algorithm,
         )
@@ -45,7 +46,7 @@ class JWTServiceImpl(JWTService):
             "expires_at": expire,
         }
 
-    def decode(self, token: BaseToken) -> Payload:
+    def decode(self, token: BaseToken) -> AuthServerAccessTokenPayload | ClientAccessTokenPayload:
         """Декодирует JWT токен и возвращает его payload."""
         try:
             payload = jwt.decode(
@@ -53,9 +54,8 @@ class JWTServiceImpl(JWTService):
                 self.auth_settings.public_key,
                 algorithms=[self.auth_settings.algorithm],
             )
-            print(payload, token)
-            return cast(Payload, payload)
+            return cast(AuthServerAccessTokenPayload, payload)
         except jwt.ExpiredSignatureError:
-            raise Exception("Token has expired")
+            raise TokenExpiredError()
         except jwt.DecodeError:
-            raise Exception("Invalid token")
+            raise InvalidTokenError()

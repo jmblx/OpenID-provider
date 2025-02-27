@@ -1,23 +1,27 @@
+import logging
+
 from dishka import FromDishka
 from dishka.integrations.fastapi import DishkaRoute
 from fastapi import APIRouter
 from fastapi.responses import ORJSONResponse
 from starlette import status
 
-from application.auth.code_to_token_handler import (
-    CodeToTokenHandler,
-    CodeToTokenCommand,
-)
-from application.auth.login_user_handler import (
-    AuthenticateUserHandler,
+from application.auth_as.login_user_auth_server import (
     AuthenticateUserCommand,
+    AuthenticateUserHandler,
 )
-from application.common.token_types import Fingerprint
-from presentation.web_api.utils import render_auth_code_url
+from application.auth_for_client.code_to_token_handler import CodeToTokenHandler, CodeToTokenCommand
+from application.auth_for_client.get_me_page_data_handler import GetMeDataHandler, GetMeDataCommand, MeData
+from application.common.auth_server_token_types import Fingerprint
+from presentation.web_api.routes.auth.models import GetMePageDataSchema, CodeToTokenResponseSchema
+from presentation.web_api.utils import set_auth_server_tokens, set_client_tokens
 
 auth_router = APIRouter(route_class=DishkaRoute, tags=["auth"])
 # jinja_loader = PackageLoader("presentation.web_api.registration")
 # templates = Jinja2Templates(directory="templates", loader=jinja_loader)
+
+
+logger = logging.getLogger(__name__)
 
 
 @auth_router.post("/login")
@@ -25,11 +29,14 @@ async def login(
     command: AuthenticateUserCommand,
     handler: FromDishka[AuthenticateUserHandler],
 ) -> ORJSONResponse:
-    auth_code = await handler.handle(command)
-    redirect_url = render_auth_code_url(command.redirect_url, auth_code)
-    return ORJSONResponse(
-        {"redirect_url": redirect_url}, status_code=status.HTTP_201_CREATED
+    tokens = await handler.handle(command)
+    response = ORJSONResponse(
+        # {"access_token": access_token, "refresh_token": refresh_token},
+        {"status": "success"},
+        status_code=status.HTTP_200_OK,
     )
+    set_auth_server_tokens(response, tokens)
+    return response
 
 
 @auth_router.post("/code-to-token")
@@ -38,32 +45,32 @@ async def code_to_token(
     fingerprint: FromDishka[Fingerprint],
     command: CodeToTokenCommand,
 ) -> ORJSONResponse:
-    access_token, refresh_token = await handler.handle(command, fingerprint)
-    response = ORJSONResponse(
-        # {"access_token": access_token, "refresh_token": refresh_token},
-        {"status": "success"},
-        status_code=status.HTTP_200_OK,
-    )
-    response.set_cookie(
-        key="access_token",
-        value=access_token,
-        httponly=True,
-        secure=False,
-        max_age=60 * 5,
-        expires=60 * 5,
-        samesite="lax",
+    response_data = await handler.handle(command, fingerprint)
+    logger.info("response_data: %s", response_data)
+    tokens = {
+        "access_token": response_data.pop("access_token", None),
+        "refresh_token": response_data.pop("refresh_token", None),
+    }
+
+    response = ORJSONResponse(content=response_data)
+
+    set_client_tokens(response, tokens)
+
+    return response
+
+
+
+@auth_router.post("/auth-to-client")
+async def auth_to_client(handler: FromDishka[GetMeDataHandler], command: GetMePageDataSchema) -> MeData:
+    command_data = GetMeDataCommand(
+        client_id=command.client_id,
+        required_resources=command.required_resources.model_dump(),  # TypedDict из Pydantic-модели
+        redirect_url=str(command.redirect_url),
+        code_verifier=command.code_verifier,
+        code_challenge_method=command.code_challenge_method,
     )
 
-    response.set_cookie(
-        key="refresh_token",
-        value=refresh_token,
-        httponly=True,
-        secure=False,
-        max_age=60 * 60 * 24 * 30,
-        expires=60 * 60 * 24 * 30,
-        samesite="lax",
-    )
-    return response
+    return await handler.handle(command_data)
 
 
 # @auth_router.get("/pages/login")

@@ -15,7 +15,7 @@ from domain.entities.user.value_objects import UserID, Email, HashedPassword
 from infrastructure.db.models.registry import mapper_registry
 from infrastructure.db.models.secondary import (
     user_client_association_table,
-    user_role_association,
+    user_role_association, user_rs_association_table,
 )
 
 user_table = Table(
@@ -45,16 +45,12 @@ mapper_registry.map_imperatively(
             back_populates="users_roles",
             uselist=True,
         ),
-        "clients": relationship(
-            "Client",
-            secondary=user_client_association_table,
-            back_populates="users",
-            uselist=True,
-        ),
-        # "strategies": relationship(
-        #     "Strategy",
-        #     secondary=user_strategy_association_table,
+        "resource_servers": relationship("ResourceServer", uselist=True, back_populates="users_rss", secondary=user_rs_association_table),
+        # "clients": relationship(
+        #     "Client",
+        #     secondary=user_client_association_table,
         #     back_populates="users",
+        #     uselist=True,
         # ),
     },
     column_prefix="_",

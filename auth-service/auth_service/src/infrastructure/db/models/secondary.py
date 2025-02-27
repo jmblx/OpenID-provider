@@ -25,6 +25,24 @@ user_role_association = Table(
     Column("role_id", sa.Integer, ForeignKey("role.id"), nullable=False),
 )
 
+client_rs_association_table = Table(
+    "client_rs_association_table",
+    mapper_registry.metadata,
+    Column("id", sa.Integer, primary_key=True, autoincrement=True),
+    Column("client_id", sa.Integer, ForeignKey("client.id"), nullable=False),
+    Column(
+        "rs_id", sa.Integer, ForeignKey("resource_server.id"), nullable=False
+    ),
+)
+
+user_rs_association_table = Table(
+    "user_rs_association_table",
+    mapper_registry.metadata,
+    Column("id", sa.Integer, primary_key=True, autoincrement=True),
+    Column("rs_id", sa.Integer, ForeignKey("resource_server.id"), nullable=False),
+    Column("user_id", PGUUID(as_uuid=True), ForeignKey("user.id"), nullable=False),
+)
+
 # user_strategy_association_table = Table(
 #     "user_strategy_association",
 #     mapper_registry.metadata,

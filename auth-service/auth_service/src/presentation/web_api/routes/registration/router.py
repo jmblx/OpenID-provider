@@ -4,7 +4,7 @@ from fastapi import APIRouter
 from fastapi.responses import ORJSONResponse
 from starlette import status
 
-from application.auth.register_user_handler import (
+from application.auth_as.register_user_auth_server_hander import (
     RegisterUserHandler,
     RegisterUserCommand,
 )
@@ -14,7 +14,7 @@ from domain.exceptions.auth import (
 )
 from domain.exceptions.user import UserAlreadyExistsError
 from presentation.web_api.responses import ErrorResponse
-from presentation.web_api.utils import render_auth_code_url
+from presentation.web_api.utils import render_auth_code_url, set_auth_server_tokens
 
 reg_router = APIRouter(route_class=DishkaRoute, tags=["reg"])
 
@@ -40,8 +40,10 @@ async def registration(
     handler: FromDishka[RegisterUserHandler],
     command: RegisterUserCommand,
 ) -> ORJSONResponse:
-    auth_code = await handler.handle(command)
-    redirect_url = render_auth_code_url(command.redirect_url, auth_code)
-    return ORJSONResponse(
-        {"redirect_url": redirect_url}, status_code=status.HTTP_201_CREATED
+    register_handler_response = await handler.handle(command)
+    response = ORJSONResponse(
+        {"id": register_handler_response["user_id"]},
+        status_code=status.HTTP_201_CREATED,
     )
+    set_auth_server_tokens(response, register_handler_response)
+    return response

@@ -135,6 +135,5 @@ class RoleBaseScopes:
 
     def to_list(self) -> list[str]:
         return [
-            f"{scope}:{bitmask:04b}"
-            for scope, bitmask in self.value.items()
+            f"{scope}:{bitmask:04b}" for scope, bitmask in self.value.items()
         ]

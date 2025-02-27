@@ -4,6 +4,9 @@ from dishka import FromDishka
 from dishka.integrations.fastapi import DishkaRoute
 from fastapi import APIRouter
 
+from application.auth_as.identify_by_cookies_query import (
+    IdentifyByCookiesQueryHandler,
+)
 from application.user.add_role_to_user_handler import (
     AddRoleToUserHandler,
     AddRoleToUserCommand,
@@ -31,3 +34,8 @@ async def add_role_to_user(
 ):
     command = AddRoleToUserCommand(user_id, role_id)
     await handler.handle(command)
+
+
+@user_account_router.get("/me")
+async def get_me(handler: FromDishka[IdentifyByCookiesQueryHandler]):
+    return await handler.handle()

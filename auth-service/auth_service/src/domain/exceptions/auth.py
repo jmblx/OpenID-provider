@@ -5,7 +5,15 @@ from domain.common.exceptions.base import DomainError
 
 
 @dataclass(eq=False)
-class InvalidTokenError(ApplicationError): ...
+class InvalidTokenError(ApplicationError):
+    def title(self) -> str:
+        return "Invalid token."
+
+
+@dataclass(eq=False)
+class TokenExpiredError(ApplicationError):
+    def title(self) -> str:
+        return "Token expired."
 
 
 @dataclass(eq=False)

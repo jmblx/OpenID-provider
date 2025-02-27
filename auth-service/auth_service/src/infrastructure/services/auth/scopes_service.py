@@ -1,23 +1,28 @@
 from collections import defaultdict
 
-from application.auth.scopes_service import ScopesService
+from application.auth_as.common.scopes_service import ScopesService
 from domain.entities.role.model import Role
 
 
 class ScopesServiceImpl(ScopesService):
     def calculate_full_user_scopes_for_client(
-        self, roles: list[Role]
+        self, roles: list[Role] | list[dict]
     ) -> list[str]:
         """
         Вычисляет полный список разрешений на основе всех ролей.
 
         Если хотя бы в одной роли установлен бит 1, то он остаётся 1 в итоговом результате.
-        Возвращает список строковых битовых масок в формате "scope:bitmask".
+        Работает как с list[Role], так и с list[dict].
         """
+
         merged_permissions = defaultdict(int)
 
         for role in roles:
-            for scope, bitmask in role.base_scopes.value.items():
+            base_scopes = (
+                role.base_scopes.value
+                if isinstance(role, Role) else role["base_scopes"]
+            )
+            for scope, bitmask in base_scopes.items():
                 merged_permissions[scope] |= bitmask
 
         return [

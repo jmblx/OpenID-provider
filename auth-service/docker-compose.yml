@@ -91,18 +91,18 @@ services:
     networks:
       - backend_service.nats.network
 
-  notification_app:
-    env_file:
-      - notification/.env-prod
-      - .env-prod # для удобства в этом файле первостепенно в проде скорее всего лучше по 1 файлу указывать
-    image: backend_service.notification_app
-#    build:
-#      context: notification/
-    command: [ "sh", "/notification_app/docker/app.sh" ]
-    networks:
-      - backend_service.nats.network
-    depends_on:
-      - nats
+#  notification_app:
+#    env_file:
+#      - notification/.env-prod
+#      - .env-prod # для удобства в этом файле первостепенно в проде скорее всего лучше по 1 файлу указывать
+#    image: backend_service.notification_app
+##    build:
+##      context: notification/
+#    command: [ "sh", "/notification_app/docker/app.sh" ]
+#    networks:
+#      - backend_service.nats.network
+#    depends_on:
+#      - nats
 
   db_migration:
     profiles: [ "migration" ]
@@ -121,26 +121,26 @@ services:
       - .env-prod
     command: [ "sh", "/backend-service.auth_service/docker/migrate.sh" ]
 
-  nginx:
-    image: nginx:latest
-    container_name: nginx_app
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./app/conf.d:/etc/nginx/conf.d
-      - ./certbot/conf:/etc/letsencrypt
-      - ./nginx-logs:/var/log/nginx
-      - ./certbot/www:/var/www/certbot:rw
-      - ./static:/usr/share/nginx/html
-    depends_on:
-      - auth_service
-      - db
-      - redis
-#      - certbot
-    networks:
-      - backend_service.db.network
+#  nginx:
+#    image: nginx:latest
+#    container_name: nginx_app
+#    ports:
+#      - "80:80"
+#      - "443:443"
+#    volumes:
+#      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+#      - ./app/conf.d:/etc/nginx/conf.d
+#      - ./certbot/conf:/etc/letsencrypt
+#      - ./nginx-logs:/var/log/nginx
+#      - ./certbot/www:/var/www/certbot:rw
+#      - ./static:/usr/share/nginx/html
+#    depends_on:
+#      - auth_service
+#      - db
+#      - redis
+##      - certbot
+#    networks:
+#      - backend_service.db.network
 
   grafana:
     profiles: [ "grafana" ]

@@ -39,16 +39,10 @@ class HttpIdentityProvider(IdentityProvider):
         jwt_service: JWTService,
         access_token: AccessToken,
         user_repo: UserRepository,
-        refresh_token: RefreshToken,
-        token_whitelist_service: TokenWhiteListService,
-        fingerprint: Fingerprint,
     ):
         self.access_token = access_token
         self.jwt_service = jwt_service
         self.user_repo = user_repo
-        self.refresh_token = refresh_token
-        self.token_whitelist_service = token_whitelist_service
-        self.fingerprint = fingerprint
 
     def _get_refresh_token_payload_(self) -> dict:
         payload = self.jwt_service.decode(self.refresh_token)

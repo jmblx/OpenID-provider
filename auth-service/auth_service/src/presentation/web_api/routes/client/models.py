@@ -17,8 +17,10 @@ class RoleViewModel(BaseModel):
     base_scopes: list[str]
     is_base: bool
 
+
 class RoleViewWithIdModel(RoleViewModel):
     id: int
+
 
 class ClientViewModel(BaseModel):
     name: str

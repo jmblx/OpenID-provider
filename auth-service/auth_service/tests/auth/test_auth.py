@@ -29,8 +29,8 @@
 #     fingerprint: str,
 #     expected_error_message: str,
 # ):
-#     query = f"""
-#         query {{
+#     command = f"""
+#         command {{
 #           authUser(authData: {{
 #             email: "{email}"
 #             password: "{password}"
@@ -43,7 +43,7 @@
 #         headers["Fingerprint"] = fingerprint
 #
 #     response = await ac.post(
-#         "/graphql", headers=headers, json={"query": query}
+#         "/graphql", headers=headers, json={"command": command}
 #     )
 #
 #     assert response.status_code == 200
@@ -244,7 +244,7 @@
 #     github_name: str,
 #     expected_error_message: str,
 # ):
-#     query = f"""
+#     command = f"""
 #     mutation {{
 #         addUser(
 #             command: {{
@@ -266,7 +266,7 @@
 #     }}
 #     """
 #
-#     response = await ac.post("/graphql", json={"query": query})
+#     response = await ac.post("/graphql", json={"command": command})
 #
 #     assert response.status_code == 200
 #     command = response.json()

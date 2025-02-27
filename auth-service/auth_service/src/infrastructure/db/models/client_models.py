@@ -8,11 +8,13 @@ from domain.entities.client.value_objects import (
     ClientName,
     ClientBaseUrl,
     ClientType,
-    ClientID,
     AllowedRedirectUrls,
 )
 from infrastructure.db.models.registry import mapper_registry
-from infrastructure.db.models.secondary import user_client_association_table
+from infrastructure.db.models.secondary import (
+    user_client_association_table,
+    client_rs_association_table,
+)
 
 client_table = sa.Table(
     "client",
@@ -39,13 +41,13 @@ mapper_registry.map_imperatively(
             AllowedRedirectUrls, client_table.c.allowed_redirect_urls
         ),
         "type": composite(ClientType, client_table.c.type),
-        "users": relationship(
-            "User",
-            secondary=user_client_association_table,
-            back_populates="clients",
-            uselist=True,
-        ),
-        "roles": relationship("Role", back_populates="client", uselist=True),
+        # "roles": relationship("Role", back_populates="client", uselist=True),
+        # "resource_servers": relationship(
+        #     "ResourceServer",
+        #     secondary=client_rs_association_table,
+        #     back_populates="clients",
+        #     uselist=True
+        # ),
     },
     column_prefix="_",
 )

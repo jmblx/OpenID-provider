@@ -1,6 +1,7 @@
 from dataclasses import dataclass, field
 
 from domain.entities.client.value_objects import ClientID
+from domain.entities.resource_server.value_objects import ResourceServerID
 from domain.entities.role.value_objects import (
     RoleID,
     RoleName,
@@ -13,7 +14,7 @@ class Role:
     id: RoleID = field(init=False)
     name: RoleName
     base_scopes: RoleBaseScopes
-    client_id: ClientID
+    rs_id: ResourceServerID
     is_base: bool
 
     @classmethod
@@ -21,12 +22,12 @@ class Role:
         cls,
         name: str,
         base_scopes: dict[str, str],
-        client_id: int,
+        rs_id: int,
         is_base: bool = False,
     ) -> "Role":
         return cls(
             name=RoleName(name),
             base_scopes=RoleBaseScopes.create(base_scopes),
-            client_id=ClientID(client_id),
+            rs_id=ResourceServerID(rs_id),
             is_base=is_base,
         )

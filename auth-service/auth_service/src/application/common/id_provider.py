@@ -1,15 +1,16 @@
 import logging
 from abc import ABC, abstractmethod
+from typing import Annotated
 from uuid import UUID
 
+from dishka import FromComponent
 from fastapi import HTTPException
-from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
 from application.common.interfaces.jwt_service import JWTService
 from application.common.interfaces.user_repo import UserRepository
 from application.common.interfaces.white_list import TokenWhiteListService
-from application.common.token_types import (
+from application.common.auth_server_token_types import (
     AccessToken,
     RefreshToken,
     Fingerprint,
@@ -21,7 +22,7 @@ from domain.entities.user.value_objects import UserID
 
 class IdentityProvider(ABC):
     @abstractmethod
-    def get_current_user_id(self) -> UserID: ...
+    async def get_current_user_id(self) -> UserID: ...
 
     @abstractmethod
     async def get_current_user(self) -> User: ...
@@ -40,7 +41,9 @@ class HttpIdentityProvider(IdentityProvider):
         access_token: AccessToken,
         user_repo: UserRepository,
         refresh_token: RefreshToken,
-        token_whitelist_service: TokenWhiteListService,
+        token_whitelist_service: Annotated[
+            TokenWhiteListService, FromComponent("auth_server")
+        ],
         fingerprint: Fingerprint,
     ):
         self.access_token = access_token
@@ -63,21 +66,21 @@ class HttpIdentityProvider(IdentityProvider):
         token_data = await self.token_whitelist_service.get_refresh_token_data(
             jti
         )
-        logger.info("tokend data: %s, jti: %s", token_data, jti)
+        logger.info("token data: %s", token_data)
         if not token_data or token_data.fingerprint != self.fingerprint:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Invalid refresh token or fingerprint",
             )
-        return UserID(jti)
+        return UserID(token_data.user_id)
 
     def _get_refresh_token_jti(self) -> UUID:
         payload = self._get_refresh_token_payload_()
         return payload["jti"]
 
     async def get_current_user(self) -> User:
-        user_id = self.get_current_user_id()
-        user: User = await self.user_service.get_by_id(user_id)  # type: ignore
+        user_id = await self.get_current_user_id()
+        user: User = await self.user_repo.get_by_id(user_id)
         return user
 
     def get_current_client_id(self) -> ClientID:

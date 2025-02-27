@@ -7,7 +7,7 @@ AUTH_URL = "http://127.0.0.1:8000/graphql"  # замените на URL ваше
 
 # ГрафQL запрос авторизации
 query = """
-query {
+command {
   authUser(authData: {
     email: "admin@admin.com"
     password: "admin"
@@ -18,7 +18,7 @@ query {
 
 async def send_auth_request(session, url, headers, query):
     async with session.post(
-        url, json={"query": query}, headers=headers
+        url, json={"command": query}, headers=headers
     ) as response:
         data = await response.json()
         print(f"Response status: {response.status}")

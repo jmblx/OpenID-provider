@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
-from typing import TypedDict
+from typing import TypedDict, Sequence
 
+from domain.entities.resource_server.value_objects import ResourceServerID
 from domain.entities.role.model import Role
 from domain.entities.user.model import User
 from domain.entities.user.value_objects import UserID, Email
@@ -40,4 +41,9 @@ class UserRepository(ABC):
     @abstractmethod
     async def add_roles_to_user(
         self, user_id: UserID, role_ids: list[int]
+    ) -> None: ...
+
+    @abstractmethod
+    async def add_rs_to_user(
+        self, user_id: UserID, rs_ids: Sequence[ResourceServerID]
     ) -> None: ...

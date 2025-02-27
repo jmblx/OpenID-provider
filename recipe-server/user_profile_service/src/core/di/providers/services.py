@@ -91,19 +91,8 @@ class ServiceProvider(Provider):
     notify_service = provide(
         NotifyServiceImpl, scope=Scope.REQUEST, provides=NotifyService
     )
-    email_confirmation_service = provide(
-        EmailConfirmationService,
-        scope=Scope.REQUEST,
-        provides=EmailConfirmationServiceI,
-    )
-    reset_pwd_service = provide(
-        ResetPwdServiceImpl, scope=Scope.REQUEST, provides=ResetPwdService
-    )
     user_service = provide(
         UserServiceImpl, scope=Scope.REQUEST, provides=UserService
-    )
-    scopes_service = provide(
-        ScopesServiceImpl, scope=Scope.REQUEST, provides=ScopesService
     )
     # reg_validation_service = provide(
     #     RegUserValidationService,

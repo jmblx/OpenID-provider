@@ -1,13 +1,16 @@
 import uuid
 from abc import ABC, abstractmethod
-from typing import Optional, TypedDict
+from typing import Optional, TypedDict, Literal
+
+from domain.entities.resource_server.value_objects import ResourceServerIds
 
 
-class AuthCodeData(TypedDict):
+class AuthCodeData(TypedDict, total=False):
     user_id: str
     client_id: str
-    redirect_url: str
     code_challenger: str
+    user_data_needed: list[Literal["email", "avatar_path"]]
+    rs_ids: ResourceServerIds
 
 
 class AuthorizationCodeStorage(ABC):

@@ -15,5 +15,7 @@ class ReadClientPageViewQueryHandler:
         self.client_reader = client_reader
 
     async def handle(self, query: ReadClientPageViewQuery) -> ClientView:
-        client_view = await self.client_reader.read_for_client_page(ClientID(query.client_id))
+        client_view = await self.client_reader.read_for_client_page(
+            ClientID(query.client_id)
+        )
         return client_view
