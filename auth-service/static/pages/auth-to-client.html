@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Authorize Client</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f8f9fa;
+        }
+        .container {
+            max-width: 400px;
+            background: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        .user-info {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        .user-info img {
+            border-radius: 50%;
+            margin-right: 10px;
+            width: 50px;
+            height: 50px;
+        }
+        .permission-checkbox {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="user-info">
+            <img id="user-avatar" src="" alt="User Avatar">
+            <span id="user-email"></span>
+        </div>
+        <h3>Client: <span id="client-name"></span></h3>
+        <p>Requested Resources:</p>
+        <ul id="requested-resources" class="list-group mb-3"></ul>
+        <div class="form-check permission-checkbox">
+            <input class="form-check-input" type="checkbox" id="permission-checkbox">
+            <label class="form-check-label" for="permission-checkbox">Allow access to requested resources</label>
+        </div>
+        <button class="btn btn-primary w-100 mt-3" id="authorize-button">Authorize</button>
+    </div>
+
+<script>
+    function getQueryParams() {
+        const params = {};
+        const urlParams = new URLSearchParams(window.location.search);
+        for (const [key, value] of urlParams.entries()) {
+            params[key] = value;
+        }
+        return params;
+    }
+
+    const queryParams = getQueryParams();
+    const fingerprint = localStorage.getItem('deviceFingerprint') || '';
+
+    fetch('/api/auth-to-client', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-Device-Fingerprint': fingerprint,
+        },
+        body: JSON.stringify({
+            client_id: parseInt(queryParams.client_id),
+            required_resources: JSON.parse(queryParams.required_resources),
+            redirect_url: queryParams.redirect_url,
+            code_verifier: queryParams.code_verifier,
+            code_challenge_method: queryParams.code_challenge_method
+        })
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Authorization failed');
+        }
+        return response.json();
+    })
+    .then(data => {
+        displayUserData(data);
+    })
+    .catch(() => {
+        const loginUrl = new URL('/pages/login.html', window.location.origin);
+        Object.keys(queryParams).forEach(key => {
+            loginUrl.searchParams.append(key, queryParams[key]);
+        });
+        window.location.href = loginUrl.toString();
+    });
+
+    function displayUserData(data) {
+        fetch('/api/me', {
+            headers: { 'X-Device-Fingerprint': fingerprint }
+        })
+        .then(response => response.json())
+        .then(userData => {
+            document.getElementById('user-avatar').src = userData.avatar_path;
+            document.getElementById('user-email').textContent = userData.email;
+        });
+
+        document.getElementById('client-name').textContent = data.client_name;
+        const requestedResources = document.getElementById('requested-resources');
+        const parsedResources = JSON.parse(queryParams.required_resources);
+
+        if (parsedResources.user_data_needed?.length) {
+            const li = document.createElement('li');
+            li.classList.add('list-group-item');
+            li.textContent = `Требуемые данные: ${parsedResources.user_data_needed.join(', ')}`;
+            requestedResources.appendChild(li);
+        }
+
+        if (parsedResources.rs_ids?.length) {
+            const li = document.createElement('li');
+            li.classList.add('list-group-item');
+            li.textContent = `Ресурсные серверы с ID: ${parsedResources.rs_ids.join(', ')}`;
+            requestedResources.appendChild(li);
+        }
+
+        document.getElementById('authorize-button').addEventListener('click', () => {
+            if (document.getElementById('permission-checkbox').checked) {
+                if (data.redirect_url) {
+                    window.location.href = `${data.redirect_url}?auth_code=${data.auth_code}`;
+                } else {
+                    alert('Error: redirect_url not found.');
+                }
+            } else {
+                alert('Please allow access to requested resources.');
+            }
+        });
+    }
+</script>
+</body>
+</html>

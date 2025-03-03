@@ -10,6 +10,7 @@ from application.common.interfaces.email_confirmation_service import (
     EmailConfirmationServiceI,
 )
 from application.common.interfaces.http_auth import HttpAuthServerService, HttpClientService
+from application.common.interfaces.imedia_storage import StorageServiceInterface
 from application.common.interfaces.jwt_service import JWTService
 from application.common.interfaces.notify_service import NotifyService
 from application.common.interfaces.auth_server_token_creation import AuthServerTokenCreationService
@@ -26,6 +27,7 @@ from domain.common.services.pwd_service import PasswordHasher
 from infrastructure.external_services.message_routing.notify_service import (
     NotifyServiceImpl,
 )
+from infrastructure.external_services.storage.minio_service import MinIOService
 
 from infrastructure.services.auth.auth_code import (
     RedisAuthorizationCodeStorage,
@@ -117,6 +119,8 @@ class ServiceProvider(Provider):
         ScopesServiceImpl, scope=Scope.REQUEST, provides=ScopesService
     )
     http_client_service = provide(HttpClientServiceImpl, scope=Scope.REQUEST, provides=HttpClientService)
+    storage_service_interface = provide(MinIOService, scope=Scope.REQUEST, provides=StorageServiceInterface)
+
     # reg_validation_service = provide(
     #     RegUserValidationService,
     #     scope=Scope.REQUEST,

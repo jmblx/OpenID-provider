@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from uuid import UUID
 
+from application.common.id_provider import IdentityProvider
 from application.common.interfaces.imedia_storage import (
     StorageServiceInterface,
 )
@@ -12,7 +13,6 @@ from domain.entities.user.value_objects import UserID
 
 @dataclass
 class SetUserAvatarCommand:
-    user_id: UUID
     image: ImageDTO
 
 
@@ -22,21 +22,24 @@ class SetUserAvatarHandler:
         user_repo: UserRepository,
         media_storage: StorageServiceInterface,
         uow: Uow,
+        idp: IdentityProvider,
     ):
         self.user_repo = user_repo
         self.media_storage = media_storage
         self.uow = uow
+        self.idp = idp
 
-    async def __call__(
+    async def handle(
         self,
         command: SetUserAvatarCommand,
     ) -> str:
-        avatar_path = await self.media_storage.set_avatar(
+        user = await self.idp.get_current_user()
+        avatar_path = self.media_storage.set_avatar(
             filename=command.image.filename,
             content=command.image.content,
             content_type=command.image.content_type,
+            user_id=user.id.value.hex,
         )
-        user = await self.user_repo.get_by_id(UserID(command.user_id))
         user.avatar_path = avatar_path
         await self.uow.commit()
         return avatar_path

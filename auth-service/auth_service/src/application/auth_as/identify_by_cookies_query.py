@@ -9,7 +9,7 @@ class IdentifyByCookiesQueryHandler:
         user = await self.idp.get_current_user()
 
         return {
-            "email": user.email,
-            "id": user.id,
+            "email": user.email.value,
+            "id": user.id.value,
             "avatar_path": user.avatar_path,
         }

@@ -11,3 +11,4 @@ class MinIOConfig(BaseModel):
     access_key: str = os.getenv("MINIO_ACCESS_KEY")
     secret_key: str = os.getenv("MINIO_SECRET_KEY")
     user_avatar_bucket_name: str = os.getenv("MINIO_USER_AVATAR_BUCKET_NAME")
+    public_url: str = os.getenv("MINIO_PUBLIC_URL")

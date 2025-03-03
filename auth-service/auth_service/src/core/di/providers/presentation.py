@@ -11,7 +11,7 @@ from application.common.auth_server_token_types import (
 class PresentationProvider(Provider):
     @provide(scope=Scope.REQUEST, provides=Fingerprint)
     async def provide_session(self, request: Request) -> Fingerprint:
-        return Fingerprint(request.headers.get("fingerprint"))  # type: ignore
+        return Fingerprint(request.headers.get("X-Device-Fingerprint"))  # type: ignore
 
     @provide(scope=Scope.REQUEST, provides=RefreshToken)
     async def provide_session_from_cookie(

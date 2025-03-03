@@ -24,6 +24,7 @@ def set_tokens(response: ORJSONResponse, tokens: AuthServerTokens, access_key: s
         max_age=60 * 5,
         expires=60 * 5,
         samesite="lax",
+        # samesite="none"
     )
     response.set_cookie(
         key=refresh_key,
@@ -33,6 +34,7 @@ def set_tokens(response: ORJSONResponse, tokens: AuthServerTokens, access_key: s
         max_age=60 * 60 * 24 * 30,
         expires=60 * 60 * 24 * 30,
         samesite="lax",
+        # samesite="none"
     )
 
 

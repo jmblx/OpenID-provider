@@ -71,8 +71,8 @@ class TokenWhiteListServiceImpl(TokenWhiteListService):
             oldest_jti_list = await self.redis.zrange(f"{self.audience}_refresh_tokens:{user_id}", 0, 0)
             if oldest_jti_list:
                 await self._remove_token_by_jti(oldest_jti_list[0])
-
         serialized_token_data = self._serialize_refresh_token_data(refresh_token_data)
+        logger.info("serialize_refresh_token_data: %s, refresh_token_data: %s", serialized_token_data, refresh_token_data)
         await self.redis.hset(f"{self.audience}_refresh_token:{jti}", mapping=serialized_token_data)
         await self.redis.zadd(f"{self.audience}_refresh_tokens:{user_id}", {jti: created_at})
 

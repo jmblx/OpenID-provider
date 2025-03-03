@@ -7,6 +7,7 @@ from fastapi import HTTPException
 
 from application.auth_as.common.scopes_service import ScopesService
 from application.common.client_token_types import ClientAccessToken, ClientRefreshToken
+from application.common.interfaces.imedia_storage import StorageServiceInterface
 from application.common.interfaces.role_repo import RoleRepository
 from application.common.interfaces.user_repo import UserRepository
 from application.common.services.auth_code import AuthorizationCodeStorage, AuthCodeData
@@ -24,7 +25,6 @@ from domain.entities.user.value_objects import UserID
 class CodeToTokenCommand:
     auth_code: str
     code_challenger: str
-    redirect_url: str
 
 
 class CodeToTokenResponse(TypedDict, total=False):
@@ -45,7 +45,8 @@ class CodeToTokenHandler:
         role_repo: RoleRepository,
         auth_code_storage: AuthorizationCodeStorage,
         user_repository: UserRepository,
-        uow: Uow
+        uow: Uow,
+        s3_storage: StorageServiceInterface,
     ) -> None:
         self.auth_service = auth_service
         self.scopes_service = scopes_service
@@ -53,6 +54,7 @@ class CodeToTokenHandler:
         self.auth_code_storage = auth_code_storage
         self.user_repository = user_repository
         self.uow = uow
+        self.s3_storage = s3_storage
 
     def _validate_pkce(
         self, user_code_challenger: str, real_code_challenger: str
@@ -87,8 +89,14 @@ class CodeToTokenHandler:
         await self.user_repository.add_rs_to_user(user.id, rs_ids)
         result = {
             k: getattr(getattr(user, k), "value", getattr(user, k))
-            for k in auth_code_data["user_data_needed"]
+            for k in auth_code_data["user_data_needed"] if k != "avatar_path"
         }
+        try:
+            if idx := auth_code_data["user_data_needed"].index("avatar_path"):
+                result["avatar_path"] = self.s3_storage.get_presigned_avatar_url(user.id.value.hex)
+                auth_code_data["user_data_needed"].pop(idx)
+        except ValueError: ...
+
         user_roles = await self.role_repo.get_user_roles_by_rs_id(
             user_id=user.id, rs_ids=rs_ids
         )

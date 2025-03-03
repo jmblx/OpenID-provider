@@ -48,6 +48,7 @@ from application.user.reset_pwd.change_pwd_handler import SetNewPasswordHandler
 from application.user.reset_pwd.request_change_pwd_handler import (
     RequestChangePasswordHandler,
 )
+from application.user.set_user_avatar_handler import SetUserAvatarHandler
 
 
 class HandlerProvider(Provider):
@@ -112,3 +113,4 @@ class HandlerProvider(Provider):
     register_resource_server_handler = provide(RegisterResourceServerHandler, scope=Scope.REQUEST)
     update_resource_server_handler = provide(UpdateResourceServerHandler, scope=Scope.REQUEST)
     get_client_resources_page_data_handler = provide(GetMeDataHandler, scope=Scope.REQUEST)
+    set_user_avatar_handler = provide(SetUserAvatarHandler, scope=Scope.REQUEST)

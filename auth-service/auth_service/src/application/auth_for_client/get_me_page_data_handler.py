@@ -1,10 +1,7 @@
 from dataclasses import dataclass
 
 from application.auth_for_client.common.allow_client_access_service import (
-    AllowClientAccessService, RequiredResources,
-)
-from application.auth_for_client.common.resource_server_service import (
-    ResourceServerService,
+    RequiredResources,
 )
 from application.client.client_queries import ValidateClientRequest
 from application.common.id_provider import IdentityProvider
@@ -28,8 +25,6 @@ class MeData:
     client_name: str
     auth_code: str
     redirect_url: str
-
-# сохранить в редиску на 5 минут данные по {client_id}:{user_id}:{allow_to_client_token} данные типа RequiredResources
 
 
 class GetMeDataHandler:
