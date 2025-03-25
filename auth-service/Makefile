@@ -18,12 +18,18 @@ else
 endif
 
 # Docker цели
-#docker-compose --profile grafana up
+#
 up:
-	docker-compose up --build
+	docker-compose up -d
+
+up-prod:
+	docker-compose --profile grafana up
+
+up-setup:
+	docker-compose --profile setup up
 
 up-m: check_docker
-	docker-compose --profile migration up
+	docker-compose --profile migration up -d
 
 build: check_docker
 	docker-compose build

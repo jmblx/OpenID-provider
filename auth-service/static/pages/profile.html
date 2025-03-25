@@ -1,10 +1,177 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Title</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f8f9fa;
+        }
+        .container {
+            max-width: 400px;
+            background: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        .user-info {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        .user-info img {
+            border-radius: 50%;
+            margin-right: 10px;
+            width: 50px;
+            height: 50px;
+            cursor: pointer;
+        }
+        .edit-icon {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
+    <div class="container">
+        <div class="user-info">
+            <img id="user-avatar" src="/icons/defaultAvatar.svg" alt="User Avatar" onclick="openAvatarUpload()">
+            <span id="user-email">Loading...</span>
+        </div>
+        <div class="d-flex justify-content-end">
+            <img src="/icons/edit.svg" class="edit-icon" onclick="openAvatarUpload()">
+        </div>
+        <button class="btn btn-primary w-100 mt-3" id="return-button">Return to Authorization</button>
+        <input type="file" id="avatar-upload" style="display: none;" onchange="uploadAvatar()">
+    </div>
 
+    <script>
+        const fingerprint = localStorage.getItem('deviceFingerprint') || '';
+        function getQueryParams() {
+            const params = {};
+            const urlParams = new URLSearchParams(window.location.search);
+            for (const [key, value] of urlParams.entries()) {
+                params[key] = value;
+            }
+            return params;
+        }
+
+        async function loadUserData() {
+            try {
+                const response = await fetchWithAuth('/api/me');
+                if (!response.ok) {
+                    throw new Error('Failed to load user data');
+                }
+                const userData = await response.json();
+                document.getElementById('user-email').textContent = userData.email;
+                loadUserAvatar();
+            } catch (error) {
+                console.error('Error loading user data:', error);
+            }
+        }
+
+        async function fetchWithAuth(url, options = {}) {
+            const accessToken = localStorage.getItem('access_token');
+            options.headers = {
+                ...options.headers,
+                Authorization: `Bearer ${accessToken}`,
+                'X-Device-Fingerprint': fingerprint,
+            };
+            const response = await fetch(url, options);
+            if (response.status === 401) {
+                window.location.href = '/pages/login.html';
+            }
+            return response;
+        }
+
+        function openAvatarUpload() {
+            document.getElementById('avatar-upload').click();
+        }
+
+        const avatarUrl = '/avatars/jwt/'; // Базовый URL аватарки
+        const localStorageKey = 'lastAvatarUpdate'; // Ключ для хранения метки времени
+
+        // Функция для загрузки аватарки
+        async function loadUserAvatar() {
+            try {
+                // Получаем метку времени последнего обновления из localStorage
+                const lastUpdate = localStorage.getItem(localStorageKey);
+                // Если метка времени есть, добавляем её к URL аватарки
+                const url = lastUpdate ? `${avatarUrl}?t=${lastUpdate}` : avatarUrl;
+
+                const response = await fetchWithAuth(url);
+                if (!response.ok) {
+                    throw new Error('Failed to load avatar');
+                }
+                const blob = await response.blob();
+                const imageUrl = URL.createObjectURL(blob);
+                document.getElementById('user-avatar').src = imageUrl;
+            } catch (error) {
+                console.error('Error loading avatar:', error);
+                document.getElementById('user-avatar').src = '/path/to/default/avatar.webp';
+            }
+        }
+
+        // Функция для загрузки новой аватарки
+        async function uploadAvatar() {
+            const fileInput = document.getElementById('avatar-upload');
+            if (fileInput.files.length === 0) {
+                return;
+            }
+            const file = fileInput.files[0];
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                const response = await fetchWithAuth('/api/set-avatar', {
+                    method: 'POST',
+                    body: formData,
+                });
+                if (!response.ok) {
+                    throw new Error('Failed to upload avatar');
+                }
+                alert('Avatar updated successfully!');
+
+                // Сохраняем текущее время как метку последнего обновления
+                const timestamp = new Date().getTime();
+                localStorage.setItem(localStorageKey, timestamp);
+
+                // Принудительно обновляем аватарку
+                loadUserAvatar();
+            } catch (error) {
+                console.error('Error uploading avatar:', error);
+                alert('Failed to upload avatar');
+            }
+        }
+
+        function setupReturnButton() {
+            const params = getQueryParams();
+            const clientName = params.client_name || 'Client';
+            document.getElementById('return-button').textContent = `<- Authorize on ${clientName}`;
+
+            document.getElementById('return-button').addEventListener('click', () => {
+                delete params.client_name;
+                const redirectUrl = new URL('http://127.0.0.1/pages/auth-to-client.html');
+                for (const [key, value] of Object.entries(params)) {
+                    redirectUrl.searchParams.append(key, value);
+                }
+                window.location.href = redirectUrl.toString();
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadUserData();
+            setupReturnButton();
+        });
+    </script>
 </body>
 </html>

@@ -108,12 +108,9 @@ services:
 #      - nats
 
   db_migration:
-    profiles: [ "migration" ]
+    profiles: [ "setup" ]
     container_name: backend_service.db_migration
     image: backend_service.auth_service
-#    build:
-#      context: auth_service
-#      dockerfile: Dockerfile
     restart: on-failure
     depends_on:
       db:
@@ -124,8 +121,50 @@ services:
       - .env-prod
     command: [ "sh", "/backend-service.auth_service/docker/migrate.sh" ]
 
+  minio:
+    image: minio/minio
+    container_name: minio
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: minio-key
+      MINIO_ROOT_PASSWORD: 17471747
+      MINIO_SERVER_URL: http://minio.example.com:9000
+    volumes:
+      - ./minio-data:/data
+      - ./minio-config:/root/.minio
+    command: server /data --console-address ":9001"
+    restart: always
+    networks:
+      - backend_service.minio.network
+    extra_hosts:
+      - "minio.example.com:127.0.0.1"
+
+  mc:
+    profiles: [ "setup" ]
+    image: minio/mc
+    depends_on:
+      - minio
+    environment:
+      - MINIO_ALIAS=myminio
+      - MINIO_URL=http://minio:9000
+      - MINIO_ACCESS_KEY=minio-key
+      - MINIO_SECRET_KEY=17471747
+      - BUCKET_NAME=avatars
+#     mc policy set private $${MINIO_ALIAS}/$${BUCKET_NAME}
+    entrypoint: >
+      /bin/sh -c "
+      sleep 10;
+      mc alias set $${MINIO_ALIAS} $${MINIO_URL} $${MINIO_ACCESS_KEY} $${MINIO_SECRET_KEY};
+      mc mb $${MINIO_ALIAS}/$${BUCKET_NAME} || true;
+      mc policy set public $${MINIO_ALIAS}/$${BUCKET_NAME}
+      "
+    networks:
+      - backend_service.minio.network
+
   nginx:
-    image: custom-nginx-jwt
+    image: custom-openresty-jwt
     container_name: nginx_app
     ports:
       - "80:80"
@@ -263,46 +302,6 @@ services:
 #    networks:
 #      - custom
 #    command: ["/bin/sh", "-c", "while true; do make collect-data; sleep 3600; done"]
-  minio:
-    image: minio/minio
-    container_name: minio
-    ports:
-      - "9000:9000"  # Порт для S3-совместимого API
-      - "9001:9001"  # Порт для веб-консоли MinIO
-    environment:
-      MINIO_ROOT_USER: minio-key  # Замените на ключ доступа длиной от 3 символов
-      MINIO_ROOT_PASSWORD: 17471747  # Замените на секретный ключ длиной от 8 символов
-      MINIO_SERVER_URL: http://minio.example.com:9000
-    volumes:
-      - ./minio-data:/data  # Папка для хранения данных
-      - ./minio-config:/root/.minio  # Папка для конфигурационных файлов
-    command: server /data --console-address ":9001"
-    restart: always
-    networks:
-      - backend_service.minio.network
-    extra_hosts:
-      - "minio.example.com:127.0.0.1"
-
-  mc:
-    image: minio/mc
-    depends_on:
-      - minio
-    environment:
-      - MINIO_ALIAS=myminio
-      - MINIO_URL=http://minio:9000
-      - MINIO_ACCESS_KEY=minio-key
-      - MINIO_SECRET_KEY=17471747
-      - BUCKET_NAME=avatars
-      - POLICY_NAME=dodiq
-    entrypoint: >
-      /bin/sh -c "
-      sleep 10;
-      mc alias set $${MINIO_ALIAS} $${MINIO_URL} $${MINIO_ACCESS_KEY} $${MINIO_SECRET_KEY};
-      mc mb $${MINIO_ALIAS}/$${BUCKET_NAME} || true;
-      mc policy set private $${MINIO_ALIAS}/$${BUCKET_NAME}
-      "
-    networks:
-      - backend_service.minio.network
 
 networks:
   backend_service.db.network:
