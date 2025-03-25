@@ -93,11 +93,11 @@ class CodeToTokenHandler:
         }
         try:
             if idx := auth_code_data["user_data_needed"].index("avatar_path"):
-                result["avatar_path"] = self.s3_storage.get_presigned_avatar_url(user.id.value.hex)
+                result["avatar_path"] = self.s3_storage.get_presigned_avatar_url(str(user.id.value))
                 auth_code_data["user_data_needed"].pop(idx)
         except ValueError: ...
 
-        user_roles = await self.role_repo.get_user_roles_by_rs_id(
+        user_roles = await self.role_repo.get_user_roles_by_rs_ids(
             user_id=user.id, rs_ids=rs_ids
         )
         logger.info(f"User roles: %s, rs_ids: %s", user_roles, rs_ids)
@@ -107,9 +107,10 @@ class CodeToTokenHandler:
             )
         )
         tokens = await self.auth_service.create_and_save_tokens(
-            user, user_scopes, client_id, fingerprint,
+            user, user_scopes, client_id, rs_ids, fingerprint,
         )
         await self.auth_code_storage.delete_auth_code_data(command.auth_code)
         result.update(**tokens)
         await self.uow.commit()
+        logger.info("Auth to client result: %s", result)
         return result

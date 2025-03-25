@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from uuid import UUID
 
-from application.common.id_provider import IdentityProvider
+from application.common.id_provider import UserIdentityProvider
 from application.common.interfaces.imedia_storage import (
     StorageServiceInterface,
 )
@@ -22,7 +22,7 @@ class SetUserAvatarHandler:
         user_repo: UserRepository,
         media_storage: StorageServiceInterface,
         uow: Uow,
-        idp: IdentityProvider,
+        idp: UserIdentityProvider,
     ):
         self.user_repo = user_repo
         self.media_storage = media_storage
@@ -38,7 +38,7 @@ class SetUserAvatarHandler:
             filename=command.image.filename,
             content=command.image.content,
             content_type=command.image.content_type,
-            user_id=user.id.value.hex,
+            user_id=str(user.id.value),
         )
         user.avatar_path = avatar_path
         await self.uow.commit()

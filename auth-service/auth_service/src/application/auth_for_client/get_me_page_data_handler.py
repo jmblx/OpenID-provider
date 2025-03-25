@@ -4,7 +4,8 @@ from application.auth_for_client.common.allow_client_access_service import (
     RequiredResources,
 )
 from application.client.client_queries import ValidateClientRequest
-from application.common.id_provider import IdentityProvider
+from application.common.id_provider import UserIdentityProvider
+from application.common.interfaces.rs_reader import ResourceServerReader
 from application.common.services.auth_code import AuthorizationCodeStorage, AuthCodeData
 from application.common.services.client_service import ClientService
 from application.common.services.pkce import PKCEData, PKCEService, PKCECodeChallengeMethod
@@ -25,20 +26,23 @@ class MeData:
     client_name: str
     auth_code: str
     redirect_url: str
+    rs_names: dict[int, str]
 
 
 class GetMeDataHandler:
     def __init__(
         self,
-        idp: IdentityProvider,
+        idp: UserIdentityProvider,
         client_service: ClientService,
         auth_code_storage: AuthorizationCodeStorage,
         pkce_service: PKCEService,
+        rs_reader: ResourceServerReader
     ):
         self.idp = idp
         self.client_service = client_service
         self.auth_code_storage = auth_code_storage
         self.pkce_service = pkce_service
+        self.rs_reader = rs_reader
 
     async def handle(
         self, command: GetMeDataCommand
@@ -68,9 +72,10 @@ class GetMeDataHandler:
             ),
             **command.required_resources
         }
+        rs_names = await self.rs_reader.get_resource_server_data_by_ids(command.required_resources["rs_ids"])
 
         await self.auth_code_storage.store_auth_code_data(
             auth_code, auth_code_data, expiration_time=6000
         )
-        return MeData(redirect_url=command.redirect_url, client_name=client.name.value, auth_code=auth_code)
+        return MeData(redirect_url=command.redirect_url, client_name=client.name.value, auth_code=auth_code, rs_names=rs_names)
 

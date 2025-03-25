@@ -1,5 +1,5 @@
 from application.auth_as.common.types import AuthServerTokens
-from application.common.id_provider import IdentityProvider
+from application.common.id_provider import UserIdentityProvider
 from application.common.interfaces.http_auth import HttpAuthServerService
 
 
@@ -7,7 +7,7 @@ class RefreshTokensHandler:
     def __init__(
         self,
         auth_service: HttpAuthServerService,
-        idp: IdentityProvider,
+        idp: UserIdentityProvider,
     ):
         self.auth_service = auth_service
         self.idp = idp

@@ -32,7 +32,7 @@ async def login(
     tokens = await handler.handle(command)
     response = ORJSONResponse(
         # {"access_token": access_token, "refresh_token": refresh_token},
-        {"status": "success"},
+        {"status": "success", "access_token": tokens.get("access_token")},
         status_code=status.HTTP_200_OK,
     )
     set_auth_server_tokens(response, tokens)
@@ -48,7 +48,7 @@ async def code_to_token(
     response_data = await handler.handle(command, fingerprint)
     logger.info("response_data: %s", response_data)
     tokens = {
-        "access_token": response_data.pop("access_token", None),
+        "access_token": "",
         "refresh_token": response_data.pop("refresh_token", None),
     }
 

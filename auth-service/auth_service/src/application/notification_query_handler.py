@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from application.common.id_provider import IdentityProvider
+from application.common.id_provider import UserIdentityProvider
 from application.common.interfaces.user_reader import UserReader
 from infrastructure.external_services.investments.service import (
     InvestmentsService,
@@ -10,7 +10,7 @@ from infrastructure.external_services.investments.service import (
 class NotificationQueryHandler:
     def __init__(
         self,
-        idp: IdentityProvider,
+        idp: UserIdentityProvider,
         user_reader: UserReader,
         investments_service: InvestmentsService,
     ):

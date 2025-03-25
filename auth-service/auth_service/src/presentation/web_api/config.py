@@ -5,25 +5,34 @@ from dataclasses import dataclass
 from pathlib import Path
 
 import yaml
-from dotenv import load_dotenv
 
 # from infrastructure.log.main import AppLoggingConfig
 from presentation.web_api.gunicorn.config import GunicornConfig
 
-load_dotenv()
+
+if os.getenv("DEBUG", True).lower() not in ("false", "0"):
+    from dotenv import load_dotenv
+
+    load_dotenv()
 
 BACKEND_URL = os.environ.get("BACKEND_URL", "http://localhost:8000")
-API_ADMIN_PWD = os.environ.get("API_ADMIN_PWD")
+# API_ADMIN_PWD = os.environ.get("API_ADMIN_PWD")
+TRACING = os.getenv("TRACING", True).lower() not in ("false", "0")
 DEFAULT_TOML_CONFIG_PATH = (
     Path(__file__).resolve().parent.parent.parent.parent
     / "config"
     / "config.toml"
 )
-DEFAULT_LOGGING_CONFIG_PATH = (
+LOGGING_CONFIG_PATH = (
     Path(__file__).resolve().parent.parent.parent.parent
     / "config"
     / "logging.yaml"
+) if TRACING else (
+    Path(__file__).resolve().parent.parent.parent.parent
+    / "config"
+    / "logging_non_tracing.yaml"
 )
+
 
 
 @dataclass
@@ -45,7 +54,7 @@ logger = logging.getLogger(__name__)
 
 def load_config(path: str | None = None) -> PresentationConfig:
     if path is None:
-        path = os.getenv("CONFIG_PATH", DEFAULT_LOGGING_CONFIG_PATH)
+        path = os.getenv("CONFIG_PATH", LOGGING_CONFIG_PATH)
 
     # data = read_toml(path)
 

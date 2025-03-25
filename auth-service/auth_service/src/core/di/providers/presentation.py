@@ -6,6 +6,7 @@ from application.common.auth_server_token_types import (
     RefreshToken,
     AccessToken,
 )
+from application.common.client_token_types import ClientAccessToken, ClientRefreshToken
 
 
 class PresentationProvider(Provider):
@@ -23,4 +24,16 @@ class PresentationProvider(Provider):
     async def provide_session_from_token(
         self, request: Request
     ) -> AccessToken:
-        return AccessToken(request.cookies.get("access_token"))
+        return AccessToken(request.headers.get("Authorization").replace("Bearer ", ""))
+
+    @provide(scope=Scope.REQUEST, provides=ClientAccessToken)
+    async def provide_client_access_token(
+        self, request: Request
+    ) -> ClientAccessToken:
+        return ClientAccessToken(request.headers.get("Authorization").replace("Bearer ", ""))
+
+    @provide(scope=Scope.REQUEST, provides=ClientRefreshToken)
+    async def provide_client_refresh_token(
+        self, request: Request
+    ) -> ClientRefreshToken:
+        return ClientRefreshToken(request.cookies.get("client_refresh_token"))

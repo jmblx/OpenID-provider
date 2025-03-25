@@ -31,6 +31,6 @@ class RoleRepository(ABC):
     ) -> list[Role]: ...
 
     @abstractmethod
-    async def get_user_roles_by_rs_id(
+    async def get_user_roles_by_rs_ids(
         self, user_id: UserID, rs_ids: Sequence[ResourceServerID]
     ) -> list[Role]: ...

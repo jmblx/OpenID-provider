@@ -44,7 +44,7 @@ class EmailConfirmationService(EmailConfirmationServiceI):
     ) -> None:
         await self._redis.set(
             f"email_confirmation_token:{email_confirmation_token}",
-            user_id.hex,
+            str(user_id),
             ex=1800,
         )
 

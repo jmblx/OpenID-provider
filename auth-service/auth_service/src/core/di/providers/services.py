@@ -19,8 +19,10 @@ from application.common.services.auth_code import AuthorizationCodeStorage
 from application.common.services.pkce import PKCEService
 from application.common.services.client_service import ClientService
 from application.common.id_provider import (
-    IdentityProvider,
-    HttpIdentityProvider,
+    UserIdentityProviderImpl,
+    UserIdentityProvider,
+    ClientIdentityProviderImpl,
+    ClientIdentityProvider,
 )
 from application.user.reset_pwd.service import ResetPwdService
 from domain.common.services.pwd_service import PasswordHasher
@@ -97,9 +99,8 @@ class ServiceProvider(Provider):
     #     provides=TokenWhiteListService,
     # )
     client_service = provide(ClientService, scope=Scope.REQUEST)
-    identity_provider = provide(
-        HttpIdentityProvider, scope=Scope.REQUEST, provides=IdentityProvider
-    )
+    user_identity_provider = provide(UserIdentityProviderImpl, scope=Scope.REQUEST, provides=UserIdentityProvider)
+    client_identity_provider = provide(ClientIdentityProviderImpl, scope=Scope.REQUEST, provides=ClientIdentityProvider)
     # investment_service = provide(InvestmentsService, scope=Scope.REQUEST)
     notify_service = provide(
         NotifyServiceImpl, scope=Scope.REQUEST, provides=NotifyService

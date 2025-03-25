@@ -23,7 +23,7 @@ class ClientTokenCreationServiceImpl(ClientTokenCreationService):
         logger.info("scopes: %s", user_scopes)
         jwt_payload = {
             "sub": str(user_id),
-            "jti": uuid4().hex,
+            "jti": str(uuid4()),
             "scopes": user_scopes,
         }
         encoded_token = self.jwt_service.encode(
@@ -33,10 +33,10 @@ class ClientTokenCreationServiceImpl(ClientTokenCreationService):
         return ClientAccessToken(encoded_token["token"])
 
     async def create_client_refresh_token(
-        self, user_id: UUID, fingerprint: Fingerprint, client_id: int,
+        self, user_id: UUID, fingerprint: Fingerprint, client_id: int, rs_ids: list[int]
     ) -> ClientRefreshTokenWithData:
-        jti = uuid4().hex
-        jwt_payload = {"sub": user_id.hex, "jti": jti, "client_id": client_id}
+        jti = str(uuid4())
+        jwt_payload = {"sub": str(user_id), "jti": jti, "client_id": client_id, "rs_ids": rs_ids}
         encoded_token = self.jwt_service.encode(
             payload=jwt_payload,
             expire_timedelta=timedelta(

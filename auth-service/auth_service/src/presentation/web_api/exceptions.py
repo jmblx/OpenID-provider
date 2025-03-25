@@ -20,6 +20,7 @@ from domain.exceptions.user import (
     UserNotFoundByIdError,
     UnauthenticatedUserError,
 )
+from presentation.web_api.config import TRACING
 from presentation.web_api.middlewares.metrics import APP_NAME
 from presentation.web_api.middlewares.metrics.labels import EXCEPTIONS
 from presentation.web_api.responses import ErrorData, ErrorResponse
@@ -72,18 +73,16 @@ async def app_error_handler(
     method = request.method
     path = request.url.path
 
-    # Логируем ошибку
     logger.error("Handle error", exc_info=err, extra={"error": err})
 
-    # Инкрементируем метрику
-    EXCEPTIONS.labels(
-        method=method,
-        path=path,
-        exception_type=type(err).__name__,
-        app_name=APP_NAME,
-    ).inc()
+    if TRACING:
+        EXCEPTIONS.labels(
+            method=method,
+            path=path,
+            exception_type=type(err).__name__,
+            app_name=APP_NAME,
+        ).inc()
 
-    # Возвращаем ответ с ошибкой
     return await handle_error(
         request=request,
         err=err,
@@ -105,13 +104,13 @@ async def unknown_exception_handler(
         "Unknown error occurred", exc_info=err, extra={"error": err}
     )
 
-    # Инкрементируем метрику
-    EXCEPTIONS.labels(
-        method=method,
-        path=path,
-        exception_type=type(err).__name__,
-        app_name=APP_NAME,
-    ).inc()
+    if TRACING:
+        EXCEPTIONS.labels(
+            method=method,
+            path=path,
+            exception_type=type(err).__name__,
+            app_name=APP_NAME,
+        ).inc()
 
     # Возвращаем ответ с ошибкой
     return ORJSONResponse(

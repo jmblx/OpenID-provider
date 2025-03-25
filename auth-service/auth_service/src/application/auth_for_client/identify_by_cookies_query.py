@@ -1,8 +1,8 @@
-from application.common.id_provider import IdentityProvider
+from application.common.id_provider import UserIdentityProvider
 
 
 class IdentifyByCookiesQueryHandler:
-    def __init__(self, idp: IdentityProvider):
+    def __init__(self, idp: UserIdentityProvider):
         self.idp = idp
 
     async def handle(self):

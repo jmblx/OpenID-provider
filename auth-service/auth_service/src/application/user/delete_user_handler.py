@@ -21,6 +21,6 @@ class DeleteUserHandler:
         user_id = UserID(command.user_id)
         user = await self.user_repository.get_by_id(user_id)
         if user is None:
-            raise UserNotFoundByIdError(user_id.value.hex)
+            raise UserNotFoundByIdError(str(user_id.value))
         await self.user_repository.delete(user)
         await self.uow.commit()

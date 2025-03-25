@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from typing import TypeVar, Generic
 from uuid import UUID
 
 from application.auth_as.common.types import (
@@ -16,17 +17,20 @@ from domain.entities.user.model import User
 from domain.entities.user.value_objects import Email, RawPassword
 
 
-class HttpService(ABC):
+TokenType = TypeVar("TokenType")
+
+
+class HttpService(ABC, Generic[TokenType]):
     @abstractmethod
     async def invalidate_other_tokens(
-        self, refresh_token: RefreshToken, fingerprint: Fingerprint
+        self, refresh_token: TokenType, fingerprint: Fingerprint
     ) -> None:
         """
         Инвалидирует все токены пользователя, кроме текущего.
         """
 
     @abstractmethod
-    async def revoke(self, refresh_token: RefreshToken) -> None:
+    async def revoke(self, refresh_token: TokenType) -> None:
         """
         Инвалидация RefreshToken (logout пользователя).
 
@@ -57,7 +61,7 @@ class HttpService(ABC):
     #     """
 
 
-class HttpAuthServerService(HttpService):
+class HttpAuthServerService(HttpService[RefreshToken]):
     """Абстракция для сервиса аутентификации и управления токенами."""
     @abstractmethod
     async def create_and_save_tokens(
@@ -67,12 +71,13 @@ class HttpAuthServerService(HttpService):
     ) -> AuthServerTokens: ...
 
 
-class HttpClientService(HttpService):
+class HttpClientService(HttpService[AccessToken]):
     @abstractmethod
     async def create_and_save_tokens(
         self,
         user: User,
         user_scopes: list[str],
         client_id: int,
+        rs_ids: list[int] | None,
         fingerprint: Fingerprint | None = None,
     ) -> ClientTokens: ...

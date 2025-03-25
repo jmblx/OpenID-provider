@@ -11,14 +11,16 @@ from fastapi.responses import ORJSONResponse
 
 from core.di.container import container
 from infrastructure.log.main import configure_logging
-from presentation.web_api.config import load_config
+from presentation.web_api.config import load_config, TRACING
+from presentation.web_api.middlewares import setup_middlewares
 from presentation.web_api.routes.auth.router import auth_router
 from presentation.web_api.routes.client.client_router import client_router
 from presentation.web_api.exceptions import setup_exception_handlers
+from presentation.web_api.routes.client_token_manage.client_token_manage_router import client_token_manage_router
 from presentation.web_api.routes.registration.router import reg_router
 from presentation.web_api.routes.resource_server.router import rs_router
 from presentation.web_api.routes.role.router import role_router
-from presentation.web_api.routes.token_manage.router import token_manage_router
+from presentation.web_api.routes.auth_server_token_manage.router import token_manage_router
 from presentation.web_api.routes.healthcheck.router import healthcheck_router
 from presentation.web_api.routes.email_confirmation.router import (
     email_conf_router,
@@ -41,7 +43,7 @@ logger = logging.getLogger(__name__)
 # logger.addHandler(logstash_handler)
 
 
-config = load_config()
+config = load_config(TRACING)
 
 
 def create_app() -> FastAPI:
@@ -62,8 +64,9 @@ def create_app() -> FastAPI:
     app.include_router(user_password_router)
     app.include_router(user_account_router)
     app.include_router(rs_router)
+    app.include_router(client_token_manage_router)
     setup_exception_handlers(app)
-    # setup_middlewares(app)
+    setup_middlewares(app)
     return app
 
 

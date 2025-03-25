@@ -52,7 +52,6 @@ class MinIOService(StorageServiceInterface):
         except S3Error as e:
             raise Exception(f"Ошибка при загрузке файла в MinIO: {e}")
 
-
     def get_presigned_avatar_url(self, user_id: str) -> str:
         """
         Генерирует presigned URL для доступа к аватарке.

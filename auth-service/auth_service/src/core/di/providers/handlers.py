@@ -21,6 +21,8 @@ from application.auth_as.revoke_token_handler import (
 )
 from application.auth_for_client.code_to_token_handler import CodeToTokenHandler
 from application.auth_for_client.get_me_page_data_handler import GetMeDataHandler
+from application.auth_for_client.refresh_tokens_handler import RefreshClientTokensHandler
+from application.auth_for_client.revoke_token_handler import RevokeClientTokenHandler
 from application.client.add_allowed_url import (
     AddAllowedRedirectUrlCommandHandler,
 )
@@ -114,3 +116,5 @@ class HandlerProvider(Provider):
     update_resource_server_handler = provide(UpdateResourceServerHandler, scope=Scope.REQUEST)
     get_client_resources_page_data_handler = provide(GetMeDataHandler, scope=Scope.REQUEST)
     set_user_avatar_handler = provide(SetUserAvatarHandler, scope=Scope.REQUEST)
+    revoke_client_tokens_handler = provide(RevokeClientTokenHandler, scope=Scope.REQUEST)
+    refresh_client_tokens_handler = provide(RefreshClientTokensHandler, scope=Scope.REQUEST)

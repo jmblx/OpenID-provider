@@ -22,8 +22,8 @@ reg_router = APIRouter(route_class=DishkaRoute, tags=["reg"])
 @reg_router.post(
     "/register",
     responses={
-        status.HTTP_307_TEMPORARY_REDIRECT: {
-            "description": "redirection to invoice download link",
+        status.HTTP_201_CREATED: {
+            "description": "user created",
         },
         status.HTTP_400_BAD_REQUEST: {
             "model": ErrorResponse[
@@ -34,7 +34,7 @@ reg_router = APIRouter(route_class=DishkaRoute, tags=["reg"])
             "model": ErrorResponse[UserAlreadyExistsError],
         },
     },
-    status_code=status.HTTP_307_TEMPORARY_REDIRECT,
+    status_code=status.HTTP_201_CREATED,
 )
 async def registration(
     handler: FromDishka[RegisterUserHandler],
@@ -42,7 +42,7 @@ async def registration(
 ) -> ORJSONResponse:
     register_handler_response = await handler.handle(command)
     response = ORJSONResponse(
-        {"id": register_handler_response["user_id"]},
+        {"id": register_handler_response["user_id"], "access_token": register_handler_response["access_token"]},
         status_code=status.HTTP_201_CREATED,
     )
     set_auth_server_tokens(response, register_handler_response)

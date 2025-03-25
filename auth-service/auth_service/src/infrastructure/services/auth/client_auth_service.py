@@ -61,6 +61,7 @@ class HttpClientServiceImpl(HttpClientService):
         user: User,
         user_scopes: list[str],
         client_id: int,
+        rs_ids: list[int] | None,
         fingerprint: Fingerprint | None = None,
     ) -> ClientTokens:
         """Создаёт и сохраняет токены."""
@@ -74,7 +75,7 @@ class HttpClientServiceImpl(HttpClientService):
         )
         refresh_token_data = (
             await self.token_creation_service.create_client_refresh_token(
-                user_id, fingerprint, client_id
+                user_id, fingerprint, client_id, rs_ids
             )
         )
         await (
@@ -87,4 +88,3 @@ class HttpClientServiceImpl(HttpClientService):
             "access_token": access_token,
             "refresh_token": refresh_token_data.token,
         }
-
