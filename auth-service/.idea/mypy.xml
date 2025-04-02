@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project version="4">
-  <component name="MypyConfigService">
-    <option name="customMypyPath" value="C:\Users\Alex Zhilin\AppData\Local\pypoetry\Cache\virtualenvs\auth-service-iJMxYhMC-py3.12\Scripts\mypy.exe" />
-    <option name="mypyArguments" value="--explicit-package-bases" />
-    <option name="mypyConfigFilePath" value="D:\vs\hihhapka\auth-service\api\pyproject.toml" />
-  </component>
-</project>
