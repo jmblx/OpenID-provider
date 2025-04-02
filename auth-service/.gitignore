@@ -1,9 +1,0 @@
-minio-data/
-minio-config/
-
-# Игнорировать файлы pyc
-*.pyc
-__pycache__/
-
-.idea/
-
