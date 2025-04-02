@@ -18,9 +18,8 @@ else
 endif
 
 # Docker цели
-#
 up:
-	docker-compose up -d
+	docker-compose up
 
 up-prod:
 	docker-compose --profile grafana up

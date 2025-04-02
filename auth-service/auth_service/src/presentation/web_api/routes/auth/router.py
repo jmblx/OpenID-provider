@@ -32,7 +32,7 @@ async def login(
     tokens = await handler.handle(command)
     response = ORJSONResponse(
         # {"access_token": access_token, "refresh_token": refresh_token},
-        {"status": "success", "access_token": tokens.get("access_token")},
+        {"status": "success"},
         status_code=status.HTTP_200_OK,
     )
     set_auth_server_tokens(response, tokens)

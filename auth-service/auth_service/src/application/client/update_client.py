@@ -19,7 +19,7 @@ class UpdateClientCommand:
     client_id: int
     name: str | None
     base_url: str | None
-    allowed_urls: list[str] | None
+    allowed_redirect_urls: list[str] | None
     client_type: ClientTypeEnum | None
 
 
@@ -40,8 +40,8 @@ class UpdateClientCommandHandler:
                 ClientBaseUrl(command.base_url) if command.base_url else None
             ),
             "allowed_redirect_urls": (
-                AllowedRedirectUrls(command.allowed_urls)
-                if command.allowed_urls
+                AllowedRedirectUrls(command.allowed_redirect_urls)
+                if command.allowed_redirect_urls
                 else None
             ),
             "type": (

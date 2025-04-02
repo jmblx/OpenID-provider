@@ -1,6 +1,5 @@
 FROM python:3.12.7-alpine
 
-# Установка необходимых пакетов, включая make
 RUN apk add --no-cache make build-base
 
 ENV PYTHONDONTWRITEBYTECODE=1 \

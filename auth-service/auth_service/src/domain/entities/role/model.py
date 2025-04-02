@@ -16,6 +16,7 @@ class Role:
     base_scopes: RoleBaseScopes
     rs_id: ResourceServerID
     is_base: bool
+    is_active: bool = True
 
     @classmethod
     def create(

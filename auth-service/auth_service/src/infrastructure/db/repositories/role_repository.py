@@ -30,12 +30,16 @@ class RoleRepositoryImpl(RoleRepository):
         return role.id
 
     async def get_by_id(self, role_id: RoleID) -> Role | None:
-        role = await self.session.get(Role, role_id)
-        return role
+        stmt = (
+            select(Role)
+            .where(and_(Role.id == role_id), Role.is_active == True)
+        )
+        result = await self.session.execute(stmt)
+        return result.scalar_one_or_none()
 
     async def get_roles_by_ids(self, role_ids: list[RoleID]) -> Sequence[Role]:
         result = await self.session.execute(
-            sa.select(Role).where(Role.id.in_(role_ids))
+            sa.select(Role).where(and_(Role.id.in_(role_ids), Role.is_active == True))
         )
         roles = result.scalars().all()
         return roles
@@ -43,7 +47,7 @@ class RoleRepositoryImpl(RoleRepository):
     async def get_roles_by_rs_id(
         self, rs_id: int, order_by_id: bool = False
     ) -> Sequence[Role]:
-        query = sa.select(Role).where(Role.rs_id == rs_id)
+        query = sa.select(Role).where(and_(Role.rs_id == rs_id), Role.is_active == True)
         if order_by_id:
             query = query.order_by(Role.id)
         result = await self.session.execute(query)
@@ -53,8 +57,7 @@ class RoleRepositoryImpl(RoleRepository):
     async def get_base_rs_roles(self, rs_id: ResourceServerID) -> list[Role]:
         stmt = (
             sa.select(Role)
-            .where(Role.rs_id == rs_id)
-            .where(Role.is_base == True)
+            .where(and_(Role.rs_id == rs_id, Role.is_base == True, Role.is_active == True))
         )
         result = await self.session.execute(stmt)
         return result.scalars().all()
@@ -70,6 +73,7 @@ class RoleRepositoryImpl(RoleRepository):
             WHERE u.id = :user_id
               AND rs.id = ANY(:rs_ids)
               AND rs.type = :rs_type
+              AND r.is_active = TRUE
         """)
 
         result = await self.session.execute(stmt, {
@@ -80,3 +84,5 @@ class RoleRepositoryImpl(RoleRepository):
 
         return result.mappings().all()
 
+    async def delete_role(self, role: Role) -> None:
+        role.is_active = True

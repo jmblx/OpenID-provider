@@ -226,14 +226,6 @@
                 });
 
                 if (response.ok) {
-                    const data = await response.json();
-
-                    // Сохраняем Access Token в localStorage
-                    if (data.access_token) {
-                        localStorage.setItem('access_token', data.access_token);
-                    }
-
-                    // Перенаправляем на страницу auth-to-client.html
                     const authToClientUrl = new URL('/pages/auth-to-client.html', window.location.origin);
                     Object.keys(params).forEach(key => {
                         authToClientUrl.searchParams.append(key, params[key]);

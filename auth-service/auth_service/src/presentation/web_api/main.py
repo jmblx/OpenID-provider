@@ -43,7 +43,7 @@ logger = logging.getLogger(__name__)
 # logger.addHandler(logstash_handler)
 
 
-config = load_config(TRACING)
+config = load_config()
 
 
 def create_app() -> FastAPI:

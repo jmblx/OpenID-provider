@@ -4,10 +4,6 @@ from domain.entities.client.value_objects import ClientTypeEnum
 from presentation.web_api.routes.auth.models import UserAuthRequest
 
 
-class UserRegisterRequest(UserAuthRequest):
-    role_id: int
-
-
 class ClientAuthResponseModel(BaseModel):
     client_name: str
 
@@ -33,5 +29,5 @@ class ClientViewModel(BaseModel):
 class UpdateClientModel(BaseModel):
     name: str | None
     base_url: str | None
-    allowed_urls: list[str] | None
+    new_allowed_redirect_urls: list[str] | None
     client_type: ClientTypeEnum | None

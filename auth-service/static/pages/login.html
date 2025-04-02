@@ -155,11 +155,18 @@
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
 
+            // Получаем параметры из URL (если есть)
+            const urlParams = new URLSearchParams(window.location.search);
+            const params = {};
+            for (const [key, value] of urlParams.entries()) {
+                params[key] = value;
+            }
+
             const payload = {
                 email: email,
                 password: password,
                 fingerprint: fingerprint,
-                ...params
+                ...params // Добавляем параметры из URL в тело запроса (если нужно)
             };
 
             try {
@@ -169,24 +176,25 @@
                         'Content-Type': 'application/json',
                         'X-Device-Fingerprint': fingerprint,
                     },
-                    credentials: 'include',  // Отправляем куки (если нужно)
+                    credentials: 'include', // Для отправки кук
                     body: JSON.stringify(payload)
                 });
 
                 if (response.ok) {
-                    const data = await response.json();
+                    // Проверяем, есть ли обязательные параметры для auth-to-client
+                    const hasAuthToClientParams = params.client_id && params.required_resources && params.redirect_url;
 
-                    // Сохраняем Access Token в localStorage
-                    if (data.access_token) {
-                        localStorage.setItem('access_token', data.access_token);
+                    if (hasAuthToClientParams) {
+                        // Если параметры есть — перенаправляем на auth-to-client.html с ними
+                        const authToClientUrl = new URL('/pages/auth-to-client.html', window.location.origin);
+                        Object.keys(params).forEach(key => {
+                            authToClientUrl.searchParams.append(key, params[key]);
+                        });
+                        window.location.href = authToClientUrl.toString();
+                    } else {
+                        // Если параметров нет — перенаправляем на профиль
+                        window.location.href = '/pages/profile.html';
                     }
-
-                    // Перенаправляем на страницу auth-to-client.html
-                    const authToClientUrl = new URL('/pages/auth-to-client.html', window.location.origin);
-                    Object.keys(params).forEach(key => {
-                        authToClientUrl.searchParams.append(key, params[key]);
-                    });
-                    window.location.href = authToClientUrl.toString();
                 } else {
                     const errorData = await response.json();
                     alert(`Ошибка входа: ${errorData.detail || 'Неизвестная ошибка'}`);

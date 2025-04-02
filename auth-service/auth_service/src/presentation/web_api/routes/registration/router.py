@@ -42,7 +42,7 @@ async def registration(
 ) -> ORJSONResponse:
     register_handler_response = await handler.handle(command)
     response = ORJSONResponse(
-        {"id": register_handler_response["user_id"], "access_token": register_handler_response["access_token"]},
+        {"id": register_handler_response["user_id"]},
         status_code=status.HTTP_201_CREATED,
     )
     set_auth_server_tokens(response, register_handler_response)

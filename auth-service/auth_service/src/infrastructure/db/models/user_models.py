@@ -26,6 +26,7 @@ user_table = Table(
     Column("is_email_confirmed", Boolean, default=False),
     Column("hashed_password", String, nullable=False),
     Column("avatar_path", String, nullable=True),
+    Column("is_admin", Boolean, nullable=False),
 )
 
 mapper_registry.map_imperatively(
@@ -46,6 +47,7 @@ mapper_registry.map_imperatively(
             uselist=True,
         ),
         "resource_servers": relationship("ResourceServer", uselist=True, back_populates="users_rss", secondary=user_rs_association_table),
+        "is_admin": user_table.c.is_admin,
         # "clients": relationship(
         #     "Client",
         #     secondary=user_client_association_table,

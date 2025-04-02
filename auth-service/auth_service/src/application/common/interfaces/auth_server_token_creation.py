@@ -14,7 +14,7 @@ class AuthServerTokenCreationService(ABC):
 
     @abstractmethod
     def create_auth_server_access_token(
-        self, user_id: UUID
+        self, user_id: UUID, is_admin: bool
     ) -> AccessToken:
         """Создание AccessToken."""
 

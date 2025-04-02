@@ -115,98 +115,71 @@
     </div>
 
     <script>
-        async function refreshAccessToken() {
-            try {
-                const response = await fetch('/api/auth-service/refresh-token', {
-                    method: 'POST',
-                    credentials: 'include',
-                });
+    async function fetchWithAuth(url, options = {}) {
+        // Куки с токеном будут отправляться автоматически благодаря credentials: 'include'
+        const response = await fetch(url, {
+            ...options,
+            credentials: 'include' // Важно для работы с HttpOnly cookies
+        });
 
-                if (response.ok) {
-                    const data = await response.json();
-                    localStorage.setItem('access_token', data.access_token);
-                    return data.access_token;
-                } else {
-                    throw new Error('Не удалось обновить Access Token');
-                }
-            } catch (error) {
-                console.error('Ошибка при обновлении Access Token:', error);
-                throw error;
-            }
+        if (response.status === 401) {
+            // Перенаправляем на страницу входа при ошибке авторизации
+            const loginUrl = new URL('/login', window.location.origin);
+            loginUrl.search = window.location.search; // Сохраняем параметры
+            window.location.href = loginUrl.toString();
+            return;
         }
 
-        async function fetchWithAuth(url, options = {}) {
-            let accessToken = localStorage.getItem('access_token');
+        return response;
+    }
 
-            options.headers = {
-                ...options.headers,
-                Authorization: `Bearer ${accessToken}`,
-            };
+    function getQueryParams() {
+        const params = {};
+        const urlParams = new URLSearchParams(window.location.search);
+        for (const [key, value] of urlParams.entries()) {
+            params[key] = value;
+        }
+        return params;
+    }
 
-            let response = await fetch(url, options);
+    const avatarUrl = '/avatars/jwt/';
+    const localStorageKey = 'lastAvatarUpdate';
 
-            if (response.status === 401) {
-                try {
-                    accessToken = await refreshAccessToken();
-                    options.headers.Authorization = `Bearer ${accessToken}`;
-                    response = await fetch(url, options);  // Повторяем запрос с новым Access Token
-                } catch (error) {
-                    // Если не удалось обновить Access Token, перенаправляем на страницу входа
-                    window.location.href = '/pages/login.html';
-                    return;
-                }
+    async function loadUserAvatar() {
+        try {
+            const lastUpdate = localStorage.getItem(localStorageKey);
+            const url = lastUpdate ? `${avatarUrl}?t=${lastUpdate}` : avatarUrl;
+
+            const response = await fetchWithAuth(url);
+            if (!response.ok) {
+                throw new Error('Failed to load avatar');
             }
+            const blob = await response.blob();
+            const imageUrl = URL.createObjectURL(blob);
+            document.getElementById('user-avatar').src = imageUrl;
+        } catch (error) {
+            console.error('Error loading avatar:', error);
+            document.getElementById('user-avatar').src = '/path/to/default/avatar.webp';
+        }
+    }
 
-            return response;
+    function goToProfilePage() {
+        const queryParams = getQueryParams();
+        const profileUrl = new URL('/pages/profile.html', window.location.origin);
+
+        for (const [key, value] of Object.entries(queryParams)) {
+            profileUrl.searchParams.append(key, value);
         }
 
-        function getQueryParams() {
-            const params = {};
-            const urlParams = new URLSearchParams(window.location.search);
-            for (const [key, value] of urlParams.entries()) {
-                params[key] = value;
-            }
-            return params;
+        if (!profileUrl.searchParams.has('client_name')) {
+            profileUrl.searchParams.append('client_name', document.getElementById('client-name').textContent);
         }
 
-        const avatarUrl = '/avatars/jwt/';
-        const localStorageKey = 'lastAvatarUpdate';
+        window.location.href = profileUrl.toString();
+    }
 
-        async function loadUserAvatar() {
-            try {
-                // Получаем метку времени последнего обновления из localStorage
-                const lastUpdate = localStorage.getItem(localStorageKey);
-                // Если метка времени есть, добавляем её к URL аватарки
-                const url = lastUpdate ? `${avatarUrl}?t=${lastUpdate}` : avatarUrl;
-
-                const response = await fetchWithAuth(url);
-                if (!response.ok) {
-                    throw new Error('Failed to load avatar');
-                }
-                const blob = await response.blob();
-                const imageUrl = URL.createObjectURL(blob);
-                document.getElementById('user-avatar').src = imageUrl;
-            } catch (error) {
-                console.error('Error loading avatar:', error);
-                document.getElementById('user-avatar').src = '/path/to/default/avatar.webp';
-            }
-        }
-
-        function goToProfilePage() {
-            const queryParams = getQueryParams();
-            const profileUrl = new URL('/pages/profile.html', window.location.origin);
-
-            for (const [key, value] of Object.entries(queryParams)) {
-                profileUrl.searchParams.append(key, value);
-            }
-
-            if (!profileUrl.searchParams.has('client_name')) {
-                profileUrl.searchParams.append('client_name', document.getElementById('client-name').textContent);
-            }
-
-            window.location.href = profileUrl.toString();
-        }
-
+    // Инициализация
+    document.addEventListener('DOMContentLoaded', () => {
         const profileLink = document.getElementById('profile-link');
         profileLink.addEventListener('click', goToProfilePage);
 
@@ -222,6 +195,7 @@
         const fingerprint = localStorage.getItem('deviceFingerprint') || '';
 
         fetchWithAuth('/api/auth-to-client', {
+            credentials: 'include',
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -254,6 +228,7 @@
 
         function displayUserData(data) {
             fetchWithAuth('/api/me', {
+                credentials: 'include',
                 headers: {
                     'Content-Type': 'application/json',
                     'X-Device-Fingerprint': fingerprint,
@@ -262,9 +237,7 @@
             .then(response => response.json())
             .then(userData => {
                 loadUserAvatar();
-
                 document.getElementById('user-email').textContent = userData.email;
-
                 window.userEmail = userData.email;
             });
 
@@ -280,7 +253,6 @@
                 requestedResources.appendChild(li);
             }
 
-            // Отображаем имена ресурсных серверов
             if (data.rs_names) {
                 const rsNames = Object.values(data.rs_names).map(rs => rs.name);
                 if (rsNames.length) {
@@ -305,13 +277,13 @@
                 }
             });
 
-            document.getElementById('profile-link').addEventListener('click', goToProfilePage);
+            const gearIcon = document.querySelector('.gear-icon');
+            gearIcon.addEventListener('click', (event) => {
+                event.stopPropagation();
+                goToProfilePage();
+            });
         }
-        const gearIcon = document.querySelector('.gear-icon');
-        gearIcon.addEventListener('click', (event) => {
-            event.stopPropagation();
-            goToProfilePage();
-        });
+    });
     </script>
 </body>
 </html>

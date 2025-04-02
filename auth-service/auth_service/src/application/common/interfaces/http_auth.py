@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import TypeVar, Generic
+from typing import TypeVar, Generic, NewType
 from uuid import UUID
 
 from application.auth_as.common.types import (
@@ -68,6 +68,7 @@ class HttpAuthServerService(HttpService[RefreshToken]):
         self,
         user: User,
         fingerprint: Fingerprint | None = None,
+        is_admin: bool = False
     ) -> AuthServerTokens: ...
 
 
@@ -81,3 +82,13 @@ class HttpClientService(HttpService[AccessToken]):
         rs_ids: list[int] | None,
         fingerprint: Fingerprint | None = None,
     ) -> ClientTokens: ...
+
+
+SessionID = NewType("SessionID", UUID)
+
+
+class HttpAdminSessionService(ABC):
+    @abstractmethod
+    async def create_and_save_session(
+        self, admin_username: str
+    ) -> SessionID: ...

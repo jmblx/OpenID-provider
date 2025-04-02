@@ -108,7 +108,7 @@ services:
 #      - nats
 
   db_migration:
-    profiles: [ "setup" ]
+    profiles: [ "setup", "migration" ]
     container_name: backend_service.db_migration
     image: backend_service.auth_service
     restart: on-failure

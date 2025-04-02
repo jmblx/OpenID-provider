@@ -17,11 +17,12 @@ class AuthServerTokenCreationServiceImpl(AuthServerTokenCreationService):
         self.jwt_settings = jwt_settings
 
     def create_auth_server_access_token(
-        self, user_id: UUID
+        self, user_id: UUID, is_admin
     ) -> AccessToken:
         jwt_payload = {
             "sub": str(user_id),
             "jti": str(uuid4()),
+            "is_admin": is_admin,
         }
         encoded_token = self.jwt_service.encode(
             payload=jwt_payload,

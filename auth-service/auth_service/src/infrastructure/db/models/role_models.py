@@ -15,6 +15,7 @@ role_table = Table(
     Column("base_scopes", JSONB, nullable=False),
     Column("rs_id", Integer, ForeignKey("resource_server.id"), nullable=False),
     Column("is_base", Boolean, nullable=False),
+    Column("is_active", Boolean, nullable=False, default=True),
 )
 
 
@@ -36,6 +37,7 @@ mapper_registry.map_imperatively(
             "ResourceServer", back_populates="roles", uselist=False
         ),
         "is_base": role_table.c.is_base,
+        "is_active": role_table.c.is_active,
     },
     column_prefix="_",
 )

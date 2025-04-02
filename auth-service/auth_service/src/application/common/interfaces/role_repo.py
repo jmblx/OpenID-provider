@@ -22,7 +22,7 @@ class RoleRepository(ABC):
 
     @abstractmethod
     async def get_roles_by_rs_id(
-        self, client_id: ClientID, order_by_id: bool = False
+        self, client_id: ResourceServerID, order_by_id: bool = False
     ) -> Sequence[Role]: ...
 
     @abstractmethod
@@ -34,3 +34,6 @@ class RoleRepository(ABC):
     async def get_user_roles_by_rs_ids(
         self, user_id: UserID, rs_ids: Sequence[ResourceServerID]
     ) -> list[Role]: ...
+
+    @abstractmethod
+    async def delete_role(self, role: Role) -> None: ...

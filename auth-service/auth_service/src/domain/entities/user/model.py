@@ -22,6 +22,7 @@ class User:
     id: UserID
     email: Email
     hashed_password: HashedPassword
+    is_admin: bool = field(default=False)
     roles: list[Role] = field(default_factory=list)
     is_email_confirmed: bool = field(default=False)
     avatar_path: str = field(default=None)

@@ -108,6 +108,7 @@ class HttpAuthServerServiceImpl(HttpAuthServerService):
         self,
         user: User,
         fingerprint: Fingerprint | None = None,
+        is_admin: bool = False,
     ) -> AuthServerTokens:
         """Создаёт и сохраняет токены."""
         if not fingerprint:
@@ -115,7 +116,7 @@ class HttpAuthServerServiceImpl(HttpAuthServerService):
         user_id: UUID = user.id.value
         access_token = (
             self.token_creation_service.create_auth_server_access_token(
-                user_id
+                user_id, is_admin
             )
         )
         refresh_token_data = (

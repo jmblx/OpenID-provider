@@ -10,6 +10,7 @@ from application.role.create_role_handler import (
     CreateRoleCommand,
     CreateRoleHandler,
 )
+from application.role.delete_role_handler import DeleteRoleHandler, DeleteRoleCommand
 from application.role.upd_role_command_handler import (
     UpdateRoleHandler,
     UpdateRoleCommand,
@@ -37,4 +38,13 @@ async def update_role(
     data.update({"role_id": role_id})
     command = UpdateRoleCommand(**data)
     await handler.handle(command)
+    return ORJSONResponse({"status": "success"}, status_code=HTTP_200_OK)
+
+
+@role_router.delete("/{role_id}")
+async def delete_role(
+    role_id: int,
+    handler: FromDishka[DeleteRoleHandler],
+) -> ORJSONResponse:
+    await handler.handle(DeleteRoleCommand(role_id=role_id))
     return ORJSONResponse({"status": "success"}, status_code=HTTP_200_OK)

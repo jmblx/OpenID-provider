@@ -1,3 +1,4 @@
+import logging
 from dataclasses import dataclass, field
 
 from application.common.interfaces.role_repo import RoleRepository
@@ -12,6 +13,9 @@ class UpdateRoleCommand:
     new_name: str | None
     new_base_scopes: dict[str, str] | None
     new_is_base: bool | None
+
+
+logger = logging.getLogger(__name__)
 
 
 class UpdateRoleHandler:
@@ -35,6 +39,7 @@ class UpdateRoleHandler:
                 command.new_is_base if command.new_base_scopes else None
             ),
         }
+        logger.info(f"Updating role with updates: %s", updates)
 
         for attr, value in updates.items():
             if value is not None:

@@ -10,7 +10,7 @@ from domain.exceptions.resource_server import ResourceServerNotFoundError
 class UpdateResourceServerCommand:
     rs_id: int
     new_name: str | None
-    type: ResourceServerType | None
+    new_type: ResourceServerType | None
 
 
 class UpdateResourceServerHandler:
@@ -25,7 +25,7 @@ class UpdateResourceServerHandler:
 
         updates = {
             "name": (command.new_name if command.new_name else None),
-            "type": (command.type if command.type else None),
+            "type": (command.new_type if command.new_type else None),
         }
 
         for attr, value in updates.items():

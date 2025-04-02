@@ -80,16 +80,32 @@
         }
 
         async function fetchWithAuth(url, options = {}) {
-            const accessToken = localStorage.getItem('access_token');
-            options.headers = {
-                ...options.headers,
-                Authorization: `Bearer ${accessToken}`,
-                'X-Device-Fingerprint': fingerprint,
+            // Дефолтные настройки для всех запросов
+            const defaults = {
+                credentials: 'include',
+                headers: {
+                    'X-Device-Fingerprint': fingerprint,
+                    ...options.headers, // Позволяет переопределить headers
+                },
             };
-            const response = await fetch(url, options);
+
+            const response = await fetch(url, { ...defaults, ...options });
+
+            // Обработка 401 + сохранение параметров
             if (response.status === 401) {
-                window.location.href = '/pages/login.html';
+                const loginUrl = new URL('/pages/login.html', window.location.href);
+                loginUrl.search = window.location.search; // Сохраняем query-параметры
+                window.location.href = loginUrl.toString();
+                return Promise.reject(new Error('Unauthorized')); // Прерываем цепочку
             }
+
+            // Обработка других ошибок (403, 500 и т.д.)
+            if (!response.ok) {
+                const error = new Error(`HTTP error: ${response.status}`);
+                error.response = response;
+                throw error;
+            }
+
             return response;
         }
 

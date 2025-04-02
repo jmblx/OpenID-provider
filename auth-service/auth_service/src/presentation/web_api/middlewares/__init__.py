@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from metrics import add_metrics_middleware
+from .metrics import add_metrics_middleware
 from ..config import TRACING
 
 

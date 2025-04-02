@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Управление ресурсным сервером</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        .role-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            position: relative;
+            background-color: #f9f9f9;
+        }
+
+        .role-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .role-name-container {
+            flex-grow: 1;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .editable-field {
+            margin-bottom: 15px;
+        }
+
+        .editable-field label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .scope-checkboxes {
+            margin-top: 10px;
+            padding-left: 20px;
+        }
+
+        .new-role-section {
+            border: 2px dashed #ccc;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            background-color: #f5f5f5;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .disabled-role {
+            opacity: 0.7;
+            pointer-events: none;
+        }
+
+        .disabled-section {
+            color: #999;
+        }
+
+        .create-mode .form-control {
+            /* В режиме создания все поля сразу доступны для редактирования */
+            disabled: false;
+        }
+    </style>
+</head>
+<body class="container mt-4">
+    <h1 id="rs-name" class="text-center"></h1>
+    <div id="rs-info" class="mb-4">
+        <div class="editable-field">
+            <label for="rs-name-input">Название ресурсного сервера:</label>
+            <input type="text" id="rs-name-input" class="form-control" oninput="checkRSChanges()">
+        </div>
+        <div class="editable-field">
+            <label for="rs-type-select">Тип ресурсного сервера:</label>
+            <select id="rs-type-select" class="form-control" onchange="checkRSChanges()">
+                <option value="RBAC_BY_AS">RBAC управляется сервером авторизации</option>
+                <option value="RS_CONTROLLED">Управляется ресурсным сервером</option>
+            </select>
+        </div>
+        <button class="btn btn-success btn-sm mt-2 hidden" id="save-rs-btn" onclick="saveRS()">Сохранить</button>
+    </div>
+
+    <h3>Роли ресурсного сервера</h3>
+    <div id="roles-container" class="row"></div>
+
+    <!-- Секция для добавления новой роли -->
+    <div id="new-role-section" class="new-role-section hidden">
+        <h4>Новая роль</h4>
+        <div class="editable-field">
+            <label for="new-role-name">Название роли:</label>
+            <input type="text" id="new-role-name" class="form-control">
+        </div>
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="new-role-is-base">
+            <label class="form-check-label">Базовая роль</label>
+        </div>
+        <div class="editable-field">
+            <label>Доступы:</label>
+            <div id="new-role-scopes"></div>
+            <button class="btn btn-secondary btn-sm mt-2" onclick="addNewScopeField()">Добавить доступ</button>
+        </div>
+        <div class="action-buttons">
+            <button class="btn btn-success" onclick="confirmNewRole()">Создать роль</button>
+            <button class="btn btn-danger" onclick="cancelNewRole()">Отмена</button>
+        </div>
+    </div>
+
+    <button class="btn btn-primary mt-3" id="add-role-btn" onclick="showNewRoleSection()">Добавить роль</button>
+
+     <script>
+        // Глобальные переменные
+        let currentRsId = null;
+        let availableScopes = {};
+        let currentRsType = null;
+        let rolesDisabled = false;
+        let initialRSData = null;
+        let initialRolesData = [];
+        let isCreateMode = false;
+
+        document.addEventListener("DOMContentLoaded", async function () {
+            const params = new URLSearchParams(window.location.search);
+            currentRsId = params.get("rsId");
+
+            if (!currentRsId) {
+                // Режим создания нового ресурсного сервера
+                isCreateMode = true;
+                document.body.classList.add('create-mode');
+                document.getElementById("rs-name").textContent = "Создание нового ресурсного сервера";
+                document.getElementById("save-rs-btn").classList.remove("hidden");
+                document.getElementById("rs-name-input").disabled = false;
+                document.getElementById("rs-type-select").disabled = false;
+                return;
+            }
+
+            // Режим редактирования существующего ресурсного сервера
+            const rsData = await fetchRSData(currentRsId);
+
+            if (rsData) {
+                currentRsType = rsData.type;
+                initialRSData = {
+                    name: rsData.name,
+                    type: rsData.type
+                };
+                initialRolesData = [...rsData.roles];
+
+                renderRSInfo(rsData);
+                renderRoles(rsData.roles);
+                initAvailableScopes(rsData.roles);
+
+                // Проверяем, нужно ли отключить роли при загрузке
+                if (currentRsType === "RS_CONTROLLED") {
+                    disableRolesSection();
+                }
+
+                // Включаем редактирование полей
+                document.getElementById("rs-name-input").disabled = false;
+                document.getElementById("rs-type-select").disabled = false;
+            }
+        });
+
+        function disableRolesSection() {
+            // Отключаем кнопку добавления роли
+            document.getElementById("add-role-btn").disabled = true;
+            document.getElementById("add-role-btn").classList.add("disabled-section");
+
+            // Отключаем редактирование ролей
+            document.querySelectorAll(".role-name").forEach(input => {
+                input.disabled = true;
+            });
+            document.querySelectorAll(".is-base-checkbox").forEach(checkbox => {
+                checkbox.disabled = true;
+            });
+            document.querySelectorAll(".scope-checkbox").forEach(checkbox => {
+                checkbox.disabled = true;
+            });
+
+            rolesDisabled = true;
+        }
+
+        function enableRolesSection() {
+            // Включаем кнопку добавления роли
+            document.getElementById("add-role-btn").disabled = false;
+            document.getElementById("add-role-btn").classList.remove("disabled-section");
+
+            // Включаем редактирование ролей
+            document.querySelectorAll(".role-name").forEach(input => {
+                input.disabled = false;
+            });
+            document.querySelectorAll(".is-base-checkbox").forEach(checkbox => {
+                checkbox.disabled = false;
+            });
+            document.querySelectorAll(".scope-checkbox").forEach(checkbox => {
+                checkbox.disabled = false;
+            });
+
+            rolesDisabled = false;
+        }
+
+        function initAvailableScopes(roles) {
+            availableScopes = {};
+            roles.forEach(role => {
+                role.base_scopes.forEach(scope => {
+                    const [scopeKey] = scope.split(":");
+                    availableScopes[scopeKey] = true;
+                });
+            });
+        }
+
+        async function fetchRSData(rsId) {
+            try {
+                const response = await fetch(`/api/rs/${rsId}`);
+                if (!response.ok) throw new Error("Ошибка загрузки данных");
+                return await response.json();
+            } catch (error) {
+                console.error(error);
+                alert("Не удалось загрузить данные ресурсного сервера.");
+                return null;
+            }
+        }
+
+        function renderRSInfo(rsData) {
+            document.getElementById("rs-name").textContent = `Ресурсный сервер: ${rsData.name}`;
+            document.getElementById("rs-name-input").value = rsData.name;
+            document.getElementById("rs-type-select").value = rsData.type;
+        }
+
+        function renderRoles(roles) {
+            const container = document.getElementById("roles-container");
+            container.innerHTML = "";
+
+            roles.forEach((role, index) => {
+                const roleCard = document.createElement("div");
+                roleCard.classList.add("col-md-6", "role-card");
+                roleCard.id = `role-${role.id}`;
+
+                function createScopeCheckbox(scopeKey, scopeValue, bitPosition, label) {
+                    return `
+                        <div class="form-check">
+                            <input class="form-check-input scope-checkbox" type="checkbox"
+                                   data-scope-key="${scopeKey}" data-bit-pos="${bitPosition}"
+                                   ${scopeValue[bitPosition] === "1" ? "checked" : ""}
+                                   onchange="checkRoleChanges(${role.id})">
+                            <label class="form-check-label">${label}</label>
+                        </div>`;
+                }
+
+                let scopeCheckboxes = "";
+                const scopeLabels = ["Создание", "Чтение", "Обновление", "Удаление"];
+
+                role.base_scopes.forEach(scope => {
+                    const scopeEntries = scope.split(":");
+                    if (scopeEntries.length !== 2) return;
+
+                    const scopeKey = scopeEntries[0];
+                    const scopeValue = scopeEntries[1];
+
+                    scopeCheckboxes += `<strong>${scopeKey}</strong><br>`;
+                    scopeLabels.forEach((label, idx) => {
+                        scopeCheckboxes += createScopeCheckbox(scopeKey, scopeValue, idx, label);
+                    });
+                });
+
+                roleCard.innerHTML = `
+                    <div class="role-header">
+                        <h5 class="role-name-container">
+                            <input type="text" value="${role.name}" class="form-control role-name"
+                                   oninput="checkRoleChanges(${role.id})">
+                        </h5>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input is-base-checkbox" type="checkbox"
+                               ${role.is_base ? "checked" : ""}
+                               onchange="checkRoleChanges(${role.id})">
+                        <label class="form-check-label">Базовая роль</label>
+                    </div>
+                    ${scopeCheckboxes}
+                    <div class="action-buttons">
+                        <button class="btn btn-success btn-sm mt-2 hidden save-btn"
+                                id="save-role-${role.id}"
+                                onclick="saveRole(${index}, ${role.id})">Сохранить</button>
+                        <button class="btn btn-danger btn-sm mt-2" onclick="deleteRole(${role.id})">Удалить</button>
+                    </div>
+                `;
+
+                container.appendChild(roleCard);
+            });
+        }
+
+        function checkRSChanges() {
+            if (isCreateMode) return; // В режиме создания всегда показываем кнопку сохранения
+
+            const currentName = document.getElementById("rs-name-input").value;
+            const currentType = document.getElementById("rs-type-select").value;
+
+            const hasChanges = currentName !== initialRSData.name || currentType !== initialRSData.type;
+            document.getElementById("save-rs-btn").classList.toggle("hidden", !hasChanges);
+        }
+
+        function checkRoleChanges(roleId) {
+            const roleCard = document.getElementById(`role-${roleId}`);
+            if (!roleCard) return;
+
+            const roleIndex = initialRolesData.findIndex(r => r.id === roleId);
+            if (roleIndex === -1) return;
+
+            const initialRole = initialRolesData[roleIndex];
+            const currentName = roleCard.querySelector(".role-name").value;
+            const currentIsBase = roleCard.querySelector(".is-base-checkbox").checked;
+
+            // Проверяем изменения в scope
+            let scopeChanged = false;
+            const scopeCheckboxes = roleCard.querySelectorAll(".scope-checkbox");
+
+            initialRole.base_scopes.forEach(scope => {
+                const [scopeKey, scopeValue] = scope.split(":");
+                scopeCheckboxes.forEach(checkbox => {
+                    if (checkbox.dataset.scopeKey === scopeKey) {
+                        const bitPos = parseInt(checkbox.dataset.bitPos);
+                        if ((checkbox.checked ? "1" : "0") !== scopeValue[bitPos]) {
+                            scopeChanged = true;
+                        }
+                    }
+                });
+            });
+
+            const hasChanges = currentName !== initialRole.name ||
+                             currentIsBase !== initialRole.is_base ||
+                             scopeChanged;
+
+            document.getElementById(`save-role-${roleId}`).classList.toggle("hidden", !hasChanges);
+        }
+
+                async function saveRS() {
+            const newName = document.getElementById("rs-name-input").value;
+            const newType = document.getElementById("rs-type-select").value;
+
+            // Проверяем смену типа на RS_CONTROLLED
+            if (newType === "RS_CONTROLLED" && currentRsType !== "RS_CONTROLLED") {
+                const confirmChange = confirm("При смене типа на 'Управляется ресурсным сервером' все роли станут неактивными (но не будут удалены). Вы не сможете добавлять или редактировать роли. Продолжить?");
+                if (!confirmChange) {
+                    // Возвращаем предыдущее значение
+                    document.getElementById("rs-type-select").value = currentRsType || "RBAC_BY_AS";
+                    checkRSChanges();
+                    return;
+                }
+
+                // Делаем роли недоступными для редактирования
+                disableRolesSection();
+            }
+            // Если меняем обратно на RBAC_BY_AS
+            else if (newType === "RBAC_BY_AS" && currentRsType === "RS_CONTROLLED" && rolesDisabled) {
+                // Возвращаем возможность редактирования ролей
+                enableRolesSection();
+            }
+
+            const requestData = {
+                name: newName,
+                type: newType
+            };
+
+            try {
+                let response;
+                const params = new URLSearchParams(window.location.search);
+                let rsId = params.get("rsId");
+
+                if (isCreateMode || !rsId) {
+                    // Создание нового ресурсного сервера
+                    response = await fetch("/api/rs", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(requestData)
+                    });
+
+                    if (response.ok) {
+                        const newRS = await response.json();
+                        window.history.replaceState({}, "", `?rsId=${newRS.rs_id}`);
+                        rsId = newRS.rs_id;
+                        currentRsId = rsId;
+                        isCreateMode = false;
+                        document.body.classList.remove('create-mode');
+                    }
+                } else {
+                    // Обновление существующего ресурсного сервера
+                    response = await fetch(`/api/rs/${rsId}`, {
+                        method: "PUT",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(requestData)
+                    });
+                }
+
+                if (!response.ok) {
+                    throw new Error(`Ошибка сохранения: статус ${response.status}`);
+                }
+
+                alert(isCreateMode ? "Ресурсный сервер успешно создан!" : "Данные ресурсного сервера успешно обновлены!");
+
+                if (isCreateMode) {
+                    // После создания переходим в режим редактирования
+                    const newRS = await response.json();
+                    currentRsType = newType;
+                    initialRSData = {
+                        name: newName,
+                        type: newType
+                    };
+
+                    // Загружаем данные только что созданного RS
+                    const rsData = await fetchRSData(newRS.rs_id);
+                    if (rsData) {
+                        initialRolesData = [...rsData.roles];
+                        renderRSInfo(rsData);
+                        renderRoles(rsData.roles);
+                        initAvailableScopes(rsData.roles);
+
+                        if (currentRsType === "RS_CONTROLLED") {
+                            disableRolesSection();
+                        }
+                    }
+
+                    document.getElementById("rs-name").textContent = `Ресурсный сервер: ${newName}`;
+                } else {
+                    // Обновляем начальные данные
+                    initialRSData = {
+                        name: newName,
+                        type: newType
+                    };
+                    currentRsType = newType;
+
+                    // Обновляем список ролей (на случай, если изменился тип)
+                    const rsData = await fetchRSData(rsId);
+                    if (rsData) {
+                        if (rsData.roles) {
+                            initialRolesData = [...rsData.roles];
+                            renderRoles(rsData.roles);
+                        }
+
+                        if (currentRsType === "RS_CONTROLLED") {
+                            disableRolesSection();
+                        }
+                    }
+                }
+
+                // Скрываем кнопку сохранения
+                document.getElementById("save-rs-btn").classList.add("hidden");
+            } catch (error) {
+                console.error(error);
+                alert(`Ошибка ${isCreateMode ? 'создания' : 'обновления'} ресурсного сервера: ${error.message}`);
+
+                // В случае ошибки возвращаем предыдущее значение
+                if (!isCreateMode) {
+                    document.getElementById("rs-type-select").value = currentRsType;
+                    checkRSChanges();
+
+                    // Если нужно, возвращаем возможность редактирования ролей
+                    if (rolesDisabled && newType === "RBAC_BY_AS") {
+                        enableRolesSection();
+                    }
+                }
+            }
+        }
+
+        async function saveRole(index, roleId) {
+            const roleCard = document.getElementById(`role-${roleId}`);
+            if (!roleCard) return;
+
+            const newName = roleCard.querySelector(".role-name").value;
+            const isBase = roleCard.querySelector(".is-base-checkbox").checked;
+
+            // Собираем обновленные scope
+            const newBaseScopes = {};
+            const scopeCheckboxes = roleCard.querySelectorAll(".scope-checkbox");
+
+            // Группируем чекбоксы по scope_key
+            const scopesMap = {};
+            scopeCheckboxes.forEach(checkbox => {
+                const scopeKey = checkbox.dataset.scopeKey;
+                if (!scopesMap[scopeKey]) {
+                    scopesMap[scopeKey] = ['0', '0', '0', '0'];
+                }
+                const bitPos = parseInt(checkbox.dataset.bitPos);
+                scopesMap[scopeKey][bitPos] = checkbox.checked ? '1' : '0';
+            });
+
+            // Формируем строку из 0 и 1 (например "1100")
+            for (const [scopeKey, bits] of Object.entries(scopesMap)) {
+                newBaseScopes[scopeKey] = bits.join('');
+            }
+
+            const requestData = {
+                new_name: newName,
+                new_is_base: isBase,
+                new_base_scopes: newBaseScopes
+            };
+
+            try {
+                const response = await fetch(`/api/role/${roleId}`, {
+                    method: "PUT",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(requestData)
+                });
+
+                if (!response.ok) throw new Error("Ошибка сохранения роли");
+
+                alert("Роль успешно обновлена!");
+
+                // Обновляем начальные данные
+                const roleIndex = initialRolesData.findIndex(r => r.id === roleId);
+                if (roleIndex !== -1) {
+                    initialRolesData[roleIndex] = {
+                        ...initialRolesData[roleIndex],
+                        name: newName,
+                        is_base: isBase,
+                        base_scopes: Object.entries(newBaseScopes).map(([key, value]) => `${key}:${value}`)
+                    };
+                }
+
+                // Скрываем кнопку сохранения
+                document.getElementById(`save-role-${roleId}`).classList.add("hidden");
+            } catch (error) {
+                console.error(error);
+                alert("Ошибка обновления роли!");
+            }
+        }
+
+        async function deleteRole(roleId) {
+            if (!confirm("Вы уверены, что хотите удалить эту роль?")) return;
+
+            try {
+                const response = await fetch(`/api/role/${roleId}`, {
+                    method: "DELETE"
+                });
+
+                if (!response.ok) throw new Error("Ошибка удаления роли");
+
+                alert("Роль успешно удалена!");
+                document.getElementById(`role-${roleId}`).remove();
+            } catch (error) {
+                console.error(error);
+                alert("Ошибка удаления роли!");
+            }
+        }
+
+        // Функции для работы с новой ролью
+        function showNewRoleSection() {
+            document.getElementById("new-role-section").classList.remove("hidden");
+            document.getElementById("add-role-btn").classList.add("hidden");
+            // Добавляем пустое поле scope по умолчанию
+            addNewScopeField();
+        }
+
+        function cancelNewRole() {
+            document.getElementById("new-role-section").classList.add("hidden");
+            document.getElementById("add-role-btn").classList.remove("hidden");
+            document.getElementById("new-role-name").value = "";
+            document.getElementById("new-role-is-base").checked = false;
+            document.getElementById("new-role-scopes").innerHTML = "";
+        }
+
+        function addNewScopeField() {
+            const scopesContainer = document.getElementById("new-role-scopes");
+            const scopeId = Date.now(); // Уникальный ID для scope
+
+            const scopeField = document.createElement("div");
+            scopeField.classList.add("scope-field", "mb-3");
+            scopeField.innerHTML = `
+                <div class="d-flex align-items-center gap-2">
+                    <input type="text" class="form-control scope-key" placeholder="Ключ scope (например, user_profile)">
+                    <select class="form-select scope-permissions">
+                        <option value="0000">Нет доступа</option>
+                        <option value="1000">Только создание</option>
+                        <option value="0100">Только чтение</option>
+                        <option value="0010">Только обновление</option>
+                        <option value="0001">Только удаление</option>
+                        <option value="1111">Полный доступ</option>
+                        <option value="1100">Создание и чтение</option>
+                        <option value="0110">Чтение и обновление</option>
+                        <option value="0011">Обновление и удаление</option>
+                    </select>
+                    <button class="btn btn-danger btn-sm" onclick="removeScopeField(this)">×</button>
+                </div>
+            `;
+            scopesContainer.appendChild(scopeField);
+        }
+
+        function removeScopeField(button) {
+            button.closest(".scope-field").remove();
+        }
+
+        async function confirmNewRole() {
+            const name = document.getElementById("new-role-name").value.trim();
+            const isBase = document.getElementById("new-role-is-base").checked;
+
+            if (!name) {
+                alert("Пожалуйста, укажите название роли");
+                return;
+            }
+
+            // Собираем scope
+            const baseScopes = {};
+            const scopeFields = document.querySelectorAll(".scope-field");
+
+            scopeFields.forEach(field => {
+                const keyInput = field.querySelector(".scope-key");
+                const permissionsSelect = field.querySelector(".scope-permissions");
+
+                const key = keyInput.value.trim();
+                const permissions = permissionsSelect.value;
+
+                if (key) {
+                    baseScopes[key] = permissions;
+                }
+            });
+
+            if (Object.keys(baseScopes).length === 0) {
+                alert("Пожалуйста, добавьте хотя бы один scope");
+                return;
+            }
+
+            const requestData = {
+                name: name,
+                base_scopes: baseScopes,
+                rs_id: parseInt(currentRsId),
+                is_base: isBase
+            };
+
+            try {
+                const response = await fetch("/api/role", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(requestData)
+                });
+
+                if (!response.ok) throw new Error("Ошибка создания роли");
+
+                const newRole = await response.json();
+                alert("Роль успешно создана!");
+
+                // Обновляем список ролей
+                const rsData = await fetchRSData(currentRsId);
+                if (rsData) {
+                    renderRoles(rsData.roles);
+                }
+
+                // Сбрасываем форму
+                cancelNewRole();
+            } catch (error) {
+                console.error(error);
+                alert("Ошибка создания роли: " + error.message);
+            }
+        }
+    </script>
+</body>
+</html>

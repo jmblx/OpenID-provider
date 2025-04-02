@@ -39,9 +39,11 @@ from application.client.register_client_hadler import (
 from application.client.update_client import (
     UpdateClientCommandHandler,
 )
+from application.resource_server.read_rs_view_handler import ReadResourceServerPageViewQueryHandler
 from application.resource_server.register_rs_handler import RegisterResourceServerHandler
 from application.resource_server.update_rs_handler import UpdateResourceServerHandler
 from application.role.create_role_handler import CreateRoleHandler
+from application.role.delete_role_handler import DeleteRoleHandler
 from application.role.upd_role_command_handler import UpdateRoleHandler
 from application.user.add_role_to_user_handler import AddRoleToUserHandler
 from application.user.confirm_email_handler import ConfirmEmailHandler
@@ -118,3 +120,5 @@ class HandlerProvider(Provider):
     set_user_avatar_handler = provide(SetUserAvatarHandler, scope=Scope.REQUEST)
     revoke_client_tokens_handler = provide(RevokeClientTokenHandler, scope=Scope.REQUEST)
     refresh_client_tokens_handler = provide(RefreshClientTokensHandler, scope=Scope.REQUEST)
+    read_resource_server_page_view_query_handler = provide(ReadResourceServerPageViewQueryHandler, scope=Scope.REQUEST)
+    delete_role_handler = provide(DeleteRoleHandler, scope=Scope.REQUEST)

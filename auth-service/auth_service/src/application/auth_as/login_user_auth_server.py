@@ -55,5 +55,5 @@ class AuthenticateUserHandler:
         user.check_pwd(
             RawPassword(command.password), password_hasher=self.password_hasher
         )
-        tokens = await self.auth_server_service.create_and_save_tokens(user)
+        tokens = await self.auth_server_service.create_and_save_tokens(user, is_admin=user.is_admin)
         return tokens
