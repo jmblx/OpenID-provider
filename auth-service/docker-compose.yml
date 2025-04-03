@@ -110,7 +110,7 @@ services:
   db_migration:
     profiles: [ "setup", "migration" ]
     container_name: backend_service.db_migration
-    image: menoitami/backend_service.auth_service
+    image: menoitami/backend_service.api
     restart: on-failure
     depends_on:
       db:
