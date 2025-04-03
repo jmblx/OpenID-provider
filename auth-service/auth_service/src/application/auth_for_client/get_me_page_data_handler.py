@@ -5,7 +5,7 @@ from application.auth_for_client.common.allow_client_access_service import (
 )
 from application.client.client_queries import ValidateClientRequest
 from application.common.id_provider import UserIdentityProvider
-from application.common.interfaces.rs_reader import ResourceServerReader
+from application.resource_server.common.rs_reader import ResourceServerReader
 from application.common.services.auth_code import AuthorizationCodeStorage, AuthCodeData
 from application.common.services.client_service import ClientService
 from application.common.services.pkce import PKCEData, PKCEService, PKCECodeChallengeMethod

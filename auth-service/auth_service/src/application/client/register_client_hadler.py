@@ -1,7 +1,7 @@
 import logging
 from dataclasses import dataclass
 
-from application.common.interfaces.client_repo import ClientRepository
+from application.client.common.client_repo import ClientRepository
 from application.common.uow import Uow
 from application.dtos.client import ClientCreateDTO
 from domain.entities.client.model import Client

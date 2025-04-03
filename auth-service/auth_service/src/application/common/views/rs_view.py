@@ -12,5 +12,5 @@ class ResourceServerView(TypedDict, total=False):
 
 
 @dataclass
-class ResourceServersIdsData:
+class ResourceServerIdsData:
     name: str

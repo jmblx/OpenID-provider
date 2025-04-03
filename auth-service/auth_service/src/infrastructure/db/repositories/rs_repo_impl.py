@@ -1,6 +1,6 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from application.common.interfaces.rs_repo import ResourceServerRepository
+from application.resource_server.common.rs_repo import ResourceServerRepository
 from application.resource_server.dtos import ResourceServerCreateDTO
 from domain.entities.resource_server.model import ResourceServer
 from domain.entities.resource_server.value_objects import ResourceServerID

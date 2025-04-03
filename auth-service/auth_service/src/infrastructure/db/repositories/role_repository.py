@@ -63,7 +63,7 @@ class RoleRepositoryImpl(RoleRepository):
         return result.scalars().all()
 
     async def get_user_roles_by_rs_ids(
-            self, user_id: UserID, rs_ids: Sequence[ResourceServerID]
+        self, user_id: UserID, rs_ids: Sequence[ResourceServerID]
     ) -> list[Role]:
         stmt = text("""
             SELECT r.* FROM role r
@@ -85,4 +85,4 @@ class RoleRepositoryImpl(RoleRepository):
         return result.mappings().all()
 
     async def delete_role(self, role: Role) -> None:
-        role.is_active = True
+        role.is_active = False

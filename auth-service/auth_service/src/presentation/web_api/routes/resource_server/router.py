@@ -6,13 +6,15 @@ from pydantic import BaseModel
 from starlette import status
 from starlette.responses import Response
 
+from application.common.views.rs_view import ResourceServerIdsData
+from application.resource_server.get_all_resource_servers import GetAllRSIdsHandler
 from application.resource_server.read_rs_view_handler import ReadResourceServerPageViewQueryHandler, \
     ReadResourceServerPageViewQuery
 from application.resource_server.register_rs_handler import RegisterResourceServerCommand, \
     RegisterResourceServerHandler
 from application.resource_server.dtos import ResourceServerCreateDTO
 from application.resource_server.update_rs_handler import UpdateResourceServerHandler, UpdateResourceServerCommand
-from domain.entities.resource_server.value_objects import ResourceServerType
+from domain.entities.resource_server.value_objects import ResourceServerType, ResourceServerID
 from presentation.web_api.routes.resource_server.models import ResourceServerViewModel
 
 rs_router = APIRouter(route_class=DishkaRoute, tags=["resource_server"], prefix="/rs")
@@ -31,6 +33,14 @@ async def register_rs(
 class UpdateResourceServerModel(BaseModel):
     new_name: str | None
     new_type: ResourceServerType | None
+
+
+@rs_router.get("/ids_data")
+async def get_rs_ids(
+    handler: FromDishka[GetAllRSIdsHandler],
+) -> dict[ResourceServerID, ResourceServerIdsData]:
+    resource_server_ids_data = await handler.handle()
+    return resource_server_ids_data
 
 
 @rs_router.put("/{rs_id}")

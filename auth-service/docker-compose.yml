@@ -94,18 +94,18 @@ services:
     networks:
       - backend_service.nats.network
 
-#  notification_app:
-#    env_file:
-#      - notification/.env-prod
-#      - .env-prod # для удобства в этом файле первостепенно в проде скорее всего лучше по 1 файлу указывать
-#    image: backend_service.notification_app
-##    build:
-##      context: notification/
-#    command: [ "sh", "/notification_app/docker/app.sh" ]
-#    networks:
-#      - backend_service.nats.network
-#    depends_on:
-#      - nats
+  notification_app:
+    env_file:
+      - notification/.env-prod
+      - .env-prod # для удобства в этом файле первостепенно в проде скорее всего лучше по 1 файлу указывать
+    image: backend_service.notification_app
+#    build:
+#      context: notification/
+    command: [ "sh", "/notification_app/docker/app.sh" ]
+    networks:
+      - backend_service.nats.network
+    depends_on:
+      - nats
 
   db_migration:
     profiles: [ "setup", "migration" ]

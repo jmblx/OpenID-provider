@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from application.common.interfaces.client_repo import ClientRepository
+from application.client.common.client_repo import ClientRepository
 from application.common.uow import Uow
 from domain.entities.client.model import Client
 from domain.entities.client.value_objects import (

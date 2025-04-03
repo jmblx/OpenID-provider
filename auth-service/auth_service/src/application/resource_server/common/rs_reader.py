@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import TypedDict
 
-from application.common.views.rs_view import ResourceServerView
+from application.common.views.rs_view import ResourceServerView, ResourceServerIdsData
 from domain.entities.resource_server.value_objects import ResourceServerID
 
 
@@ -15,3 +15,8 @@ class ResourceServerReader(ABC):
 
     @abstractmethod
     async def read_for_rs_page(self, rs_id: ResourceServerID) -> ResourceServerView | None: ...
+
+    @abstractmethod
+    async def read_all_resource_server_ids_data(
+        self,
+    ) -> dict[ResourceServerID, ResourceServerIdsData]: ...

@@ -29,5 +29,5 @@ class ClientViewModel(BaseModel):
 class UpdateClientModel(BaseModel):
     name: str | None
     base_url: str | None
-    new_allowed_redirect_urls: list[str] | None
+    allowed_redirect_urls: list[str] | None
     client_type: ClientTypeEnum | None

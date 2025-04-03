@@ -1,11 +1,12 @@
 from dishka import Provider, provide, Scope
 
-from application.common.interfaces.rs_reader import ResourceServerReader
+from application.resource_server.common.rs_reader import ResourceServerReader
 from application.common.interfaces.user_reader import UserReader
+from application.resource_server.get_all_resource_servers import GetAllRSIdsHandler
 from infrastructure.db.readers.client_reader import ClientReaderImpl
 from infrastructure.db.readers.rs_reader import ResourceServerReaderImpl
 from infrastructure.db.readers.user_reader import UserReaderImpl
-from application.common.interfaces.client_reader import ClientReader
+from application.client.common.client_reader import ClientReader
 
 
 class ReaderProvider(Provider):

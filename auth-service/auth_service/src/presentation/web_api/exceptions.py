@@ -13,7 +13,7 @@ from core.exceptions.user_password.exceptions import InvalidResetPasswordToken
 from domain.common.exceptions.base import AppError
 from domain.exceptions.auth import (
     InvalidRedirectURLError,
-    InvalidClientError,
+    InvalidClientError, InvalidCredentialsError,
 )
 from domain.exceptions.user import (
     UserAlreadyExistsError,
@@ -58,7 +58,11 @@ def setup_exception_handlers(app: FastAPI):
     app.add_exception_handler(
         InvalidResetPasswordToken, error_handler(status.HTTP_400_BAD_REQUEST)
     )
+    app.add_exception_handler(
+        InvalidCredentialsError, error_handler(status.HTTP_403_FORBIDDEN)
+    )
     app.add_exception_handler(Exception, unknown_exception_handler)
+
 
 
 def error_handler(

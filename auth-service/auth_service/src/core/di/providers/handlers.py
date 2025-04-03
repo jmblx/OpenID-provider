@@ -39,6 +39,7 @@ from application.client.register_client_hadler import (
 from application.client.update_client import (
     UpdateClientCommandHandler,
 )
+from application.resource_server.get_all_resource_servers import GetAllRSIdsHandler
 from application.resource_server.read_rs_view_handler import ReadResourceServerPageViewQueryHandler
 from application.resource_server.register_rs_handler import RegisterResourceServerHandler
 from application.resource_server.update_rs_handler import UpdateResourceServerHandler
@@ -122,3 +123,4 @@ class HandlerProvider(Provider):
     refresh_client_tokens_handler = provide(RefreshClientTokensHandler, scope=Scope.REQUEST)
     read_resource_server_page_view_query_handler = provide(ReadResourceServerPageViewQueryHandler, scope=Scope.REQUEST)
     delete_role_handler = provide(DeleteRoleHandler, scope=Scope.REQUEST)
+    get_all_rs_ids_handler = provide(GetAllRSIdsHandler, scope=Scope.REQUEST)

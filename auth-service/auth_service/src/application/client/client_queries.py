@@ -2,7 +2,7 @@ from typing import TypedDict
 
 from pydantic import BaseModel
 
-from application.common.interfaces.client_reader import ClientReader
+from application.client.common.client_reader import ClientReader
 from domain.entities.client.model import Client
 from domain.entities.client.value_objects import (
     ClientID,

@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from application.common.interfaces.client_reader import ClientReader
+from application.client.common.client_reader import ClientReader
 from application.common.views.client_view import ClientView
 from domain.entities.client.value_objects import ClientID
 

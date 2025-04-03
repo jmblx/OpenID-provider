@@ -1,7 +1,7 @@
 import logging
 
 from application.client.client_queries import ValidateClientRequest
-from application.common.interfaces.client_repo import ClientRepository
+from application.client.common.client_repo import ClientRepository
 from domain.entities.client.model import Client
 from domain.entities.client.value_objects import ClientRedirectUrl, ClientID
 from domain.exceptions.client import ClientNotFound

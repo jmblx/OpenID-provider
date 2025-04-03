@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from application.common.interfaces.rs_reader import ResourceServerReader
+from application.resource_server.common.rs_reader import ResourceServerReader
 from application.common.views.rs_view import ResourceServerView
 from domain.entities.resource_server.value_objects import ResourceServerID
 

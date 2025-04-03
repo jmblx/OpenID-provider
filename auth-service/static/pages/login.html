@@ -168,40 +168,46 @@
                 fingerprint: fingerprint,
                 ...params // Добавляем параметры из URL в тело запроса (если нужно)
             };
+        try {
+            const response = await fetch('/api/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Device-Fingerprint': fingerprint,
+                },
+                credentials: 'include', // Для отправки кук
+                body: JSON.stringify(payload)
+            });
 
-            try {
-                const response = await fetch('/api/login', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-Device-Fingerprint': fingerprint,
-                    },
-                    credentials: 'include', // Для отправки кук
-                    body: JSON.stringify(payload)
-                });
+            const responseData = await response.json(); // Всегда парсим JSON, даже при ошибке
 
-                if (response.ok) {
-                    // Проверяем, есть ли обязательные параметры для auth-to-client
-                    const hasAuthToClientParams = params.client_id && params.required_resources && params.redirect_url;
+            if (response.ok) {
+                // Проверяем, есть ли обязательные параметры для auth-to-client
+                const hasAuthToClientParams = params.client_id && params.required_resources && params.redirect_url;
 
-                    if (hasAuthToClientParams) {
-                        // Если параметры есть — перенаправляем на auth-to-client.html с ними
-                        const authToClientUrl = new URL('/pages/auth-to-client.html', window.location.origin);
-                        Object.keys(params).forEach(key => {
-                            authToClientUrl.searchParams.append(key, params[key]);
-                        });
-                        window.location.href = authToClientUrl.toString();
-                    } else {
-                        // Если параметров нет — перенаправляем на профиль
-                        window.location.href = '/pages/profile.html';
-                    }
+                if (hasAuthToClientParams) {
+                    // Если параметры есть — перенаправляем на auth-to-client.html с ними
+                    const authToClientUrl = new URL('/pages/auth-to-client.html', window.location.origin);
+                    Object.keys(params).forEach(key => {
+                        authToClientUrl.searchParams.append(key, params[key]);
+                    });
+                    window.location.href = authToClientUrl.toString();
                 } else {
-                    const errorData = await response.json();
-                    alert(`Ошибка входа: ${errorData.detail || 'Неизвестная ошибка'}`);
+                    // Если параметров нет — перенаправляем на профиль
+                    window.location.href = '/pages/profile.html';
                 }
-            } catch (error) {
-                alert(`Ошибка отправки запроса: ${error.message}`);
+            } else {
+                // Обрабатываем ошибку 500 с Invalid credentials
+                if (response.status === 403) {
+                    alert("Неправильный email или пароль. Пожалуйста, проверьте введенные данные.");
+                } else {
+                    // Обработка других ошибок
+                    alert(`Ошибка входа: ${responseData.detail || responseData.error?.title || 'Неизвестная ошибка'}`);
+                }
             }
+        } catch (error) {
+            alert(`Ошибка отправки запроса: ${error.message}`);
+        }
         });
     });
 </script>

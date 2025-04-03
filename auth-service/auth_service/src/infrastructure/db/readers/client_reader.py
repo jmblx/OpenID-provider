@@ -1,17 +1,15 @@
 import logging
-import typing
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from application.common.interfaces.role_repo import RoleRepository
 from application.common.views.client_view import ClientView, ClientsIdsData
-from application.common.views.role_view import RoleViewWithId
 from domain.entities.client.model import Client
 from domain.entities.client.value_objects import ClientID
 from domain.exceptions.client import ClientNotFound
 from infrastructure.db.models import client_table
-from application.common.interfaces.client_reader import (
+from application.client.common.client_reader import (
     ClientReader,
     ClientAuthData,
 )

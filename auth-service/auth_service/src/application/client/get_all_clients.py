@@ -1,12 +1,8 @@
 from logging import getLogger
 
-from application.common.interfaces.client_reader import ClientReader
+from application.client.common.client_reader import ClientReader
 from application.common.views.client_view import ClientsIdsData
 from domain.entities.client.value_objects import ClientID
-
-
-# @dataclass
-# class GetAllClientsIdsQuery:
 
 
 logger = getLogger(__name__)

@@ -1,8 +1,8 @@
 from dishka import Provider, Scope, provide
 
-from application.common.interfaces.client_repo import ClientRepository
+from application.client.common.client_repo import ClientRepository
 from application.common.interfaces.role_repo import RoleRepository
-from application.common.interfaces.rs_repo import ResourceServerRepository
+from application.resource_server.common.rs_repo import ResourceServerRepository
 from application.common.interfaces.user_repo import UserRepository
 from infrastructure.db.repositories.client_repo_impl import (
     ClientRepositoryImpl,

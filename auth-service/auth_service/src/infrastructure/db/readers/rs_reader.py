@@ -4,9 +4,9 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from application.common.interfaces.role_repo import RoleRepository
-from application.common.interfaces.rs_reader import ResourceServerData, ResourceServerReader
+from application.resource_server.common.rs_reader import ResourceServerData, ResourceServerReader
 from application.common.views.role_view import RoleViewWithId
-from application.common.views.rs_view import ResourceServerView
+from application.common.views.rs_view import ResourceServerView, ResourceServerIdsData
 from domain.entities.resource_server.model import ResourceServer
 from domain.entities.resource_server.value_objects import ResourceServerID, ResourceServerType
 from domain.exceptions.resource_server import ResourceServerNotFoundError
@@ -48,3 +48,15 @@ class ResourceServerReaderImpl(ResourceServerReader):
                     for role in resource_server_roles
                 ]
         return resource_server_data
+
+    async def read_all_resource_server_ids_data(
+        self,
+    ) -> dict[ResourceServerID, ResourceServerIdsData]:
+        query = select(ResourceServer.id, ResourceServer.name)
+        data = await self.session.execute(query)
+        resource_servers_data = data.mappings().all()
+        result = {
+            resource_server["id"]: ResourceServerIdsData(name=resource_server["name"])
+            for resource_server in resource_servers_data
+        }
+        return result
