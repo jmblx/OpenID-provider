@@ -167,7 +167,7 @@ def upgrade() -> None:
                     'id': uuid4(),
                     'email': email.strip(),
                     'is_email_confirmed': True,
-                    'hashed_password': pwd_hasher.hash_password(RawPassword(password.strip())),
+                    'hashed_password': pwd_hasher.hash_password(RawPassword(password.strip())).value,
                     'avatar_path': None,
                     'is_admin': True
                 }
