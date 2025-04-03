@@ -282,15 +282,15 @@ services:
       - loki
     logging: *default-logging
 
-  #  certbot:
-#    image: certbot/certbot:latest
-#    container_name: certbot
-#    volumes:
-#      - ./certbot/www:/var/www/certbot:rw
-#      - ./certbot/conf:/etc/letsencrypt:rw
-#    entrypoint: /bin/sh -c 'trap exit TERM; while :; do sleep 6h & wait $!; done'
-#    networks:
-#      - custom
+  certbot:
+    image: certbot/certbot:latest
+    container_name: certbot
+    volumes:
+      - ./certbot/www:/var/www/certbot:rw
+      - ./certbot/conf:/etc/letsencrypt:rw
+    entrypoint: /bin/sh -c 'trap exit TERM; while :; do sleep 6h & wait $!; done'
+    networks:
+      - custom
 
 #  investments_service:
 #    env_file:
