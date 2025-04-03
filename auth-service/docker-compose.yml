@@ -164,7 +164,7 @@ services:
       - backend_service.minio.network
 
   nginx:
-    image: custom-openresty-jwt
+    image: menoitami/custom-openresty-jwt
     container_name: nginx_app
     ports:
       - "80:80"
