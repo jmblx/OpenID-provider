@@ -238,7 +238,7 @@
 
         async function fetchRSData(rsId) {
             try {
-                const response = await fetch(`/api/rs/${rsId}`);
+                const response = await fetch(`//menoitami.ru/api/rs/${rsId}`);
                 if (!response.ok) throw new Error("Ошибка загрузки данных");
                 return await response.json();
             } catch (error) {
@@ -556,7 +556,7 @@
 
                 if (isCreateMode || !rsId) {
                     // Создание нового ресурсного сервера
-                    response = await fetch("/api/rs", {
+                    response = await fetch("//menoitami.ru/api/rs", {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify(requestData)
@@ -572,7 +572,7 @@
                     }
                 } else {
                     // Обновление существующего ресурсного сервера
-                    response = await fetch(`/api/rs/${rsId}`, {
+                    response = await fetch(`//menoitami.ru/api/rs/${rsId}`, {
                         method: "PUT",
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify(requestData)
@@ -692,7 +692,7 @@
             };
 
             try {
-                const response = await fetch(`/api/role/${roleId}`, {
+                const response = await fetch(`//menoitami.ru/api/role/${roleId}`, {
                     method: "PUT",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify(requestData)
@@ -728,7 +728,7 @@
             if (!confirm("Вы уверены, что хотите удалить эту роль?")) return;
 
             try {
-                const response = await fetch(`/api/role/${roleId}`, {
+                const response = await fetch(`//menoitami.ru/api/role/${roleId}`, {
                     method: "DELETE"
                 });
 
@@ -837,7 +837,7 @@
             };
 
             try {
-                const response = await fetch("/api/role", {
+                const response = await fetch("//menoitami.ru/api/role", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify(requestData)
