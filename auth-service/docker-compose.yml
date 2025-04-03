@@ -290,7 +290,7 @@ services:
       - ./certbot/conf:/etc/letsencrypt:rw
     entrypoint: /bin/sh -c 'trap exit TERM; while :; do sleep 6h & wait $!; done'
     networks:
-      - custom
+      - backend_service.minio.network
 
 #  investments_service:
 #    env_file:
