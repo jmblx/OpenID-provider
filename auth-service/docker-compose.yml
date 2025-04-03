@@ -57,7 +57,7 @@ services:
 #    build:
 #      context: auth_service
 #      dockerfile: Dockerfile
-    image: backend_service.auth_service
+    image: menoitami/backend_service.auth_service
     command: [ "sh", "/backend-service.auth_service/docker/serve.sh" ]
     expose:
       - 8000
@@ -98,7 +98,7 @@ services:
     env_file:
       - notification/.env-prod
       - .env-prod # для удобства в этом файле первостепенно в проде скорее всего лучше по 1 файлу указывать
-    image: backend_service.notification_app
+    image: menoitami/backend_service.notification_app
 #    build:
 #      context: notification/
     command: [ "sh", "/notification_app/docker/app.sh" ]
@@ -110,7 +110,7 @@ services:
   db_migration:
     profiles: [ "setup", "migration" ]
     container_name: backend_service.db_migration
-    image: backend_service.auth_service
+    image: menoitami/backend_service.auth_service
     restart: on-failure
     depends_on:
       db:
