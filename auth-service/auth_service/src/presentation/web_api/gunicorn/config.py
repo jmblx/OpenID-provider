@@ -17,5 +17,7 @@ class GunicornConfig:
     bind: str = "0.0.0.0:8000"
     workers: int = 2
     timeout: int = 30
-    # logger_class: Type = GunicornLoggingConfig
     worker_class: str = "uvicorn.workers.UvicornWorker"
+    proxy_protocol: bool = True  # Добавьте это
+    proxy_allow_ips: str = "*"   # И это
+    forwarded_allow_ips: str = "*"  # Критически важно!
