@@ -30,4 +30,4 @@ class UpdateClientModel(BaseModel):
     name: str | None
     base_url: str | None
     allowed_redirect_urls: list[str] | None
-    client_type: ClientTypeEnum | None
+    type: ClientTypeEnum | None
