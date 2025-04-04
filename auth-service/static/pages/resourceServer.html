@@ -521,7 +521,7 @@
             document.getElementById("save-rs-btn").classList.toggle("hidden", !hasChanges);
         }
 
-        async function saveRS() {
+       async function saveRS() {
             const newName = document.getElementById("rs-name-input").value;
             const newType = document.getElementById("rs-type-select").value;
 
@@ -529,25 +529,15 @@
             if (newType === "RS_CONTROLLED" && currentRsType !== "RS_CONTROLLED") {
                 const confirmChange = confirm("При смене типа на 'Управляется ресурсным сервером' все роли станут неактивными (но не будут удалены). Вы не сможете добавлять или редактировать роли. Продолжить?");
                 if (!confirmChange) {
-                    // Возвращаем предыдущее значение
                     document.getElementById("rs-type-select").value = currentRsType || "RBAC_BY_AS";
                     checkRSChanges();
                     return;
                 }
-
-                // Делаем роли недоступными для редактирования
                 disableRolesSection();
             }
-            // Если меняем обратно на RBAC_BY_AS
             else if (newType === "RBAC_BY_AS" && currentRsType === "RS_CONTROLLED" && rolesDisabled) {
-                // Возвращаем возможность редактирования ролей
                 enableRolesSection();
             }
-
-            const requestData = {
-                new_name: newName,
-                new_type: newType
-            };
 
             try {
                 let response;
@@ -555,11 +545,14 @@
                 let rsId = params.get("rsId");
 
                 if (isCreateMode || !rsId) {
-                    // Создание нового ресурсного сервера
+                    // POST запрос - создание нового ресурсного сервера
                     response = await fetch("https://menoitami.ru/api/rs", {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify(requestData)
+                        body: JSON.stringify({
+                            name: newName,  // Для POST используем просто name
+                            type: newType   // и type
+                        })
                     });
 
                     if (response.ok) {
@@ -571,30 +564,26 @@
                         document.body.classList.remove('create-mode');
                     }
                 } else {
-                    // Обновление существующего ресурсного сервера
+                    // PUT запрос - обновление существующего ресурсного сервера
                     response = await fetch(`https://menoitami.ru/api/rs/${rsId}`, {
                         method: "PUT",
                         headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify(requestData)
+                        body: JSON.stringify({
+                            new_name: newName,  // Для PUT используем new_name
+                            new_type: newType   // и new_type
+                        })
                     });
                 }
 
-                if (!response.ok) {
-                    throw new Error(`Ошибка сохранения: статус ${response.status}`);
-                }
+                if (!response.ok) throw new Error(`Ошибка сохранения: статус ${response.status}`);
 
                 alert(isCreateMode ? "Ресурсный сервер успешно создан!" : "Данные ресурсного сервера успешно обновлены!");
 
                 if (isCreateMode) {
-                    // После создания переходим в режим редактирования
                     const newRS = await response.json();
                     currentRsType = newType;
-                    initialRSData = {
-                        name: newName,
-                        type: newType
-                    };
+                    initialRSData = { name: newName, type: newType };
 
-                    // Загружаем данные только что созданного RS
                     const rsData = await fetchRSData(newRS.rs_id);
                     if (rsData) {
                         initialRolesData = [...(rsData.roles || [])];
@@ -609,14 +598,9 @@
 
                     document.getElementById("rs-name").textContent = `Ресурсный сервер: ${newName}`;
                 } else {
-                    // Обновляем начальные данные
-                    initialRSData = {
-                        name: newName,
-                        type: newType
-                    };
+                    initialRSData = { name: newName, type: newType };
                     currentRsType = newType;
 
-                    // Обновляем список ролей (на случай, если изменился тип)
                     const rsData = await fetchRSData(rsId);
                     if (rsData) {
                         initialRolesData = [...(rsData.roles || [])];
@@ -628,18 +612,15 @@
                     }
                 }
 
-                // Скрываем кнопку сохранения
                 document.getElementById("save-rs-btn").classList.add("hidden");
             } catch (error) {
                 console.error(error);
                 alert(`Ошибка ${isCreateMode ? 'создания' : 'обновления'} ресурсного сервера: ${error.message}`);
 
-                // В случае ошибки возвращаем предыдущее значение
                 if (!isCreateMode) {
                     document.getElementById("rs-type-select").value = currentRsType;
                     checkRSChanges();
 
-                    // Если нужно, возвращаем возможность редактирования ролей
                     if (rolesDisabled && newType === "RBAC_BY_AS") {
                         enableRolesSection();
                     }

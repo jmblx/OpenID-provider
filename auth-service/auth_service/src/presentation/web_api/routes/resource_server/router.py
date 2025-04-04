@@ -19,7 +19,7 @@ from presentation.web_api.routes.resource_server.models import ResourceServerVie
 
 rs_router = APIRouter(route_class=DishkaRoute, tags=["resource_server"], prefix="/rs")
 
-@rs_router.post("/")
+@rs_router.post("")
 async def register_rs(
     command: RegisterResourceServerCommand,
     handler: FromDishka[RegisterResourceServerHandler],

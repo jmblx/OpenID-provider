@@ -59,7 +59,6 @@ async def code_to_token(
     return response
 
 
-
 @auth_router.post("/auth-to-client")
 async def auth_to_client(handler: FromDishka[GetMeDataHandler], command: GetMePageDataSchema) -> MeData:
     command_data = GetMeDataCommand(

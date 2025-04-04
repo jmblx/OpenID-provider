@@ -20,7 +20,7 @@ from presentation.web_api.routes.role.schemas import UpdateRole
 role_router = APIRouter(route_class=DishkaRoute, tags=["role"], prefix="/role")
 
 
-@role_router.post("/")
+@role_router.post("")
 async def create_role(
     command: CreateRoleCommand, handler: FromDishka[CreateRoleHandler]
 ) -> ORJSONResponse:

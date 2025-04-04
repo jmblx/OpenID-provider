@@ -42,7 +42,7 @@ from presentation.web_api.routes.client.models import (
 client_router = APIRouter(prefix="/client", route_class=DishkaRoute, tags=["client"])
 
 
-@client_router.post("/")
+@client_router.post("")
 async def create_client(
     command: RegisterClientCommand, handler: FromDishka[RegisterClientHandler]
 ) -> ClientCreateDTO:
