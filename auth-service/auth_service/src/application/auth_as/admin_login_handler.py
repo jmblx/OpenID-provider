@@ -1,5 +1,4 @@
 import secrets
-import uuid
 from dataclasses import dataclass
 
 from application.auth_as.common.admin_settings import AdminSettings

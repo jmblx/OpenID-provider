@@ -178,7 +178,6 @@
         window.location.href = profileUrl.toString();
     }
 
-    // Инициализация
     document.addEventListener('DOMContentLoaded', () => {
         const profileLink = document.getElementById('profile-link');
         profileLink.addEventListener('click', goToProfilePage);
@@ -218,12 +217,15 @@
         .then(data => {
             displayUserData(data);
         })
-        .catch(() => {
+        .catch(e => {
+            /*
             const loginUrl = new URL('/pages/login.html', window.location.origin);
             Object.keys(queryParams).forEach(key => {
                 loginUrl.searchParams.append(key, queryParams[key]);
             });
             window.location.href = loginUrl.toString();
+            */
+            console.log(e); // Выводим ошибку в консоль
         });
 
         function displayUserData(data) {

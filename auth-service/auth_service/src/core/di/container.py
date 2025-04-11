@@ -16,8 +16,6 @@ from core.di.providers.services import (
 from core.di.providers.settings import SettingsProvider
 from core.di.providers.uow import UowProvider
 
-# from core.di.providers.usecases import UseCaseProvider
-
 
 prod_provders = [
     DBProvider(),
