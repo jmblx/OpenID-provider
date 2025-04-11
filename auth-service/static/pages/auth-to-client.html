@@ -124,9 +124,7 @@
 
         if (response.status === 401) {
             // Перенаправляем на страницу входа при ошибке авторизации
-            const loginUrl = new URL('/login', window.location.origin);
-            loginUrl.search = window.location.search; // Сохраняем параметры
-            window.location.href = loginUrl.toString();
+            console.log(response)
             return;
         }
 
@@ -219,11 +217,7 @@
         })
         .catch(e => {
             /*
-            const loginUrl = new URL('/pages/login.html', window.location.origin);
-            Object.keys(queryParams).forEach(key => {
-                loginUrl.searchParams.append(key, queryParams[key]);
-            });
-            window.location.href = loginUrl.toString();
+
             */
             console.log(e); // Выводим ошибку в консоль
         });
