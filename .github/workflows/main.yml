@@ -22,11 +22,11 @@ jobs:
 
       - name: Build Docker image
         run: |
-          cd ./auth-service/auth_service && docker build -t backend_service.api:latest .
+          cd ./auth-service/auth_service && docker build -t menoitami/backend_service.api:latest .
 
       - name: Push Docker image to Docker Hub
         run: |
-          docker push menoitami/auth_service:latest
+          docker push menoitami/backend_service.api:latest
 
   deploy:
     runs-on: ubuntu-latest
@@ -35,8 +35,8 @@ jobs:
       - name: Deploy
         uses: appleboy/ssh-action@master
         with:
-          host: ${{ secrets.HOST }}
-          username: ${{ secrets.USERNAME }}
+          host: ${{ secrets.HOST_IP }}
+          username: ${{ secrets.USER_NAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
           script: |
