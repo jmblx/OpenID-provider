@@ -30,10 +30,10 @@ class ClientTokenCreationServiceImpl(ClientTokenCreationService):
             payload=jwt_payload,
             expire_minutes=self.jwt_settings.access_token_expire_minutes,
         )
-        return ClientAccessToken(encoded_token["token"])
+        return ClientAccessToken(encoded_token["code"])
 
     async def create_client_refresh_token(
-        self, user_id: UUID, fingerprint: Fingerprint, client_id: int, rs_ids: list[int]
+        self, user_id: UUID, client_id: int, rs_ids: list[int]
     ) -> ClientRefreshTokenWithData:
         jti = str(uuid4())
         jwt_payload = {"sub": str(user_id), "jti": jti, "client_id": client_id, "rs_ids": rs_ids}
@@ -44,10 +44,9 @@ class ClientTokenCreationServiceImpl(ClientTokenCreationService):
             ),
         )
         refresh_token_data = ClientRefreshTokenWithData(
-            token=encoded_token["token"],  # type: ignore
+            token=encoded_token["code"],  # type: ignore
             user_id=user_id,
             jti=jti,
-            fingerprint=fingerprint,
             created_at=encoded_token["created_at"],
         )
         return refresh_token_data

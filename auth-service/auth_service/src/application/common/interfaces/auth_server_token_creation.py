@@ -4,7 +4,7 @@ from uuid import UUID
 from application.common.auth_server_token_types import (
     AccessToken,
     Fingerprint,
-    RefreshTokenWithData,
+    AuthServerRefreshTokenWithData,
 )
 from domain.entities.user.model import User
 
@@ -21,5 +21,5 @@ class AuthServerTokenCreationService(ABC):
     @abstractmethod
     async def create_auth_server_refresh_token(
         self, user_id: UUID, fingerprint: Fingerprint
-    ) -> RefreshTokenWithData:
+    ) -> AuthServerRefreshTokenWithData:
         """Создание RefreshToken."""

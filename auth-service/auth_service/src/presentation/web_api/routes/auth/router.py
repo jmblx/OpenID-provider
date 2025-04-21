@@ -42,10 +42,9 @@ async def login(
 @auth_router.post("/code-to-token")
 async def code_to_token(
     handler: FromDishka[CodeToTokenHandler],
-    fingerprint: FromDishka[Fingerprint],
     command: CodeToTokenCommand,
 ) -> ORJSONResponse:
-    response_data = await handler.handle(command, fingerprint)
+    response_data = await handler.handle(command)
     logger.info("response_data: %s", response_data)
     tokens = {
         "access_token": "",

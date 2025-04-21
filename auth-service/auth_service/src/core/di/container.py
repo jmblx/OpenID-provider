@@ -10,8 +10,6 @@ from core.di.providers.redis_provider import RedisProvider
 from core.di.providers.repositories import RepositoriesProvider
 from core.di.providers.services import (
     ServiceProvider,
-    ClientTokenProvider,
-    AuthServerTokenProvider,
 )
 from core.di.providers.settings import SettingsProvider
 from core.di.providers.uow import UowProvider
@@ -30,8 +28,6 @@ prod_provders = [
     ReaderProvider(),
     PresentationProvider(),
     NatsProvider(),
-    ClientTokenProvider(),
-    AuthServerTokenProvider(),
 ]
 
 container = make_async_container(*prod_provders)

@@ -11,11 +11,12 @@ def setup_middlewares(app: FastAPI):
         add_metrics_middleware(app)
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=["https://menoitami.ru"],  # или "*" для разработки
+        # allow_origins=["https://menoitami.ru"],  # или "*" для разработки
+        allow_origins=["*"],
         allow_methods=["*"],
         allow_headers=["*"],
     )
-    app.add_middleware(
-        TrustedHostMiddleware,
-        allowed_hosts=["menoitami.ru"]
-    )
+    # app.add_middleware(
+    #     TrustedHostMiddleware,
+    #     allowed_hosts=["menoitami.ru"]
+    # )

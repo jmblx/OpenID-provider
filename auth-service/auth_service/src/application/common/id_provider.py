@@ -1,21 +1,19 @@
 import logging
 from abc import ABC, abstractmethod
-from typing import Annotated
 from uuid import UUID
 
-from dishka import FromComponent
 from fastapi import HTTPException
 from starlette import status
 
 from application.common.client_token_types import ClientAccessToken, ClientRefreshToken
 from application.common.interfaces.jwt_service import JWTService
 from application.common.interfaces.user_repo import UserRepository
-from application.common.interfaces.white_list import TokenWhiteListService
 from application.common.auth_server_token_types import (
     AccessToken,
     RefreshToken,
     Fingerprint,
 )
+from application.common.interfaces.white_list import AuthServerTokenWhitelistService, ClientTokenWhitelistService
 from domain.entities.client.value_objects import ClientID
 from domain.entities.resource_server.value_objects import ResourceServerID
 from domain.entities.user.model import User
@@ -59,7 +57,7 @@ class UserIdentityProviderImpl(UserIdentityProvider, BaseTokenProvider):
         refresh_token: RefreshToken,
         jwt_service: JWTService,
         user_repo: UserRepository,
-        token_whitelist_service: Annotated[TokenWhiteListService, FromComponent("auth_server")],
+        token_whitelist_service: AuthServerTokenWhitelistService,
         fingerprint: Fingerprint,
     ):
         super().__init__(jwt_service)
@@ -78,11 +76,11 @@ class UserIdentityProviderImpl(UserIdentityProvider, BaseTokenProvider):
     async def get_current_user_id(self) -> UserID:
         jti = self._get_refresh_token_jti()
         token_data = await self.token_whitelist_service.get_refresh_token_data(jti)
-        logger.info("token data: %s", token_data)
+        logger.info("code data: %s", token_data)
         if not token_data or token_data.fingerprint != self.fingerprint:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Invalid refresh token or fingerprint",
+                detail="Invalid refresh code or fingerprint",
             )
         return UserID(token_data.user_id)
 
@@ -98,7 +96,7 @@ class ClientIdentityProviderImpl(ClientIdentityProvider, BaseTokenProvider):
         client_refresh_token: ClientRefreshToken,
         jwt_service: JWTService,
         user_repo: UserRepository,
-        token_whitelist_service: Annotated[TokenWhiteListService, FromComponent("client")],
+        token_whitelist_service: ClientTokenWhitelistService,
         fingerprint: Fingerprint,
     ):
         super().__init__(jwt_service)
@@ -123,12 +121,7 @@ class ClientIdentityProviderImpl(ClientIdentityProvider, BaseTokenProvider):
     async def get_current_user_id(self) -> UserID:
         jti = self._get_refresh_token_jti()
         token_data = await self.token_whitelist_service.get_refresh_token_data(jti)
-        logger.info("token data: %s", token_data)
-        if not token_data or token_data.fingerprint != self.fingerprint:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Invalid refresh token or fingerprint",
-            )
+        logger.info("code data: %s", token_data)
         return UserID(token_data.user_id)
 
     async def get_current_user(self) -> User:

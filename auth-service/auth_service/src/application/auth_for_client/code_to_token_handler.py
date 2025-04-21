@@ -62,7 +62,7 @@ class CodeToTokenHandler:
         return user_code_challenger == real_code_challenger
 
     async def handle(
-        self, command: CodeToTokenCommand, fingerprint: Fingerprint
+        self, command: CodeToTokenCommand
     ) -> CodeToTokenResponse:
         auth_code_data: AuthCodeData = await self.auth_code_storage.retrieve_auth_code_data(
             command.auth_code
@@ -107,7 +107,7 @@ class CodeToTokenHandler:
             )
         )
         tokens = await self.auth_service.create_and_save_tokens(
-            user, user_scopes, client_id, rs_ids, fingerprint,
+            user, user_scopes, client_id, rs_ids
         )
         await self.auth_code_storage.delete_auth_code_data(command.auth_code)
         result.update(**tokens)

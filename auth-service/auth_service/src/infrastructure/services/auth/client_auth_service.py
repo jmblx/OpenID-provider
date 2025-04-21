@@ -1,15 +1,11 @@
-from typing import Annotated
 from uuid import UUID
 
-from dishka import FromComponent
-
-from application.common.auth_server_token_types import Fingerprint, AuthServerAccessTokenPayload
+from application.common.auth_server_token_types import Fingerprint
 from application.common.client_token_types import ClientRefreshToken, ClientAccessTokenPayload, ClientTokens
-from application.common.exceptions import FingerprintMismatchException
 from application.common.interfaces.client_token_creation import ClientTokenCreationService
 from application.common.interfaces.http_auth import HttpClientService
 from application.common.interfaces.jwt_service import JWTService
-from application.common.interfaces.white_list import TokenWhiteListService
+from application.common.interfaces.white_list import ClientTokenWhitelistService
 from application.common.services.auth_code import AuthorizationCodeStorage
 from domain.entities.user.model import User
 from infrastructure.services.auth.config import JWTSettings
@@ -20,9 +16,7 @@ class HttpClientServiceImpl(HttpClientService):
         self,
         jwt_service: JWTService,
         token_creation_service: ClientTokenCreationService,
-        token_whitelist_service: Annotated[
-            TokenWhiteListService, FromComponent("client")
-        ],
+        token_whitelist_service: ClientTokenWhitelistService,
         jwt_settings: JWTSettings,
         auth_code_storage: AuthorizationCodeStorage,
         fingerprint: Fingerprint,
@@ -43,14 +37,10 @@ class HttpClientServiceImpl(HttpClientService):
         await self.token_whitelist_service.remove_token(jti)
 
     async def invalidate_other_tokens(
-        self, refresh_token: ClientRefreshToken, fingerprint: Fingerprint
+        self, refresh_token: ClientRefreshToken
     ) -> None:
         payload: ClientAccessTokenPayload = self.jwt_service.decode(refresh_token)
         jti = payload["jti"]
-        if not await self.token_whitelist_service.is_fingerprint_matching(
-            jti, fingerprint
-        ):
-            raise FingerprintMismatchException()
         user_id: UUID = payload["sub"]  # type: ignore
         await self.token_whitelist_service.remove_tokens_except_current(
             jti, user_id
@@ -62,11 +52,8 @@ class HttpClientServiceImpl(HttpClientService):
         user_scopes: list[str],
         client_id: int,
         rs_ids: list[int] | None,
-        fingerprint: Fingerprint | None = None,
     ) -> ClientTokens:
         """Создаёт и сохраняет токены."""
-        if not fingerprint:
-            fingerprint = self.fingerprint
         user_id: UUID = user.id.value
         access_token = (
             self.token_creation_service.create_client_access_token(
@@ -75,7 +62,7 @@ class HttpClientServiceImpl(HttpClientService):
         )
         refresh_token_data = (
             await self.token_creation_service.create_client_refresh_token(
-                user_id, fingerprint, client_id, rs_ids
+                user_id, client_id, rs_ids
             )
         )
         await (

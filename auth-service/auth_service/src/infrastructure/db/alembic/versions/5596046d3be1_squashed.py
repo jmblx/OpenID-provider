@@ -142,7 +142,6 @@ def upgrade() -> None:
         sa.PrimaryKeyConstraint('id')
     )
 
-    # Добавляем создание администраторов
     bind = op.get_bind()
     admin_settings = AdminSettings()
 

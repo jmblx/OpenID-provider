@@ -3,7 +3,7 @@ from datetime import timedelta
 
 from application.common.interfaces.jwt_service import JWTService
 from application.common.interfaces.auth_server_token_creation import AuthServerTokenCreationService
-from application.common.auth_server_token_types import AccessToken, RefreshTokenWithData
+from application.common.auth_server_token_types import AccessToken, AuthServerRefreshTokenWithData
 from uuid import uuid4, UUID
 
 from infrastructure.services.auth.config import JWTSettings
@@ -28,11 +28,11 @@ class AuthServerTokenCreationServiceImpl(AuthServerTokenCreationService):
             payload=jwt_payload,
             expire_minutes=self.jwt_settings.access_token_expire_minutes,
         )
-        return AccessToken(encoded_token["token"])
+        return AccessToken(encoded_token["code"])
 
     async def create_auth_server_refresh_token(
         self, user_id: UUID, fingerprint: str
-    ) -> RefreshTokenWithData:
+    ) -> AuthServerRefreshTokenWithData:
         jti = str(uuid4())
         jwt_payload = {"sub": str(user_id), "jti": jti}
         encoded_token = self.jwt_service.encode(
@@ -41,8 +41,8 @@ class AuthServerTokenCreationServiceImpl(AuthServerTokenCreationService):
                 days=self.jwt_settings.refresh_token_expire_days
             ),
         )
-        refresh_token_data = RefreshTokenWithData(
-            token=encoded_token["token"],
+        refresh_token_data = AuthServerRefreshTokenWithData(
+            token=encoded_token["code"],
             user_id=user_id,
             jti=jti,
             fingerprint=fingerprint,

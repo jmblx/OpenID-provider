@@ -54,9 +54,9 @@ services:
     container_name: backend_service.api
     env_file:
       - .env-prod
-#    build:
-#      context: auth_service
-#      dockerfile: Dockerfile
+    #    build:
+    #      context: auth_service
+    #      dockerfile: Dockerfile
     image: menoitami/backend_service.api
     command: [ "sh", "/backend-service.auth_service/docker/serve.sh" ]
     expose:
@@ -82,7 +82,7 @@ services:
       - "8000:8000"
     volumes:
       - ./certs:/backend-service.auth_service/certs
-#    logging: *default-logging
+  #    logging: *default-logging
 
   nats:
     image: nats
@@ -97,7 +97,8 @@ services:
   notification_app:
     env_file:
       - notification/.env-prod
-      - .env-prod # для удобства в этом файле первостепенно в проде скорее всего лучше по 1 файлу указывать
+      - .env-prod
+#    image: backend_service.notification_app
     image: menoitami/backend_service.notification_app
 #    build:
 #      context: notification/

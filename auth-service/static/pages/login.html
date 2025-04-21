@@ -54,6 +54,7 @@
         .form-group {
             position: relative;
             margin-bottom: 25px;
+            width: 100%;
         }
 
         label {
@@ -94,6 +95,49 @@
             color: #007bff;
             text-decoration: none;
         }
+
+        .forgot-password {
+            display: block;
+            margin-top: 10px;
+            font-size: 14px;
+            color: #6c757d;
+            text-decoration: none;
+        }
+
+        .code-inputs {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .code-inputs input {
+            width: 40px;
+            height: 50px;
+            text-align: center;
+            font-size: 18px;
+            margin: 0 5px;
+        }
+
+        .modal-footer {
+            justify-content: space-between;
+        }
+
+        .progress {
+            height: 5px;
+            margin-bottom: 20px;
+        }
+
+        .progress-bar {
+            transition: width 0.3s;
+        }
+
+        .step {
+            display: none;
+        }
+
+        .step.active {
+            display: block;
+        }
     </style>
 </head>
 <body>
@@ -113,103 +157,319 @@
             </form>
             <div class="link text-center">
                 <a href="#" id="register-link">Нет аккаунта? Зарегистрироваться</a>
+                <a href="#" class="forgot-password" data-bs-toggle="modal" data-bs-target="#forgotPasswordModal">Забыли пароль?</a>
             </div>
         </div>
     </div>
 
-<script>
-    async function generateFingerprint() {
-        const navigatorData = {
-            userAgent: navigator.userAgent,
-            platform: navigator.platform,
-            language: navigator.language,
-            screenResolution: `${window.screen.width}x${window.screen.height}`,
-            timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-        };
-        const encoder = new TextEncoder();
-        const dataBuffer = encoder.encode(JSON.stringify(navigatorData));
-        const hashBuffer = await crypto.subtle.digest('SHA-256', dataBuffer);
-        const hashArray = Array.from(new Uint8Array(hashBuffer));
-        return hashArray.map(byte => byte.toString(16).padStart(2, '0')).join('');
-    }
+    <div class="modal fade" id="forgotPasswordModal" tabindex="-1" aria-labelledby="forgotPasswordModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="forgotPasswordModalLabel">Восстановление пароля</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="progress">
+                        <div class="progress-bar" id="resetProgress" role="progressbar" style="width: 33%"></div>
+                    </div>
 
-    document.addEventListener('DOMContentLoaded', async function () {
-        const fingerprint = await generateFingerprint();
-        localStorage.setItem('deviceFingerprint', fingerprint);
-        console.log('Device Fingerprint:', fingerprint);
+                    <div class="step step1 active">
+                        <p>Введите email, указанный при регистрации. Мы отправим вам код подтверждения.</p>
+                        <div class="form-group">
+                            <label for="resetEmail">Электронная почта</label>
+                            <input type="email" class="form-control" id="resetEmail" placeholder="Ваш email">
+                        </div>
+                    </div>
 
-        const urlParams = new URLSearchParams(window.location.search);
-        const params = {};
-        for (let [key, value] of urlParams.entries()) {
-            params[key] = value;
+                    <div class="step step2">
+                        <p>Мы отправили 6-значный код на вашу почту. Введите его ниже.</p>
+                        <div class="code-inputs">
+                            <input type="text" maxlength="1" class="code-input" data-index="1">
+                            <input type="text" maxlength="1" class="code-input" data-index="2">
+                            <input type="text" maxlength="1" class="code-input" data-index="3">
+                            <input type="text" maxlength="1" class="code-input" data-index="4">
+                            <input type="text" maxlength="1" class="code-input" data-index="5">
+                            <input type="text" maxlength="1" class="code-input" data-index="6">
+                        </div>
+                    </div>
+
+                    <div class="step step3">
+                        <p>Придумайте новый пароль для вашего аккаунта.</p>
+                        <div class="form-group">
+                            <label for="newPassword">Новый пароль</label>
+                            <input type="password" class="form-control" id="newPassword" placeholder="Новый пароль">
+                        </div>
+                        <div class="form-group">
+                            <label for="confirmPassword">Подтвердите пароль</label>
+                            <input type="password" class="form-control" id="confirmPassword" placeholder="Повторите пароль">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" id="cancelResetBtn">Отмена</button>
+                    <button type="button" class="btn btn-primary" id="nextStepBtn">Далее</button>
+                    <button type="button" class="btn btn-success" id="completeResetBtn" style="display: none;">Завершить</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        async function generateFingerprint() {
+            const navigatorData = {
+                userAgent: navigator.userAgent,
+                platform: navigator.platform,
+                language: navigator.language,
+                screenResolution: `${window.screen.width}x${window.screen.height}`,
+                timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+            };
+            const encoder = new TextEncoder();
+            const dataBuffer = encoder.encode(JSON.stringify(navigatorData));
+            const hashBuffer = await crypto.subtle.digest('SHA-256', dataBuffer);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            return hashArray.map(byte => byte.toString(16).padStart(2, '0')).join('');
         }
 
-        const registerLink = document.getElementById('register-link');
-        const registerUrl = new URL('/pages/register.html', window.location.origin);
-        Object.keys(params).forEach(key => {
-            registerUrl.searchParams.append(key, params[key]);
-        });
-        registerLink.href = registerUrl.toString();
+        document.addEventListener('DOMContentLoaded', async function () {
+            const fingerprint = await generateFingerprint();
+            localStorage.setItem('deviceFingerprint', fingerprint);
+            console.log('Device Fingerprint:', fingerprint);
 
-        document.getElementById('loginButton').addEventListener('click', async function () {
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-
-            // Получаем параметры из URL (если есть)
             const urlParams = new URLSearchParams(window.location.search);
             const params = {};
-            for (const [key, value] of urlParams.entries()) {
+            for (let [key, value] of urlParams.entries()) {
                 params[key] = value;
             }
 
-            const payload = {
-                email: email,
-                password: password,
-                fingerprint: fingerprint,
-                ...params // Добавляем параметры из URL в тело запроса (если нужно)
-            };
-        try {
-            const response = await fetch('/api/login', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-Device-Fingerprint': fingerprint,
-                },
-                credentials: 'include', // Для отправки кук
-                body: JSON.stringify(payload)
+            const registerLink = document.getElementById('register-link');
+            const registerUrl = new URL('/pages/register.html', window.location.origin);
+            Object.keys(params).forEach(key => {
+                registerUrl.searchParams.append(key, params[key]);
+            });
+            registerLink.href = registerUrl.toString();
+
+            document.getElementById('loginButton').addEventListener('click', async function () {
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
+
+                const payload = {
+                    email: email,
+                    password: password,
+                    fingerprint: fingerprint,
+                    ...params
+                };
+
+                try {
+                    const response = await fetch('/api/login', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-Device-Fingerprint': fingerprint,
+                        },
+                        credentials: 'include',
+                        body: JSON.stringify(payload)
+                    });
+
+                    const responseData = await response.json();
+
+                    if (response.ok) {
+                        const hasAuthToClientParams = params.client_id && params.required_resources && params.redirect_url;
+
+                        if (hasAuthToClientParams) {
+                            const authToClientUrl = new URL('/pages/auth-to-client.html', window.location.origin);
+                            Object.keys(params).forEach(key => {
+                                authToClientUrl.searchParams.append(key, params[key]);
+                            });
+                            window.location.href = authToClientUrl.toString();
+                        } else {
+                            window.location.href = '/pages/profile.html';
+                        }
+                    } else {
+                        if (response.status === 403) {
+                            alert("Неправильный email или пароль. Пожалуйста, проверьте введенные данные.");
+                        } else {
+                            alert(`Ошибка входа: ${responseData.detail || responseData.error?.title || 'Неизвестная ошибка'}`);
+                        }
+                    }
+                } catch (error) {
+                    alert(`Ошибка отправки запроса: ${error.message}`);
+                }
             });
 
-            const responseData = await response.json(); // Всегда парсим JSON, даже при ошибке
+            const modal = new bootstrap.Modal(document.getElementById('forgotPasswordModal'));
+            let currentStep = 1;
+            let resetToken = null;
+            let resetEmail = '';
 
-            if (response.ok) {
-                // Проверяем, есть ли обязательные параметры для auth-to-client
-                const hasAuthToClientParams = params.client_id && params.required_resources && params.redirect_url;
+            const nextStepBtn = document.getElementById('nextStepBtn');
+            const completeResetBtn = document.getElementById('completeResetBtn');
+            const cancelResetBtn = document.getElementById('cancelResetBtn');
+            const progressBar = document.getElementById('resetProgress');
+            const steps = document.querySelectorAll('.step');
+            const codeInputs = document.querySelectorAll('.code-input');
 
-                if (hasAuthToClientParams) {
-                    // Если параметры есть — перенаправляем на auth-to-client.html с ними
-                    const authToClientUrl = new URL('/pages/auth-to-client.html', window.location.origin);
-                    Object.keys(params).forEach(key => {
-                        authToClientUrl.searchParams.append(key, params[key]);
-                    });
-                    window.location.href = authToClientUrl.toString();
-                } else {
-                    // Если параметров нет — перенаправляем на профиль
-                    window.location.href = '/pages/profile.html';
+             codeInputs.forEach((input, index) => {
+                input.addEventListener('input', function() {
+                    if (this.value.length === 1 && index < codeInputs.length - 1) {
+                        codeInputs[index + 1].focus();
+                    }
+                });
+
+                input.addEventListener('keydown', function(e) {
+                    if (e.key === 'Backspace' && this.value.length === 0 && index > 0) {
+                        codeInputs[index - 1].focus();
+                    }
+                });
+            });
+
+            nextStepBtn.addEventListener('click', async function() {
+                if (currentStep === 1) {
+                    resetEmail = document.getElementById('resetEmail').value;
+
+                    if (!resetEmail) {
+                        alert('Пожалуйста, введите email');
+                        return;
+                    }
+
+                    try {
+                        const response = await fetch('/user/password/reset/request-code', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({ email: resetEmail })
+                        });
+
+                        if (response.ok) {
+                            // Переход к шагу 2
+                            goToStep(2);
+                        } else {
+                            const errorData = await response.json();
+                            alert(`Ошибка: ${errorData.detail || 'Не удалось отправить код'}`);
+                        }
+                    } catch (error) {
+                        alert(`Ошибка отправки запроса: ${error.message}`);
+                    }
+                } else if (currentStep === 2) {
+                    const code = Array.from(codeInputs).map(input => input.value).join('');
+
+                    if (code.length !== 6) {
+                        alert('Пожалуйста, введите 6-значный код');
+                        return;
+                    }
+
+                    try {
+                        const response = await fetch('/user/password/reset/verify-code', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                email: resetEmail,
+                                code: code
+                            })
+                        });
+
+                        if (response.ok) {
+                            const result = await response.json();
+                            resetToken = result.reset_token;
+                            // Переход к шагу 3
+                            goToStep(3);
+                        } else {
+                            const errorData = await response.json();
+                            alert(`Ошибка: ${errorData.detail || 'Неверный код'}`);
+                        }
+                    } catch (error) {
+                        alert(`Ошибка отправки запроса: ${error.message}`);
+                    }
                 }
-            } else {
-                // Обрабатываем ошибку 500 с Invalid credentials
-                if (response.status === 403) {
-                    alert("Неправильный email или пароль. Пожалуйста, проверьте введенные данные.");
-                } else {
-                    // Обработка других ошибок
-                    alert(`Ошибка входа: ${responseData.detail || responseData.error?.title || 'Неизвестная ошибка'}`);
+            });
+
+            completeResetBtn.addEventListener('click', async function() {
+                const newPassword = document.getElementById('newPassword').value;
+                const confirmPassword = document.getElementById('confirmPassword').value;
+
+                if (!newPassword) {
+                    alert('Пожалуйста, введите новый пароль');
+                    return;
+                }
+
+                if (newPassword !== confirmPassword) {
+                    alert('Пароли не совпадают');
+                    return;
+                }
+
+                try {
+                    const response = await fetch('/user/password/reset/confirm', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            reset_token: resetToken,
+                            new_pwd: newPassword
+                        })
+                    });
+
+                    if (response.ok) {
+                        alert('Пароль успешно изменен. Теперь вы можете войти с новым паролем.');
+                        resetModal();
+                        modal.hide();
+                    } else {
+                        const errorData = await response.json();
+                        alert(`Ошибка: ${errorData.detail || 'Не удалось изменить пароль'}`);
+                    }
+                } catch (error) {
+                    alert(`Ошибка отправки запроса: ${error.message}`);
+                }
+            });
+
+            cancelResetBtn.addEventListener('click', function() {
+                resetModal();
+                modal.hide();
+            });
+
+            function goToStep(step) {
+                currentStep = step;
+
+                progressBar.style.width = `${step * 33}%`;
+
+                steps.forEach((s, i) => {
+                    s.classList.toggle('active', i === step - 1);
+                });
+
+                nextStepBtn.style.display = step < 3 ? 'block' : 'none';
+                completeResetBtn.style.display = step === 3 ? 'block' : 'none';
+
+                if (step === 2) {
+                    codeInputs[0].focus();
+                } else if (step === 3) {
+                    document.getElementById('newPassword').focus();
                 }
             }
-        } catch (error) {
-            alert(`Ошибка отправки запроса: ${error.message}`);
-        }
+
+            function resetModal() {
+                currentStep = 1;
+                resetToken = null;
+                resetEmail = '';
+
+                document.getElementById('resetEmail').value = '';
+                codeInputs.forEach(input => input.value = '');
+                document.getElementById('newPassword').value = '';
+                document.getElementById('confirmPassword').value = '';
+
+                progressBar.style.width = '33%';
+
+                steps.forEach((s, i) => {
+                    s.classList.toggle('active', i === 0);
+                });
+
+                nextStepBtn.style.display = 'block';
+                completeResetBtn.style.display = 'none';
+            }
         });
-    });
-</script>
+    </script>
 </body>
 </html>

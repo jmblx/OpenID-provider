@@ -1,8 +1,6 @@
-from typing import Annotated
 
 import argon2
-from dishka import Provider, Scope, provide, FromComponent
-from redis.asyncio import Redis
+from dishka import Provider, Scope, provide
 
 from application.auth_as.common.scopes_service import ScopesService
 from application.common.interfaces.client_token_creation import ClientTokenCreationService
@@ -14,7 +12,7 @@ from application.common.interfaces.imedia_storage import StorageServiceInterface
 from application.common.interfaces.jwt_service import JWTService
 from application.common.interfaces.notify_service import NotifyService
 from application.common.interfaces.auth_server_token_creation import AuthServerTokenCreationService
-from application.common.interfaces.white_list import TokenWhiteListService
+from application.common.interfaces.white_list import ClientTokenWhitelistService, AuthServerTokenWhitelistService
 from application.common.services.auth_code import AuthorizationCodeStorage
 from application.common.services.pkce import PKCEService
 from application.common.services.client_service import ClientService
@@ -46,8 +44,8 @@ from infrastructure.services.auth.user_auth_server_service import (
     HttpAuthServerServiceImpl,
 )
 from infrastructure.services.auth.white_list_service import (
-    AuthServerTokenService,
-    ClientTokenService,
+    AuthServerTokenWhitelistServiceImpl,
+    ClientTokenWhitelistServiceImpl,
 )
 from infrastructure.services.security.pwd_service import PasswordHasherImpl
 from infrastructure.services.user.email_confirmation_service import (
@@ -121,33 +119,10 @@ class ServiceProvider(Provider):
     )
     http_client_service = provide(HttpClientServiceImpl, scope=Scope.REQUEST, provides=HttpClientService)
     storage_service_interface = provide(MinIOService, scope=Scope.REQUEST, provides=StorageServiceInterface)
-
+    client_token_service = provide(ClientTokenWhitelistServiceImpl, scope=Scope.REQUEST, provides=ClientTokenWhitelistService)
+    auth_server_token_service = provide(AuthServerTokenWhitelistServiceImpl, scope=Scope.REQUEST, provides=AuthServerTokenWhitelistService)
     # reg_validation_service = provide(
     #     RegUserValidationService,
     #     scope=Scope.REQUEST,
     #     provides=UserValidationService,
     # )
-
-
-class AuthServerTokenProvider(Provider):
-    """Провайдер для AuthServerTokenService."""
-
-    component = "auth_server"
-
-    @provide(scope=Scope.REQUEST)
-    def provide_auth_server_service(
-        self, redis: Annotated[Redis, FromComponent("")]
-    ) -> TokenWhiteListService:
-        return AuthServerTokenService(redis)
-
-
-class ClientTokenProvider(Provider):
-    """Провайдер для ClientTokenService."""
-
-    component = "client"
-
-    @provide(scope=Scope.REQUEST)
-    def provide_client_service(
-        self, redis: Annotated[Redis, FromComponent("")]
-    ) -> TokenWhiteListService:
-        return ClientTokenService(redis)

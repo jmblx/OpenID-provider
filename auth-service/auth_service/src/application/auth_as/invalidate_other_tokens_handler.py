@@ -16,5 +16,5 @@ class InvalidateOtherTokensHandler:
 
     async def handle(self, command: InvalidateOtherTokensCommand) -> None:
         await self.http_auth_service.invalidate_other_tokens(
-            command.refresh_token, command.fingerprint
+            command.refresh_token
         )

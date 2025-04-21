@@ -18,6 +18,6 @@ class ClientTokenCreationService(ABC):
 
     @abstractmethod
     async def create_client_refresh_token(
-        self, user_id: UUID, fingerprint: Fingerprint, client_id: int, rs_ids: list[int]
+        self, user_id: UUID, client_id: int, rs_ids: list[int]
     ) -> ClientRefreshTokenWithData:
         """Создание RefreshToken."""

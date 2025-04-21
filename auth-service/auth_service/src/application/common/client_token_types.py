@@ -1,7 +1,9 @@
 from dataclasses import dataclass
+from datetime import datetime
 from typing import NewType, TypedDict
+from uuid import UUID
 
-from application.common.auth_server_token_types import BaseToken, RefreshTokenData, AuthServerAccessTokenPayload, \
+from application.common.auth_server_token_types import BaseToken, AuthServerRefreshTokenData, AuthServerAccessTokenPayload, \
     RefreshTokenPayload
 
 ClientAccessToken = NewType("AccessToken", BaseToken)
@@ -9,7 +11,17 @@ ClientRefreshToken = NewType("RefreshToken", BaseToken)
 
 
 @dataclass
-class ClientRefreshTokenData(RefreshTokenData): ...
+class ClientRefreshTokenData:
+    user_id: UUID
+    jti: str
+    created_at: datetime
+
+
+class ClientRefreshTokenDataDict(TypedDict):
+    user_id: str
+    jti: str
+    created_at: str
+
 
 @dataclass
 class ClientRefreshTokenWithData(ClientRefreshTokenData):
@@ -27,5 +39,3 @@ class ClientRefreshTokenPayload(RefreshTokenPayload):
 class ClientTokens(TypedDict):
     access_token: ClientAccessToken
     refresh_token: ClientRefreshToken
-
-

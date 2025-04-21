@@ -10,7 +10,7 @@ from application.auth_for_client.revoke_token_handler import RevokeClientTokenHa
 from application.common.client_token_types import ClientRefreshToken
 from presentation.web_api.utils import set_client_tokens
 
-client_token_manage_router = APIRouter(route_class=DishkaRoute, tags=["client-token-manage"], prefix="/client-token")
+client_token_manage_router = APIRouter(route_class=DishkaRoute, tags=["client-code-manage"], prefix="/client-code")
 
 
 @client_token_manage_router.post("/refresh")

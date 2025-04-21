@@ -1,12 +1,11 @@
 from dataclasses import dataclass
 
 from application.common.interfaces.http_auth import HttpAuthServerService
-from application.common.auth_server_token_types import RefreshToken, Fingerprint
+from application.common.auth_server_token_types import RefreshToken
 
 
 @dataclass
 class InvalidateOtherTokensCommand:
-    fingerprint: Fingerprint
     refresh_token: RefreshToken
 
 
@@ -16,5 +15,5 @@ class InvalidateOtherTokensHandler:
 
     async def handle(self, command: InvalidateOtherTokensCommand) -> None:
         await self.http_auth_service.invalidate_other_tokens(
-            command.refresh_token, command.fingerprint
+            command.refresh_token
         )

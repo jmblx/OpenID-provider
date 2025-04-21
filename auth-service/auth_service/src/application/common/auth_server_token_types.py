@@ -36,7 +36,7 @@ class JwtToken(TypedDict):
 
 
 @dataclass
-class RefreshTokenData:
+class AuthServerRefreshTokenData:
     user_id: UUID
     jti: str
     fingerprint: Fingerprint
@@ -48,5 +48,5 @@ class RefreshTokenPayload(TypedDict):
 
 
 @dataclass
-class RefreshTokenWithData(RefreshTokenData):
+class AuthServerRefreshTokenWithData(AuthServerRefreshTokenData):
     token: RefreshToken

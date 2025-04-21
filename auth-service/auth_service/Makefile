@@ -29,7 +29,6 @@ server-prod:
 
 migration:
 	alembic revision --autogenerate
-	alembic upgrade head
 
 build:
 	docker build -t backend_service.auth_service:latest .

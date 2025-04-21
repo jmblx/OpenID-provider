@@ -1,10 +1,11 @@
 import secrets
+import string
 from dataclasses import dataclass
 from typing import cast
 
 from application.user.reset_pwd.service import (
     ResetPwdService,
-    ResetPasswordToken,
+    ResetPasswordCode,
 )
 from application.common.interfaces.notify_service import NotifyService
 from application.common.interfaces.user_repo import UserRepository
@@ -14,8 +15,12 @@ from domain.entities.user.value_objects import Email
 
 @dataclass
 class RequestChangePasswordCommand:
-    email: str  # | None
-    # : str | None
+    email: str
+
+
+def generate_6_digit_code():
+    alphabet = string.digits
+    return ''.join(secrets.choice(alphabet) for _ in range(6))
 
 
 class RequestChangePasswordHandler:
@@ -34,13 +39,13 @@ class RequestChangePasswordHandler:
         user: User = await self.user_repository.get_by_email(
             Email(command.email)
         )
-        reset_pwd_token: ResetPasswordToken = cast(
-            ResetPasswordToken, secrets.token_urlsafe(32)
+        reset_pwd_code: ResetPasswordCode = cast(
+            ResetPasswordCode, generate_6_digit_code()
         )
-        await self.reset_pwd_service.save_password_reset_token(
-            user.id.value, reset_pwd_token
+        await self.reset_pwd_service.save_password_reset_code(
+            user.id.value, reset_pwd_code
         )
         await self.notify_service.pwd_reset_notify(
-            command.email, reset_pwd_token
+            command.email, reset_pwd_code
         )
         return True

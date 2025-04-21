@@ -41,7 +41,7 @@ class JWTServiceImpl(JWTService):
             algorithm=self.auth_settings.algorithm,
         )
         return {
-            "token": BaseToken(token),
+            "code": BaseToken(token),
             "created_at": now,
             "expires_at": expire,
         }

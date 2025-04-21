@@ -49,10 +49,11 @@ from application.role.upd_role_command_handler import UpdateRoleHandler
 from application.user.add_role_to_user_handler import AddRoleToUserHandler
 from application.user.confirm_email_handler import ConfirmEmailHandler
 from application.user.delete_user_handler import DeleteUserHandler
-from application.user.reset_pwd.change_pwd_handler import SetNewPasswordHandler
+from application.user.reset_pwd.reset_pwd_with_token import ResetPasswordWithTokenHandler
 from application.user.reset_pwd.request_change_pwd_handler import (
     RequestChangePasswordHandler,
 )
+from application.user.reset_pwd.verify_reset_code_handler import VerifyResetCodeHandler
 from application.user.set_user_avatar_handler import SetUserAvatarHandler
 
 
@@ -101,7 +102,7 @@ class HandlerProvider(Provider):
     request_change_password_handler = provide(
         RequestChangePasswordHandler, scope=Scope.REQUEST
     )
-    set_new_pwd_handler = provide(SetNewPasswordHandler, scope=Scope.REQUEST)
+    set_new_pwd_handler = provide(ResetPasswordWithTokenHandler, scope=Scope.REQUEST)
     delete_user_handler = provide(DeleteUserHandler, scope=Scope.REQUEST)
     add_role_to_user_handler = provide(
         AddRoleToUserHandler, scope=Scope.REQUEST
@@ -124,3 +125,4 @@ class HandlerProvider(Provider):
     read_resource_server_page_view_query_handler = provide(ReadResourceServerPageViewQueryHandler, scope=Scope.REQUEST)
     delete_role_handler = provide(DeleteRoleHandler, scope=Scope.REQUEST)
     get_all_rs_ids_handler = provide(GetAllRSIdsHandler, scope=Scope.REQUEST)
+    verify_reset_code_handler = provide(VerifyResetCodeHandler, scope=Scope.REQUEST)

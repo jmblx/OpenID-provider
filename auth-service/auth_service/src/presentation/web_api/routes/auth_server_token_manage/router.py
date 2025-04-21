@@ -19,7 +19,7 @@ from application.auth_as.revoke_token_handler import (
 from application.common.auth_server_token_types import RefreshToken, Fingerprint
 from presentation.web_api.utils import set_auth_server_tokens
 
-token_manage_router = APIRouter(route_class=DishkaRoute, tags=["auth-server-token-manage"], prefix="/auth-service")
+token_manage_router = APIRouter(route_class=DishkaRoute, tags=["auth-server-code-manage"], prefix="/auth-service")
 
 
 @token_manage_router.post("/refresh")

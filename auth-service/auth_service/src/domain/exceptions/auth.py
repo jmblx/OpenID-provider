@@ -7,7 +7,7 @@ from domain.common.exceptions.base import DomainError
 @dataclass(eq=False)
 class InvalidTokenError(ApplicationError):
     def title(self) -> str:
-        return "Invalid token."
+        return "Invalid code."
 
 
 @dataclass(eq=False)

@@ -9,7 +9,7 @@ from starlette.requests import Request
 from starlette.status import HTTP_500_INTERNAL_SERVER_ERROR
 
 from application.common.exceptions import FingerprintMismatchException
-from core.exceptions.user_password.exceptions import InvalidResetPasswordToken
+from core.exceptions.user_password.exceptions import InvalidResetPasswordCode
 from domain.common.exceptions.base import AppError
 from domain.exceptions.auth import (
     InvalidRedirectURLError,
@@ -56,7 +56,7 @@ def setup_exception_handlers(app: FastAPI):
         UnauthenticatedUserError, error_handler(status.HTTP_401_UNAUTHORIZED)
     )
     app.add_exception_handler(
-        InvalidResetPasswordToken, error_handler(status.HTTP_400_BAD_REQUEST)
+        InvalidResetPasswordCode, error_handler(status.HTTP_400_BAD_REQUEST)
     )
     app.add_exception_handler(
         InvalidCredentialsError, error_handler(status.HTTP_403_FORBIDDEN)

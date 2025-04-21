@@ -64,7 +64,7 @@
 #         assert (
 #             "authUser" in command["command"]
 #         ), "Expected 'authUser' field in the response command, but none were found."
-#         assert "token" in command["command"]["authUser"]["accessToken"]
+#         assert "code" in command["command"]["authUser"]["accessToken"]
 #         assert "expires_in" in command["command"]["authUser"]["accessToken"]
 #         assert "created_at" in command["command"]["authUser"]["accessToken"]
 #

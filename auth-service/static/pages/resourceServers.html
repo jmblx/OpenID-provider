@@ -22,7 +22,15 @@
     </style>
 </head>
 <body class="container mt-4">
-    <h1 class="text-center">Список ресурсных серверов</h1>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="text-center mb-0">Список ресурсных серверов</h1>
+        <button
+            class="btn btn-primary"
+            onclick="window.location.href='/pages/resourceServer.html'"
+        >
+            Добавить РС
+        </button>
+    </div>
     <div id="rs-container" class="row"></div>
 
     <script>

@@ -1,31 +1,18 @@
 import logging
-from typing import Annotated
 from uuid import UUID
 
-from dishka import FromComponent
-
 from application.auth_as.common.types import AuthServerTokens
-from application.common.exceptions import FingerprintMismatchException
 from application.common.interfaces.http_auth import HttpAuthServerService
 from application.common.interfaces.jwt_service import JWTService
-from application.common.interfaces.white_list import TokenWhiteListService
-from application.common.services.pkce import (
-    PKCEService,
-)
 from application.common.auth_server_token_types import (
     Fingerprint,
-    AccessToken,
     RefreshToken,
     AuthServerAccessTokenPayload,
 )
 from application.common.interfaces.auth_server_token_creation import AuthServerTokenCreationService
-from application.common.interfaces.user_repo import UserRepository
-from domain.common.services.pwd_service import PasswordHasher
+from application.common.interfaces.white_list import AuthServerTokenWhitelistService
 from domain.entities.user.model import User
 from infrastructure.services.auth.config import JWTSettings
-from application.common.services.auth_code import (
-    AuthorizationCodeStorage,
-)
 
 logger = logging.getLogger(__name__)
 
@@ -37,9 +24,7 @@ class HttpAuthServerServiceImpl(HttpAuthServerService):
         self,
         jwt_service: JWTService,
         token_creation_service: AuthServerTokenCreationService,
-        token_whitelist_service: Annotated[
-            TokenWhiteListService, FromComponent("auth_server")
-        ],
+        token_whitelist_service: AuthServerTokenWhitelistService,
         jwt_settings: JWTSettings,
         fingerprint: Fingerprint,
     ):
@@ -58,14 +43,10 @@ class HttpAuthServerServiceImpl(HttpAuthServerService):
         await self.token_whitelist_service.remove_token(jti)
 
     async def invalidate_other_tokens(
-        self, refresh_token: RefreshToken, fingerprint: Fingerprint
+        self, refresh_token: RefreshToken
     ) -> None:
         payload: AuthServerAccessTokenPayload = self.jwt_service.decode(refresh_token)
         jti = payload["jti"]
-        if not await self.token_whitelist_service.is_fingerprint_matching(
-            jti, fingerprint
-        ):
-            raise FingerprintMismatchException()
         user_id: UUID = payload["sub"]  # type: ignore
         await self.token_whitelist_service.remove_tokens_except_current(
             jti, user_id

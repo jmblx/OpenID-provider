@@ -27,19 +27,19 @@ async def save_refresh_token_to_redis(
         f"refresh_token_index:{user_id}:{fingerprint}"
     )
     if existing_jti:
-        logging.info("Found existing token with jti: %s", existing_jti)
+        logging.info("Found existing code with jti: %s", existing_jti)
         await redis.delete(f"refresh_token:{existing_jti}")
         await redis.zrem(f"refresh_tokens:{user_id}", existing_jti)
     else:
         logging.info(
-            "No existing token found for user_id: %s and fingerprint: %s",
+            "No existing code found for user_id: %s and fingerprint: %s",
             user_id,
             fingerprint,
         )
 
     await redis.hset(f"refresh_token:{jti}", mapping=refresh_token_data)
     await redis.set(f"refresh_token_index:{user_id}:{fingerprint}", jti)
-    logging.info("Saved new token with jti: %s", jti)
+    logging.info("Saved new code with jti: %s", jti)
 
     await redis.zadd(f"refresh_tokens:{user_id}", {jti: created_at})
 
@@ -48,7 +48,7 @@ async def save_refresh_token_to_redis(
         oldest_jti_list = await redis.zrange(f"refresh_tokens:{user_id}", 0, 0)
         if oldest_jti_list:
             oldest_jti = oldest_jti_list[0]
-            logging.info("Removing oldest token with jti: %s", oldest_jti)
+            logging.info("Removing oldest code with jti: %s", oldest_jti)
             await redis.zrem(f"refresh_tokens:{user_id}", oldest_jti)
             await redis.delete(f"refresh_token:{oldest_jti}")
     else:
