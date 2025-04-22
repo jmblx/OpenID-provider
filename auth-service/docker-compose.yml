@@ -20,8 +20,6 @@ services:
     restart: always
     env_file:
       - .env-prod
-    networks:
-      - backend_service.db.network
     volumes:
       - db-data:/var/lib/postgresql/data
     healthcheck:
@@ -39,8 +37,6 @@ services:
       - "6379:6379"
     expose:
       - 6379
-    networks:
-      - backend_service.redis.network
     volumes:
       - redis-data:/data
     healthcheck:
@@ -67,12 +63,6 @@ services:
       timeout: 60s
       retries: 5
       start_period: 10s
-    networks:
-      - backend_service.db.network
-      - backend_service.redis.network
-      - backend_service.grafana.network
-      - backend_service.nats.network
-      - backend_service.minio.network
     depends_on:
       db:
         condition: service_healthy
@@ -91,8 +81,6 @@ services:
       - "6222:6222"
       - "4222:4222"
     command: "--cluster_name NATS --cluster nats://0.0.0.0:6222 --http_port 8222 --port 4222"
-    networks:
-      - backend_service.nats.network
 
   notification_app:
     env_file:
@@ -103,8 +91,6 @@ services:
 #    build:
 #      context: notification/
     command: [ "sh", "/notification_app/docker/app.sh" ]
-    networks:
-      - backend_service.nats.network
     depends_on:
       - nats
 
@@ -116,8 +102,6 @@ services:
     depends_on:
       db:
         condition: service_healthy
-    networks:
-      - backend_service.db.network
     env_file:
       - .env-prod
     command: [ "sh", "/backend-service.auth_service/docker/migrate.sh" ]
@@ -137,8 +121,6 @@ services:
       - ./minio-config:/root/.minio
     command: server /data --console-address ":9001"
     restart: always
-    networks:
-      - backend_service.minio.network
     extra_hosts:
       - "minio.example.com:127.0.0.1"
 
@@ -161,8 +143,6 @@ services:
       mc mb $${MINIO_ALIAS}/$${BUCKET_NAME} || true;
       mc policy set public $${MINIO_ALIAS}/$${BUCKET_NAME}
       "
-    networks:
-      - backend_service.minio.network
 
   nginx:
     image: menoitami/custom-openresty-jwt
@@ -183,9 +163,6 @@ services:
       - db
       - redis
 #      - certbot
-    networks:
-      - backend_service.db.network
-      - backend_service.minio.network
     extra_hosts:
       - "minio.example.com:127.0.0.1"
 
@@ -199,8 +176,6 @@ services:
       - "3000"
     ports:
       - "127.0.0.1:3000:3000"
-    networks:
-      - backend_service.grafana.network
     volumes:
       - backend_service.grafana.data:/var/lib/grafana:rw
       - ./grafana/provisioning:/etc/grafana/provisioning:rw
@@ -229,8 +204,6 @@ services:
       - backend_service.loki.data:/tmp/:rw
     command: -config.file=/etc/loki/config.yaml
     restart: unless-stopped
-    networks:
-      - backend_service.grafana.network
     logging: *default-logging
 
 #  vector:
@@ -258,8 +231,6 @@ services:
     hostname: backend_service.prometheus
     ports:
       - "9090:9090"
-    networks:
-      - backend_service.grafana.network
     volumes:
       - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
     command:
@@ -277,8 +248,6 @@ services:
     command: [ "--target=all", "--storage.trace.backend=local", "--storage.trace.local.path=/var/tempo", "--auth.enabled=false" ]
     ports:
       - "14250:14250"
-    networks:
-      - backend_service.grafana.network
     depends_on:
       - loki
     logging: *default-logging
@@ -303,14 +272,6 @@ services:
 #    networks:
 #      - custom
 #    command: ["/bin/sh", "-c", "while true; do make collect-data; sleep 3600; done"]
-
-networks:
-  backend_service.db.network:
-      driver: bridge
-  backend_service.minio.network: {}
-  backend_service.redis.network: {}
-  backend_service.grafana.network: {}
-  backend_service.nats.network: {}
 
 volumes:
   db-data:

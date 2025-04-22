@@ -29,8 +29,9 @@ jobs:
           docker push menoitami/backend_service.api:latest
 
   deploy:
+    needs: build
     runs-on: ubuntu-latest
-
+    
     steps:
       - name: Deploy
         uses: appleboy/ssh-action@master
@@ -42,4 +43,5 @@ jobs:
           script: |
             cd OpenID-provider/auth-service/
             git pull origin main
+            docker compose pull
             docker-compose up -d
