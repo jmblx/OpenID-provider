@@ -25,6 +25,7 @@ from presentation.web_api.routes.healthcheck.router import healthcheck_router
 from presentation.web_api.routes.email_confirmation.router import (
     email_conf_router,
 )
+from presentation.web_api.routes.third_party_providers.router import third_party_router
 from presentation.web_api.routes.user_account.router import user_account_router
 from presentation.web_api.routes.user_password.router import (
     user_password_router,
@@ -52,6 +53,7 @@ def create_app() -> FastAPI:
         root_path="/api",
         default_response_class=ORJSONResponse,
     )
+    app.include_router(third_party_router)
     app.include_router(reg_router)
     app.include_router(client_router)
     app.include_router(auth_router)

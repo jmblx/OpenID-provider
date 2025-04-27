@@ -141,7 +141,7 @@ services:
       sleep 10;
       mc alias set $${MINIO_ALIAS} $${MINIO_URL} $${MINIO_ACCESS_KEY} $${MINIO_SECRET_KEY};
       mc mb $${MINIO_ALIAS}/$${BUCKET_NAME} || true;
-      mc policy set public $${MINIO_ALIAS}/$${BUCKET_NAME}
+      mc anonymous set download $${MINIO_ALIAS}/$${BUCKET_NAME}
       "
 
   nginx:

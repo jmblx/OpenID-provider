@@ -22,6 +22,8 @@ from application.common.id_provider import (
     ClientIdentityProviderImpl,
     ClientIdentityProvider,
 )
+from application.third_party_auth.common.idp import OauthIdentityProvider
+from application.third_party_auth.yandex.idp import YandexIdentityProvider
 from application.user.reset_pwd.service import ResetPwdService
 from domain.common.services.pwd_service import PasswordHasher
 from infrastructure.external_services.message_routing.notify_service import (
@@ -121,6 +123,7 @@ class ServiceProvider(Provider):
     storage_service_interface = provide(MinIOService, scope=Scope.REQUEST, provides=StorageServiceInterface)
     client_token_service = provide(ClientTokenWhitelistServiceImpl, scope=Scope.REQUEST, provides=ClientTokenWhitelistService)
     auth_server_token_service = provide(AuthServerTokenWhitelistServiceImpl, scope=Scope.REQUEST, provides=AuthServerTokenWhitelistService)
+    oauth_identity_provider = provide(YandexIdentityProvider, scope=Scope.REQUEST, provides=YandexIdentityProvider)
     # reg_validation_service = provide(
     #     RegUserValidationService,
     #     scope=Scope.REQUEST,
