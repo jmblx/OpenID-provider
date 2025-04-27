@@ -46,6 +46,7 @@ from application.resource_server.update_rs_handler import UpdateResourceServerHa
 from application.role.create_role_handler import CreateRoleHandler
 from application.role.delete_role_handler import DeleteRoleHandler
 from application.role.upd_role_command_handler import UpdateRoleHandler
+from application.third_party_auth.yandex.login_handler import YandexLoginHandler
 from application.user.add_role_to_user_handler import AddRoleToUserHandler
 from application.user.confirm_email_handler import ConfirmEmailHandler
 from application.user.delete_user_handler import DeleteUserHandler
@@ -126,3 +127,4 @@ class HandlerProvider(Provider):
     delete_role_handler = provide(DeleteRoleHandler, scope=Scope.REQUEST)
     get_all_rs_ids_handler = provide(GetAllRSIdsHandler, scope=Scope.REQUEST)
     verify_reset_code_handler = provide(VerifyResetCodeHandler, scope=Scope.REQUEST)
+    yandex_login_handler = provide(YandexLoginHandler, scope=Scope.REQUEST)
