@@ -12,7 +12,7 @@ class YandexIdentityProvider(OauthIdentityProvider):
         self.session = session
 
 
-    async def get_yandex_user_email(self, oauth_token: str) -> str:
+    async def get_yandex_user_email(self, oauth_token: str) -> Email:
         if not oauth_token:
             raise ValueError("Токен не может быть пустым")
 
@@ -24,7 +24,7 @@ class YandexIdentityProvider(OauthIdentityProvider):
                 async with session.get(url, headers=headers) as response:
                     response.raise_for_status()
                     data = await response.json()
-                    return data.get("default_email")
+                    return Email(data.get("default_email"))
 
         except aiohttp.ClientResponseError as e:
             raise ValueError(f"Ошибка запроса к Яндекс ID: {e.status} - {e.message}")
@@ -33,12 +33,9 @@ class YandexIdentityProvider(OauthIdentityProvider):
         except (KeyError, ValueError) as e:
             raise ValueError(f"Ошибка обработки ответа: {str(e)}")
 
-    async def get_current_user(self, oauth_token: str) -> User:
+    async def get_current_user(self, oauth_token: OAuth2Token) -> User:
         email = await self.get_yandex_user_email(oauth_token)
         query = select(User).where(User.email == email)
-        result = await self.session.execute(query)
-        user = result.scalar_one_or_none()
-
-        if not user:
-            raise ValueError("Пользователь с таким email не найден")
+        user = (await self.session.execute(query)).scalar()
         return user
+
