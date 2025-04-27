@@ -33,9 +33,12 @@ class YandexIdentityProvider(OauthIdentityProvider):
         except (KeyError, ValueError) as e:
             raise ValueError(f"Ошибка обработки ответа: {str(e)}")
 
-    async def get_current_user(self, oauth_token: OAuth2Token) -> User:
+    async def get_current_user(self, oauth_token: str) -> User:
         email = await self.get_yandex_user_email(oauth_token)
         query = select(User).where(User.email == email)
-        user = (await self.session.execute(query)).scalar()
-        return user
+        result = await self.session.execute(query)
+        user = result.scalar_one_or_none()
 
+        if not user:
+            raise ValueError("Пользователь с таким email не найден")
+        return user
