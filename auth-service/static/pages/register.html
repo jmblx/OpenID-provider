@@ -26,7 +26,7 @@
         h1 {
             font-weight: bold;
             margin: 0;
-            margin-bottom: 20px;  /* Отступ снизу */
+            margin-bottom: 20px;
             text-align: center;
         }
 
@@ -126,22 +126,44 @@
             color: #0056b3;
         }
 
-        /* Стили для имени клиента */
-        .client-name {
-            font-size: 18px;
-            color: #4fadf3;
-            font-weight: 600;
-            margin: 10px 0 20px;
-            text-align: center; /* Центрируем текст */
-        }
-
-       .client-name span {
+        .client-name span {
            font-size: 18px;
            color: #4fadf3;
            font-weight: 600;
            margin: 10px 0 20px;
            text-align: center; /* Центрируем текст */
-       }
+        }
+
+        .yandex-auth-btn {
+            margin-top: 15px;
+            background-color: #000;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+        }
+        .yandex-auth-btn i {
+            margin-right: 10px;
+        }
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 20px 0;
+        }
+        .divider::before, .divider::after {
+            content: "";
+            flex: 1;
+            border-bottom: 1px solid #ddd;
+        }
+        .divider-text {
+            padding: 0 10px;
+            color: #777;
+        }
     </style>
 </head>
 <body>
@@ -158,7 +180,15 @@
                     <input type="password" class="form-control" id="password" placeholder="Введите пароль" required>
                 </div>
                 <button type="button" id="registerButton" class="btn btn-primary w-100">Зарегистрироваться</button>
+                <div class="divider">
+                    <span class="divider-text">или</span>
+                </div>
+
+                <button type="button" id="yandexAuthBtn" class="yandex-auth-btn">
+                    <i class="fab fa-yandex"></i> Зарегистрироваться через Яндекс
+                </button>
             </form>
+
             <div class="link text-center">
                 <a href="#" id="login-link">Уже есть аккаунт? Войти</a>
             </div>
@@ -185,6 +215,79 @@
         return hashArray.map(byte => byte.toString(16).padStart(2, '0')).join('');
     }
 
+    function handleYandexAuth() {
+        YaAuthSuggest.init(
+            {
+                client_id: '83c64ffbf6db4ea282b7e4d0c5cfbb51',
+                response_type: 'token',
+                redirect_uri: 'https://menoitami.ru/pages/yandex-login.html'
+            },
+            'https://menoitami.ru'
+        )
+        .then(({ handler }) => handler())
+        .then(data => {
+            console.log('Данные авторизации через Яндекс:', data);
+            // Здесь можно отправить токен на ваш сервер для обработки
+            sendYandexTokenToServer(data.access_token);
+        })
+        .catch(error => {
+            console.log('Ошибка авторизации через Яндекс:', error);
+            if (error.type === 'access_denied') {
+                alert('Вы отменили авторизацию через Яндекс');
+            } else {
+                alert('Произошла ошибка при авторизации через Яндекс');
+            }
+        });
+    }
+
+    // Функция для отправки токена на сервер
+    async function sendYandexTokenToServer(token) {
+        try {
+            const fingerprint = localStorage.getItem('deviceFingerprint') || await generateFingerprint();
+            const urlParams = new URLSearchParams(window.location.search);
+            const params = {};
+            for (let [key, value] of urlParams.entries()) {
+                params[key] = value;
+            }
+
+            const payload = {
+                yandex_token: token,
+                fingerprint: fingerprint,
+                ...params
+            };
+
+            const response = await fetch('/api/register/yandex', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Device-Fingerprint': fingerprint,
+                },
+                credentials: 'include',
+                body: JSON.stringify(payload)
+            });
+
+            const responseData = await response.json();
+
+            if (response.ok) {
+                const hasAuthToClientParams = params.client_id && params.required_resources && params.redirect_url;
+
+                if (hasAuthToClientParams) {
+                    const authToClientUrl = new URL('/pages/auth-to-client.html', window.location.origin);
+                    Object.keys(params).forEach(key => {
+                        authToClientUrl.searchParams.append(key, params[key]);
+                    });
+                    window.location.href = authToClientUrl.toString();
+                } else {
+                    window.location.href = '/pages/profile.html';
+                }
+            } else {
+                alert(`Ошибка авторизации через Яндекс: ${responseData.detail || responseData.error?.title || 'Неизвестная ошибка'}`);
+            }
+        } catch (error) {
+            alert(`Ошибка отправки запроса: ${error.message}`);
+        }
+    }
+
     document.addEventListener('DOMContentLoaded', async function () {
         const fingerprint = await generateFingerprint();
         localStorage.setItem('deviceFingerprint', fingerprint); // Сохранение fingerprint в локальном хранилище
@@ -202,6 +305,8 @@
             loginUrl.searchParams.append(key, params[key]);
         });
         loginLink.href = loginUrl.toString();
+
+        document.getElementById('yandexAuthBtn').addEventListener('click', handleYandexAuth);
 
         document.getElementById('registerButton').addEventListener('click', async function () {
             const email = document.getElementById('email').value;

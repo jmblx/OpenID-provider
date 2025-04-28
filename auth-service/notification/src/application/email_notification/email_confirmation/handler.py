@@ -18,7 +18,7 @@ class EmailConfirmationHandler:
     async def handle(self, command: EmailConfirmationCommand):
         rendered_url = f"{self.api_paths_conf.backend_url}{self.api_paths_conf.email_confirmation_url.replace("{code}", command.email_confirmation_token)}"
         body = f"""
-        Здравствуйте! Если вы зарегистрировались в приложении task tracker,
+        Здравствуйте! Если вы зарегистрировались в приложении AuthCore,
         используя эту почту, то перейдите по следующей ссылке:
         {rendered_url}
         чтобы подтвердить регистрацию."""

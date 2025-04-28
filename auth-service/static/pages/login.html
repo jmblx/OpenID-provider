@@ -139,7 +139,8 @@
         .step.active {
             display: block;
         }
-          .yandex-auth-btn {
+
+        .yandex-auth-btn {
             margin-top: 15px;
             background-color: #000;
             color: white;
@@ -152,22 +153,26 @@
             justify-content: center;
             width: 100%;
         }
+
         .yandex-auth-btn i {
             margin-right: 10px;
         }
+
         .divider {
             display: flex;
             align-items: center;
             margin: 20px 0;
         }
+
         .divider::before, .divider::after {
             content: "";
             flex: 1;
             border-bottom: 1px solid #ddd;
         }
+
         .divider-text {
-            padding: 0 10px;
-            color: #777;
+        padding: 0 10px;
+        color: #777;
         }
     </style>
 </head>
@@ -296,7 +301,6 @@
             });
         }
 
-        // Функция для отправки токена на сервер
         async function sendYandexTokenToServer(token) {
             try {
                 const fingerprint = localStorage.getItem('deviceFingerprint') || await generateFingerprint();

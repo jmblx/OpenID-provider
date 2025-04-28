@@ -22,7 +22,7 @@ from application.common.id_provider import (
     ClientIdentityProviderImpl,
     ClientIdentityProvider,
 )
-from application.third_party_auth.common.idp import OauthIdentityProvider
+from application.third_party_auth.common.third_party_notification_service import ThirdPartyNotificationService
 from application.third_party_auth.yandex.idp import YandexIdentityProvider
 from application.user.reset_pwd.service import ResetPwdService
 from domain.common.services.pwd_service import PasswordHasher
@@ -49,11 +49,11 @@ from infrastructure.services.auth.white_list_service import (
     AuthServerTokenWhitelistServiceImpl,
     ClientTokenWhitelistServiceImpl,
 )
+from infrastructure.services.notification.third_party_notification_service import ThirdPartyNotificationServiceImpl
 from infrastructure.services.security.pwd_service import PasswordHasherImpl
-from infrastructure.services.user.email_confirmation_service import (
+from infrastructure.services.notification.email_confirmation_service import (
     EmailConfirmationService,
 )
-from infrastructure.services.user.user_service import UserServiceImpl
 
 
 class ServiceProvider(Provider):
@@ -124,6 +124,7 @@ class ServiceProvider(Provider):
     client_token_service = provide(ClientTokenWhitelistServiceImpl, scope=Scope.REQUEST, provides=ClientTokenWhitelistService)
     auth_server_token_service = provide(AuthServerTokenWhitelistServiceImpl, scope=Scope.REQUEST, provides=AuthServerTokenWhitelistService)
     oauth_identity_provider = provide(YandexIdentityProvider, scope=Scope.REQUEST, provides=YandexIdentityProvider)
+    third_party_notification_service = provide(ThirdPartyNotificationService, scope=Scope.REQUEST, provides=ThirdPartyNotificationServiceImpl)
     # reg_validation_service = provide(
     #     RegUserValidationService,
     #     scope=Scope.REQUEST,

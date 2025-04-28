@@ -20,13 +20,21 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
-      - name: Build Docker image
+      - name: Build Docker image api service
         run: |
-          cd ./auth-service/auth_service && docker build -t menoitami/backend_service.api:latest --no-cache .
+          cd ./auth-service/auth_service && docker build -t backend_service.api:latest --no-cache . && docker tag backend_service.api:latest menoitami/backend_service.api:latest
 
-      - name: Push Docker image to Docker Hub
+      - name: Push Docker image api service to Docker Hub
         run: |
           docker push menoitami/backend_service.api:latest
+
+      - name: Build notification service
+        run: |
+          cd ./auth-service/notification && docker build -t backend_service.notification_app --no-cache . && docker tag backend_service.notification_app:latest menoitami/backend_service.notification_app:latest
+      
+      - name: Push notification_service
+        run: |
+          docker push menoitami/backend_service.notification_app:latest
 
   deploy:
     needs: build

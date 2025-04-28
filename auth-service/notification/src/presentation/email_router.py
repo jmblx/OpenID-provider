@@ -7,6 +7,8 @@ from faststream.nats import NatsRouter
 from src.application.email_notification.email_confirmation.handler import EmailConfirmationHandler, \
     EmailConfirmationCommand
 from src.application.email_notification.reset_password.handler import ResetPasswordCommand, ResetPasswordHandler
+from src.application.email_notification.third_party_register_notify.handler import ThirdPartyRegisterCommand, \
+    ThirdPartyRegisterHandler
 
 email_router = NatsRouter()
 
@@ -28,4 +30,9 @@ async def handle_email_confirmation(command: EmailConfirmationCommand, handler: 
 
 @email_router.subscriber(os.getenv("EMAIL_RESET_PWD_SUB", "email.reset_password"))
 async def handle_email_reset_pwd(command: ResetPasswordCommand, handler: FromDishka[ResetPasswordHandler]) -> None:
+    await handler.handle(command)
+
+
+@email_router.subscriber(os.getenv("THIRD_PARTY_REGISTER_SUB", "email.third_party_register"))
+async def handle_third_party_register(command: ThirdPartyRegisterCommand, handler: FromDishka[ThirdPartyRegisterHandler]) -> None:
     await handler.handle(command)

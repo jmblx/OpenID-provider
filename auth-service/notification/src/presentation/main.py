@@ -20,4 +20,3 @@ def get_faststream_app() -> FastStream:
     faststream_app = FastStream(broker)
     faststream_integration.setup_dishka(container, faststream_app, auto_inject=True)
     return faststream_app
-
