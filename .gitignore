@@ -7,4 +7,7 @@ __pycache__/
 
 .idea/
 
-nginx-logs/*.log
+certbot/conf/**/*
+nginx-logs/**/*
+certs/**/*
+certbot/www/**/*
