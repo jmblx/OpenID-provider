@@ -32,11 +32,16 @@ services:
   redis:
     image: redis:7
     container_name: redis_auth
-    command: ["redis-server", "--port", "6379", "--save", "60", "1", "--appendonly", "yes"]
+    command: [
+      "redis-server",
+      "--port", "6379",
+      "--save", "60", "1",
+      "--appendonly", "yes",
+      "--replica-read-only", "no",
+      "--protected-mode", "no"
+    ]
     ports:
       - "6379:6379"
-    expose:
-      - 6379
     volumes:
       - redis-data:/data
     healthcheck:
@@ -44,7 +49,6 @@ services:
       interval: 15s
       timeout: 5s
       retries: 3
-      start_period: 30s
 
   auth_service:
     container_name: backend_service.api

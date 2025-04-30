@@ -13,6 +13,17 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Полная история коммитов
+
+      - name: Debug files structure
+        run: |
+          echo "Содержимое репозитория:"
+          ls -laR ./auth-service/
+
+      - name: Cleanup Docker
+        run: |
+          docker system prune -f
 
       - name: Log in to Docker Hub
         uses: docker/login-action@v2
@@ -20,28 +31,50 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
-      - name: Build Docker image api service
+      - name: Build and Push API Service
         run: |
-          cd ./auth-service/auth_service && docker build -t backend_service.api:latest --no-cache . && docker tag backend_service.api:latest menoitami/backend_service.api:latest
-
-      - name: Push Docker image api service to Docker Hub
-        run: |
+          cd ./auth-service/auth_service
+          export TAG=$(date +%Y%m%d-%H%M%S)
+          docker build \
+            --pull \
+            --no-cache \
+            -t backend_service.api:$TAG \
+            -t backend_service.api:latest .
+          
+          docker tag backend_service.api:latest menoitami/backend_service.api:latest
+          docker tag backend_service.api:$TAG menoitami/backend_service.api:$TAG
+          
+          echo "Собранные образы:"
+          docker images | grep backend_service.api
+          
           docker push menoitami/backend_service.api:latest
+          docker push menoitami/backend_service.api:$TAG
 
-      - name: Build notification service
+      - name: Build and Push Notification Service
         run: |
-          cd ./auth-service/notification && docker build -t backend_service.notification_app --no-cache . && docker tag backend_service.notification_app:latest menoitami/backend_service.notification_app:latest
-      
-      - name: Push notification_service
-        run: |
+          cd ./auth-service/notification
+          export TAG=$(date +%Y%m%d-%H%M%S)
+          docker build \
+            --pull \
+            --no-cache \
+            -t backend_service.notification_app:$TAG \
+            -t backend_service.notification_app:latest .
+          
+          docker tag backend_service.notification_app:latest menoitami/backend_service.notification_app:latest
+          docker tag backend_service.notification_app:$TAG menoitami/backend_service.notification_app:$TAG
+          
+          echo "Собранные образы:"
+          docker images | grep backend_service.notification_app
+          
           docker push menoitami/backend_service.notification_app:latest
+          docker push menoitami/backend_service.notification_app:$TAG
 
   deploy:
     needs: build
     runs-on: ubuntu-latest
     
     steps:
-      - name: Deploy
+      - name: Deploy to Server
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.HOST_IP }}
@@ -55,4 +88,7 @@ jobs:
             docker compose pull
             docker compose build --no-cache
             docker compose up -d --force-recreate
-            docker compose logs -f | head -n 50  # Вывод первых 50 строк логов
+            echo "Статус контейнеров:"
+            docker ps -a
+            echo "Логи (первые 50 строк):"
+            docker compose logs -f | head -n 50

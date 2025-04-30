@@ -208,18 +208,36 @@
         })
         .then(response => {
             if (!response.ok) {
-                throw new Error('Authorization failed');
+                return response.json().then(errData => {
+                    const error = new Error(errData.title || 'Authorization failed');
+                    error.response = response;
+                    error.data = errData;
+                    throw error;
+                }).catch(() => {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                });
             }
             return response.json();
         })
         .then(data => {
             displayUserData(data);
         })
-        .catch(e => {
-            /*
+        .catch(error => {
+            console.error('Authorization error:', error);
 
-            */
-            console.log(e); // Выводим ошибку в консоль
+            let errorMessage = 'Произошла ошибка авторизации';
+
+            if (error.data) {
+                if (error.data.title && error.data.title.includes('is not a valid redirect URL')) {
+                    const invalidUrl = error.data.title.split('is not a valid redirect URL')[0].trim();
+                    errorMessage = `Недопустимый URL для перенаправления: ${invalidUrl}`;
+                }
+                else if (error.data.title) {
+                    errorMessage = error.data.title;
+                }
+            }
+
+            alert(errorMessage);
         });
 
         function displayUserData(data) {

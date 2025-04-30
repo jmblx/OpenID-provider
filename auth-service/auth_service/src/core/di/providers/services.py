@@ -124,7 +124,7 @@ class ServiceProvider(Provider):
     client_token_service = provide(ClientTokenWhitelistServiceImpl, scope=Scope.REQUEST, provides=ClientTokenWhitelistService)
     auth_server_token_service = provide(AuthServerTokenWhitelistServiceImpl, scope=Scope.REQUEST, provides=AuthServerTokenWhitelistService)
     oauth_identity_provider = provide(YandexIdentityProvider, scope=Scope.REQUEST, provides=YandexIdentityProvider)
-    third_party_notification_service = provide(ThirdPartyNotificationService, scope=Scope.REQUEST, provides=ThirdPartyNotificationServiceImpl)
+    third_party_notification_service = provide(ThirdPartyNotificationServiceImpl, scope=Scope.REQUEST, provides=ThirdPartyNotificationService)
     # reg_validation_service = provide(
     #     RegUserValidationService,
     #     scope=Scope.REQUEST,
