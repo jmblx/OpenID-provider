@@ -13,7 +13,7 @@ from application.auth_as.login_user_auth_server import (
 from application.auth_for_client.code_to_token_handler import CodeToTokenHandler, CodeToTokenCommand
 from application.auth_for_client.get_me_page_data_handler import GetMeDataHandler, GetMeDataCommand, MeData
 from application.common.auth_server_token_types import Fingerprint
-from presentation.web_api.routes.auth.models import GetMePageDataSchema, CodeToTokenResponseSchema
+from presentation.web_api.routes.auth.models import GetMePageDataSchema
 from presentation.web_api.utils import set_auth_server_tokens, set_client_tokens
 
 auth_router = APIRouter(route_class=DishkaRoute, tags=["auth"])
@@ -51,7 +51,7 @@ async def code_to_token(
         "refresh_token": response_data.pop("refresh_token", None),
     }
 
-    response = ORJSONResponse(content=response_data)
+    response = ORJSONResponse(content={"status": "success"}, status_code=status.HTTP_200_OK)
 
     set_client_tokens(response, tokens)
 
