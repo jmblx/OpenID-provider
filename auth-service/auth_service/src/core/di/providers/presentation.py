@@ -30,7 +30,7 @@ class PresentationProvider(Provider):
     async def provide_client_access_token(
         self, request: Request
     ) -> ClientAccessToken:
-        return ClientAccessToken(request.headers.get("Authorization").replace("Bearer ", ""))
+        return ClientAccessToken(request.cookies.get("client_access_token"))
 
     @provide(scope=Scope.REQUEST, provides=ClientRefreshToken)
     async def provide_client_refresh_token(
