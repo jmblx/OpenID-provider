@@ -21,6 +21,7 @@ from application.auth_as.revoke_token_handler import (
 )
 from application.auth_for_client.code_to_token_handler import CodeToTokenHandler
 from application.auth_for_client.get_me_page_data_handler import GetMeDataHandler
+from application.auth_for_client.get_userinfo_handler import GetUserInfoQueryHandler
 from application.auth_for_client.refresh_tokens_handler import RefreshClientTokensHandler
 from application.auth_for_client.revoke_token_handler import RevokeClientTokenHandler
 from application.client.add_allowed_url import (
@@ -130,3 +131,4 @@ class HandlerProvider(Provider):
     verify_reset_code_handler = provide(VerifyResetCodeHandler, scope=Scope.REQUEST)
     yandex_login_handler = provide(YandexLoginHandler, scope=Scope.REQUEST)
     yandex_register_handler = provide(YandexRegisterHandler, scope=Scope.REQUEST)
+    get_user_info_query_handler = provide(GetUserInfoQueryHandler, scope=Scope.REQUEST)

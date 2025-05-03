@@ -35,6 +35,9 @@ class ClientIdentityProvider(UserIdentityProvider):
     @abstractmethod
     def get_current_rs_ids(self) -> list[ResourceServerID]: ...
 
+    @abstractmethod
+    def get_current_user_scopes(self) -> list[str]: ...
+
 
 logger = logging.getLogger(__name__)
 
@@ -117,6 +120,9 @@ class ClientIdentityProviderImpl(ClientIdentityProvider, BaseTokenProvider):
 
     def _get_refresh_token_jti(self) -> UUID:
         return self._client_refresh_token_payload["jti"]
+
+    def get_current_user_scopes(self) -> list[str]:
+        return self._client_access_token_payload["scopes"]
 
     async def get_current_user_id(self) -> UserID:
         jti = self._get_refresh_token_jti()

@@ -1,4 +1,5 @@
 import logging
+from collections import defaultdict
 from typing import Sequence
 
 import sqlalchemy as sa
@@ -64,9 +65,10 @@ class RoleRepositoryImpl(RoleRepository):
 
     async def get_user_roles_by_rs_ids(
         self, user_id: UserID, rs_ids: Sequence[ResourceServerID]
-    ) -> list[Role]:
+    ) -> dict[ResourceServerID, list[Role]]:
+        """Возвращает роли пользователя, сгруппированные по RS."""
         stmt = text("""
-            SELECT r.* FROM role r
+            SELECT r.*, rs.id AS rs_id FROM role r
             JOIN user_role_association ura ON r.id = ura.role_id
             JOIN "user" u ON ura.user_id = u.id
             JOIN resource_server rs ON r.rs_id = rs.id
@@ -82,7 +84,13 @@ class RoleRepositoryImpl(RoleRepository):
             "rs_type": ResourceServerType.RBAC_BY_AS.value,
         })
 
-        return result.mappings().all()
+        roles_by_rs = defaultdict(list)
+        for row in result.mappings():
+            role = dict(row)  # или Role(**row), если используется ORM-модель
+            rs_id = row["rs_id"]
+            roles_by_rs[rs_id].append(role)
+
+        return roles_by_rs
 
     async def delete_role(self, role: Role) -> None:
         role.is_active = False

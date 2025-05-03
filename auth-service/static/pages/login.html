@@ -288,7 +288,6 @@
             .then(({ handler }) => handler())
             .then(data => {
                 console.log('Данные авторизации через Яндекс:', data);
-                // Здесь можно отправить токен на ваш сервер для обработки
                 sendYandexTokenToServer(data.access_token);
             })
             .catch(error => {

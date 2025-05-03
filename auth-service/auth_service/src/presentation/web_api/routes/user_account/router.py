@@ -9,6 +9,7 @@ from fastapi.responses import ORJSONResponse
 from application.auth_as.identify_by_cookies_query import (
     IdentifyByCookiesQueryHandler,
 )
+from application.auth_for_client.get_userinfo_handler import GetUserInfoQueryHandler
 from application.dtos.set_image import ImageDTO
 from application.user.add_role_to_user_handler import (
     AddRoleToUserHandler,
@@ -19,6 +20,7 @@ from application.user.delete_user_handler import (
     DeleteUserCommand,
 )
 from application.user.set_user_avatar_handler import SetUserAvatarHandler, SetUserAvatarCommand
+from presentation.web_api.routes.user_account.schemas import ClientGetUserDataInfo
 
 user_account_router = APIRouter(route_class=DishkaRoute, tags=["user_account"])
 
@@ -62,3 +64,8 @@ async def set_avatar(handler: FromDishka[SetUserAvatarHandler], file: UploadFile
     avatar_path = await handler.handle(SetUserAvatarCommand(image_dto))
 
     return ORJSONResponse({"avatar_path": avatar_path})
+
+
+@user_account_router.get("/userinfo", response_model=ClientGetUserDataInfo)
+async def get_userinfo(handler: FromDishka[GetUserInfoQueryHandler]):
+    return await handler.handle()

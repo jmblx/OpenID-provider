@@ -47,7 +47,7 @@ async def code_to_token(
     response_data = await handler.handle(command)
     logger.info("response_data: %s", response_data)
     tokens = {
-        "access_token": "",
+        "access_token": response_data.pop("access_token", None),
         "refresh_token": response_data.pop("refresh_token", None),
     }
 

@@ -1,15 +1,19 @@
 import uuid
 from abc import ABC, abstractmethod
-from typing import Optional, TypedDict, Literal
+from typing import Optional, TypedDict, Literal, get_args
 
 from domain.entities.resource_server.value_objects import ResourceServerIds
+
+
+UserScope = Literal["email", "avatar_path"]
+ALLOWED_SCOPES: list[str] = list(get_args(UserScope))
 
 
 class AuthCodeData(TypedDict, total=False):
     user_id: str
     client_id: str
     code_challenger: str
-    user_data_needed: list[Literal["email", "avatar_path"]]
+    user_data_needed: list[UserScope]
     rs_ids: ResourceServerIds
 
 

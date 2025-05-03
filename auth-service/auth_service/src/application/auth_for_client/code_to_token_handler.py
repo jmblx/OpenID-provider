@@ -27,11 +27,9 @@ class CodeToTokenCommand:
     code_challenger: str
 
 
-class CodeToTokenResponse(TypedDict, total=False):
+class CodeToTokenResponse(TypedDict):
     access_token: ClientAccessToken
     refresh_token: ClientRefreshToken
-    email: str
-    avatar_path: str
 
 
 logger = logging.getLogger(__name__)
@@ -46,7 +44,7 @@ class CodeToTokenHandler:
         auth_code_storage: AuthorizationCodeStorage,
         user_repository: UserRepository,
         uow: Uow,
-        s3_storage: StorageServiceInterface,
+
     ) -> None:
         self.auth_service = auth_service
         self.scopes_service = scopes_service
@@ -54,7 +52,6 @@ class CodeToTokenHandler:
         self.auth_code_storage = auth_code_storage
         self.user_repository = user_repository
         self.uow = uow
-        self.s3_storage = s3_storage
 
     def _validate_pkce(
         self, user_code_challenger: str, real_code_challenger: str
@@ -87,25 +84,25 @@ class CodeToTokenHandler:
         client_id = int(auth_code_data["client_id"])
         rs_ids = auth_code_data["rs_ids"]
         await self.user_repository.add_rs_to_user(user.id, rs_ids)
-        result = {
-            k: getattr(getattr(user, k), "value", getattr(user, k))
-            for k in auth_code_data["user_data_needed"] if k != "avatar_path"
-        }
-        try:
-            if idx := auth_code_data["user_data_needed"].index("avatar_path"):
-                result["avatar_path"] = self.s3_storage.get_presigned_avatar_url(str(user.id.value))
-                auth_code_data["user_data_needed"].pop(idx)
-        except ValueError: ...
-
+        # result = {
+        #     k: getattr(getattr(user, k), "value", getattr(user, k))
+        #     for k in auth_code_data["user_data_needed"] if k != "avatar_path"
+        # }
+        # try:
+        #     if idx := auth_code_data["user_data_needed"].index("avatar_path"):
+        #         result["avatar_path"] = self.s3_storage.get_presigned_avatar_url(str(user.id.value))
+        #         auth_code_data["user_data_needed"].pop(idx)
+        # except ValueError: ...
+        result = {}
         user_roles = await self.role_repo.get_user_roles_by_rs_ids(
             user_id=user.id, rs_ids=rs_ids
         )
         logger.info(f"User roles: %s, rs_ids: %s", user_roles, rs_ids)
-        user_scopes = (
-            self.scopes_service.calculate_full_user_scopes_for_client(
-                user_roles
-            )
+        user_scopes = self.scopes_service.calculate_full_user_scopes_for_client(
+            user_roles
         )
+        for k in auth_code_data["user_data_needed"]:
+            user_scopes.append(f"{k}:0100")
         tokens = await self.auth_service.create_and_save_tokens(
             user, user_scopes, client_id, rs_ids
         )
