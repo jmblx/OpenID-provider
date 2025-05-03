@@ -66,6 +66,6 @@ async def set_avatar(handler: FromDishka[SetUserAvatarHandler], file: UploadFile
     return ORJSONResponse({"avatar_path": avatar_path})
 
 
-@user_account_router.get("/userinfo", response_model=ClientGetUserDataInfo)
-async def get_userinfo(handler: FromDishka[GetUserInfoQueryHandler]):
-    return await handler.handle()
+@user_account_router.get("/userinfo")
+async def get_userinfo(handler: FromDishka[GetUserInfoQueryHandler]) -> ClientGetUserDataInfo:
+    return ClientGetUserDataInfo(**await handler.handle())
