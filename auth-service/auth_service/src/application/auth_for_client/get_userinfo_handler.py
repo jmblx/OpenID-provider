@@ -22,13 +22,12 @@ class GetUserInfoQueryHandler:
     async def handle(self) -> UserData:
         user_scopes = self.idp.get_current_user_scopes()
         user: User = await self.idp.get_current_user()
-        result = defaultdict(None)
-        result["id"] = user.id.value
         available_data = [scope.split(":")[0] for scope in user_scopes if scope.split(":")[0] in ALLOWED_SCOPES]
         result = {
             k: getattr(getattr(user, k), "value", getattr(user, k))
             for k in available_data if k != "avatar_path"
         }
+        result["id"] = user.id.value
         try:
             if "avatar_path" in available_data:
                 result["avatar_path"] = self.s3_storage.get_presigned_avatar_url(str(user.id.value))

@@ -103,9 +103,9 @@ class ClientTokenWhitelistServiceImpl(ClientTokenWhitelistService):
         await self.redis.hset(f"{self.audience}_refresh_token:{jti}", mapping=self._serialize_refresh_token_data(refresh_token_data))
         await self.redis.zadd(f"{self.audience}_refresh_tokens:{user_id}", {jti: created_at})
 
-    async def get_refresh_token_data(self, jti: UUID) -> AuthServerRefreshTokenData | None:
+    async def get_refresh_token_data(self, jti: UUID) -> ClientRefreshTokenData | None:
         data = await self.redis.hgetall(f"{self.audience}_refresh_token:{jti}")
-        return AuthServerRefreshTokenData(**data) if data else None
+        return ClientRefreshTokenData(**data) if data else None
 
     async def remove_old_tokens(self, user_id: UUID, limit: int) -> None:
         if await self.redis.zcard(f"{self.audience}_refresh_tokens:{user_id}") > limit:

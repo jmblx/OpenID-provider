@@ -1,3 +1,4 @@
+import os
 from datetime import timedelta
 from io import BytesIO
 from urllib.parse import urlunparse, urlparse
@@ -14,10 +15,10 @@ class MinIOService(StorageServiceInterface):
     def __init__(self, config: MinIOConfig):
         self.config = config
         self.s3_client = Minio(
-            config.endpoint_url,  # Внутри Docker-сети используйте имя контейнера
+            config.endpoint_url,
             access_key=config.access_key,
             secret_key=config.secret_key,
-            secure=False  # Используйте True, если MinIO настроен с TLS
+            secure=False
         )
 
     def _process_avatar(self, content: bytes) -> bytes:
@@ -61,22 +62,10 @@ class MinIOService(StorageServiceInterface):
             # Генерируем presigned URL
             presigned_url = self.s3_client.presigned_get_object(
                 self.config.user_avatar_bucket_name,
-                self._get_avatar_filename(user_id),  # Имя файла
+                self._get_avatar_filename(user_id),
                 expires=timedelta(minutes=5)
             )
-            #
-            # # Разбираем URL на компоненты
-            # parsed_url = urlparse(presigned_url)
-            #
-            # # Заменяем хост и порт на public_url
-            # new_netloc = self.config.public_url
-            # if ":" in new_netloc:
-            #     new_netloc = new_netloc.split(":")[0]  # Убираем порт, если он есть
-            #
-            # # Собираем новый URL
-            # new_url = parsed_url._replace(netloc=new_netloc)
-            # presigned_url = urlunparse(new_url)
-            presigned_url = presigned_url.replace("minio:9000", "minio.example.com")
+            presigned_url = presigned_url.replace("minio:9000", os.getenv("HOST_ADDRESS"))
 
             return presigned_url
         except S3Error as e:

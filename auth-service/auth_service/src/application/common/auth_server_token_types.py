@@ -39,7 +39,7 @@ class JwtToken(TypedDict):
 class AuthServerRefreshTokenData:
     user_id: UUID
     jti: str
-    fingerprint: Fingerprint
+    fingerprint: Fingerprint | None
     created_at: datetime
 
 class RefreshTokenPayload(TypedDict):
