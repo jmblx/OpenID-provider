@@ -59,7 +59,6 @@ class MinIOService(StorageServiceInterface):
         Заменяет хост в URL на public_url.
         """
         try:
-            # Генерируем presigned URL
             presigned_url = self.s3_client.presigned_get_object(
                 self.config.user_avatar_bucket_name,
                 self._get_avatar_filename(user_id),
