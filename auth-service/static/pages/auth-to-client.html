@@ -175,6 +175,8 @@
     }
 
     document.addEventListener('DOMContentLoaded', () => {
+        saveInitialQueryParams();
+
         const profileLink = document.getElementById('profile-link');
         profileLink.addEventListener('click', goToProfilePage);
 

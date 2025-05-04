@@ -175,6 +175,7 @@
         color: #777;
         }
     </style>
+    <script src="/scripts/manageParams.js"></script>
 </head>
 <body>
     <div class="container">
@@ -352,6 +353,7 @@
             localStorage.setItem('deviceFingerprint', fingerprint);
             console.log('Device Fingerprint:', fingerprint);
 
+            saveInitialQueryParams();
             const urlParams = new URLSearchParams(window.location.search);
             const params = {};
             for (let [key, value] of urlParams.entries()) {
