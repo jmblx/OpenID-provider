@@ -1,4 +1,4 @@
-function saveInitialQueryParams() {
+export function saveInitialQueryParams() {
     const urlParams = new URLSearchParams(window.location.search);
     if (!sessionStorage.getItem('initialParams')) {
         const params = {};
@@ -9,7 +9,7 @@ function saveInitialQueryParams() {
     }
 }
 
-function getStoredParams() {
+export function getStoredParams() {
     const data = sessionStorage.getItem('initialParams');
     return data ? JSON.parse(data) : {};
 }

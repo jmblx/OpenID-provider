@@ -1,7 +1,7 @@
 import { initYandexAuth } from './yandexAuth.js';
 import { initLoginForm } from './login.js';
 import { initPasswordReset } from './passwordReset.js';
-import { saveInitialQueryParams } from './manageParams.js';
+import { saveInitialQueryParams } from './manageParamsMod.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
     // Сохраняем параметры в sessionStorage
