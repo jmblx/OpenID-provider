@@ -1,6 +1,6 @@
 import { getOrCreateFingerprint } from './fingerprint.js';
 
-export function initYandexAuth(clientId, redirectUri) {
+export function initYandexAuth({ clientId, redirectUri, authType = 'login' }) {
     const button = document.getElementById('yandexAuthBtn');
     if (!button) return;
 
@@ -17,7 +17,7 @@ export function initYandexAuth(clientId, redirectUri) {
                 window.location.origin
             ).then(({ handler }) => handler());
 
-            await sendYandexTokenToServer(data.access_token);
+            await sendYandexTokenToServer(data.access_token, authType);
         } catch (error) {
             console.error('Yandex auth error:', error);
             alert(error.type === 'access_denied'
@@ -26,10 +26,11 @@ export function initYandexAuth(clientId, redirectUri) {
         }
     }
 
-    async function sendYandexTokenToServer(token) {
+    async function sendYandexTokenToServer(token, authType) {
         const fingerprint = await getOrCreateFingerprint();
+        const endpoint = authType === 'login' ? '/api/login/yandex' : '/api/register/yandex';
 
-        const response = await fetch('/api/login/yandex', {
+        const response = await fetch(endpoint, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -43,11 +44,10 @@ export function initYandexAuth(clientId, redirectUri) {
             throw new Error(error.detail || 'Auth failed');
         }
 
-        handleAuthSuccess();
+        return handleAuthSuccess();
     }
 
     function handleAuthSuccess() {
-        // Параметры берутся из sessionStorage в auth-to-client.html
         window.location.href = '/pages/auth-to-client.html';
     }
 }

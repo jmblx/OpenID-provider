@@ -1,0 +1,13 @@
+/* Уникальные стили для страницы регистрации */
+.client-name span {
+    font-size: 18px;
+    color: #4fadf3;
+    font-weight: 600;
+    margin: 10px 0 20px;
+    text-align: center;
+}
+
+.form-container input:focus {
+    box-shadow: 0 0 6px rgba(79, 173, 243, 0.8);
+    outline: none;
+}
