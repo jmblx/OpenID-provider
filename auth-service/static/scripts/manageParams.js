@@ -1,4 +1,4 @@
-function saveInitialQueryParams() {
+export function saveInitialQueryParams() {
     const urlParams = new URLSearchParams(window.location.search);
     if (!sessionStorage.getItem('initialParams')) {
         const params = {};
