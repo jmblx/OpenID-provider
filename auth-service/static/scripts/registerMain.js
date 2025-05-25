@@ -1,5 +1,5 @@
-import { getOrCreateFingerprint } from './auth/fingerprint.js';
-import { initYandexAuth } from './auth/yandexAuth.js';
+import { getOrCreateFingerprint } from './fingerprint.js';
+import { initYandexAuth } from './yandexAuth.js';
 import { saveInitialQueryParams } from './manageParamsMod.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
