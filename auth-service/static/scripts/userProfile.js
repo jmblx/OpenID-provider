@@ -2,21 +2,18 @@ import {
     loadUserData,
     loadUserAvatar,
     setupReturnButton,
-    openAvatarUpload
+    openAvatarUpload, uploadAvatar
 } from './profileCommon.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
     try {
-        // Загрузка данных пользователя
         await Promise.all([
             loadUserData('user-email'),
             loadUserAvatar('user-avatar')
         ]);
 
-        // Настройка кнопки возврата
         setupReturnButton();
 
-        // Обработчики событий
         document.getElementById('user-avatar')?.addEventListener('click', openAvatarUpload);
         document.querySelector('.edit-icon')?.addEventListener('click', openAvatarUpload);
         document.getElementById('avatar-upload')?.addEventListener('change', async () => {

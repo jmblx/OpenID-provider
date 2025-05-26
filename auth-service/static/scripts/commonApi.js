@@ -6,14 +6,24 @@ export async function fetchWithAuth(url, options = {}) {
     const defaults = {
         credentials: 'include',
         headers: {
-            'Content-Type': 'application/json',
             'X-Device-Fingerprint': fingerprint,
-            ...options.headers,
-        },
-        ...options
+        }
     };
 
-    const response = await fetch(url, defaults);
+    if (!(options.body instanceof FormData)) {
+        defaults.headers['Content-Type'] = 'application/json';
+    }
+
+    const mergedOptions = {
+        ...defaults,
+        ...options,
+        headers: {
+            ...defaults.headers,
+            ...options.headers,
+        }
+    };
+
+    const response = await fetch(url, mergedOptions);
 
     if (response.status === 401) {
         redirectToLogin();
@@ -22,7 +32,7 @@ export async function fetchWithAuth(url, options = {}) {
 
     if (!response.ok) {
         const error = await response.json().catch(() => ({}));
-        throw new Error(error.message || 'Request failed');
+        throw new Error(error.message || error.detail || 'Request failed');
     }
 
     return response;

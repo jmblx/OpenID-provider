@@ -3,7 +3,7 @@ import { fetchWithAuth, loadUserData, loadUserAvatar } from './commonApi.js';
 
 export async function uploadAvatar() {
     const fileInput = document.getElementById('avatar-upload');
-    if (!fileInput || fileInput.files.length === 0) return false;
+    if (!fileInput?.files?.length) return false;
 
     try {
         const formData = new FormData();
@@ -11,8 +11,7 @@ export async function uploadAvatar() {
 
         await fetchWithAuth('/api/set-avatar', {
             method: 'POST',
-            body: formData,
-            headers: {} // Reset headers for FormData
+            body: formData
         });
 
         localStorage.setItem('lastAvatarUpdate', Date.now());
