@@ -1,9 +1,8 @@
 import {
-    loadUserData,
-    loadUserAvatar,
     setupReturnButton,
-    openAvatarUpload
+    openAvatarUpload, uploadAvatar
 } from './profileCommon.js';
+import {loadUserData, loadUserAvatar} from "./commonApi";
 
 document.addEventListener('DOMContentLoaded', async () => {
     try {
