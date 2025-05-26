@@ -3,229 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Profile</title>
+    <title>Admin Profile</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        .admin-panel {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            background-color: #343a40;
-            padding: 10px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            z-index: 1000;
-        }
-        .admin-panel a {
-            color: white;
-            text-decoration: none;
-            margin: 0 10px;
-            padding: 5px 10px;
-            border-radius: 4px;
-            transition: background-color 0.3s;
-        }
-        .admin-panel a:hover {
-            background-color: #495057;
-        }
-        body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background-color: #f8f9fa;
-            padding-top: 60px;
-        }
-        .container {
-            max-width: 400px;
-            background: #fff;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            text-align: center;
-            margin-top: 20px;
-        }
-        .user-info {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 20px;
-        }
-        .user-info img {
-            border-radius: 50%;
-            margin-right: 10px;
-            width: 50px;
-            height: 50px;
-            cursor: pointer;
-        }
-        .edit-icon {
-            width: 20px;
-            height: 20px;
-            cursor: pointer;
-        }
-        .hidden {
-            display: none;
-        }
-    </style>
+    <link rel="stylesheet" href="/styles/profileCommon.css">
+    <link rel="stylesheet" href="/styles/adminProfile.css">
+    <script type="module" src="/scripts/adminProfile.js"></script>
 </head>
 <body>
-    <!-- Админская панель -->
     <div class="admin-panel">
         <div>
             <a href="/pages/resourceServers.html">Resource Servers</a>
             <a href="/pages/clients.html">Clients</a>
         </div>
-        <div id="user-email-admin" style="color: white;"></div>
+        <div id="user-email-admin"></div>
     </div>
 
     <div class="container">
         <div class="user-info">
-            <img id="user-avatar" src="/icons/defaultAvatar.svg" alt="User Avatar" onclick="openAvatarUpload()">
+            <img id="user-avatar" src="/icons/defaultAvatar.svg" alt="User Avatar">
             <span id="user-email">Loading...</span>
         </div>
         <div class="d-flex justify-content-end">
-            <img src="/icons/edit.svg" class="edit-icon" onclick="openAvatarUpload()">
+            <img src="/icons/edit.svg" class="edit-icon">
         </div>
         <button class="btn btn-primary w-100 mt-3" id="return-button">Return to Authorization</button>
-        <input type="file" id="avatar-upload" style="display: none;" onchange="uploadAvatar()">
+        <input type="file" id="avatar-upload" class="hidden">
     </div>
-
-    <script>
-        const fingerprint = localStorage.getItem('deviceFingerprint') || '';
-
-        function getQueryParams() {
-            const params = {};
-            const urlParams = new URLSearchParams(window.location.search);
-            for (const [key, value] of urlParams.entries()) {
-                params[key] = value;
-            }
-            return params;
-        }
-
-        function hasAuthParams(params) {
-            const requiredParams = ['client_id', 'required_resources', 'redirect_url'];
-            return requiredParams.every(param => params[param]);
-        }
-
-        async function loadUserData() {
-            try {
-                const response = await fetchWithAuth('/api/me');
-                if (!response.ok) {
-                    throw new Error('Failed to load user data');
-                }
-                const userData = await response.json();
-                document.getElementById('user-email').textContent = userData.email;
-                document.getElementById('user-email-admin').textContent = userData.email; // Добавляем email в админ-панель
-                loadUserAvatar();
-            } catch (error) {
-                console.error('Error loading user data:', error);
-            }
-        }
-
-        async function fetchWithAuth(url, options = {}) {
-            const defaults = {
-                credentials: 'include',
-                headers: {
-                    'X-Device-Fingerprint': fingerprint,
-                    ...options.headers,
-                },
-            };
-
-            const response = await fetch(url, { ...defaults, ...options });
-
-            if (response.status === 401) {
-                const loginUrl = new URL('/pages/login.html', window.location.href);
-                loginUrl.search = window.location.search;
-                window.location.href = loginUrl.toString();
-                return Promise.reject(new Error('Unauthorized'));
-            }
-
-            if (!response.ok) {
-                const error = new Error(`HTTP error: ${response.status}`);
-                error.response = response;
-                throw error;
-            }
-
-            return response;
-        }
-
-        function openAvatarUpload() {
-            document.getElementById('avatar-upload').click();
-        }
-
-        const avatarUrl = '/avatars/jwt/';
-        const localStorageKey = 'lastAvatarUpdate';
-
-        async function loadUserAvatar() {
-            try {
-                const lastUpdate = localStorage.getItem(localStorageKey);
-                const url = lastUpdate ? `${avatarUrl}?t=${lastUpdate}` : avatarUrl;
-
-                const response = await fetchWithAuth(url);
-                if (!response.ok) {
-                    throw new Error('Failed to load avatar');
-                }
-                const blob = await response.blob();
-                const imageUrl = URL.createObjectURL(blob);
-                document.getElementById('user-avatar').src = imageUrl;
-            } catch (error) {
-                console.error('Error loading avatar:', error);
-                document.getElementById('user-avatar').src = '/icons/defaultAvatar.svg';
-            }
-        }
-
-        async function uploadAvatar() {
-            const fileInput = document.getElementById('avatar-upload');
-            if (fileInput.files.length === 0) return;
-
-            const file = fileInput.files[0];
-            const formData = new FormData();
-            formData.append('file', file);
-
-            try {
-                const response = await fetchWithAuth('/api/set-avatar', {
-                    method: 'POST',
-                    body: formData,
-                });
-                if (!response.ok) throw new Error('Failed to upload avatar');
-
-                alert('Avatar updated successfully!');
-                localStorage.setItem(localStorageKey, new Date().getTime());
-                loadUserAvatar();
-            } catch (error) {
-                console.error('Error uploading avatar:', error);
-                alert('Failed to upload avatar');
-            }
-        }
-
-        function setupReturnButton() {
-            const params = getQueryParams();
-            const returnButton = document.getElementById('return-button');
-
-            // Скрываем кнопку, если нет параметров авторизации
-            if (!hasAuthParams(params)) {
-                returnButton.classList.add('hidden');
-                return;
-            }
-
-            const clientName = params.client_name || 'Client';
-            returnButton.textContent = `<- Authorize on ${clientName}`;
-
-            returnButton.addEventListener('click', () => {
-                delete params.client_name;
-                const redirectUrl = new URL('/pages/auth-to-client.html', window.location.origin);
-                for (const [key, value] of Object.entries(params)) {
-                    redirectUrl.searchParams.append(key, value);
-                }
-                window.location.href = redirectUrl.toString();
-            });
-        }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            loadUserData();
-            setupReturnButton();
-        });
-    </script>
 </body>
 </html>
