@@ -6,7 +6,11 @@ import { saveInitialQueryParams } from './manageParamsMod.js';
 document.addEventListener('DOMContentLoaded', async () => {
     saveInitialQueryParams();
 
-    initYandexAuth('83c64ffbf6db4ea282b7e4d0c5cfbb51', 'https://menoitami.ru/pages/yandex-login.html');
+    initYandexAuth({
+        clientId: '83c64ffbf6db4ea282b7e4d0c5cfbb51',
+        redirectUri: 'https://menoitami.ru/pages/yandex-login.html',
+        authType: 'login'
+    });
     initLoginForm();
     initPasswordReset();
 

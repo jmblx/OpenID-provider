@@ -1,4 +1,5 @@
 import { getOrCreateFingerprint } from './fingerprint.js';
+import { fetchWithAuth } from './commonApi.js';
 
 export function initYandexAuth({ clientId, redirectUri, authType = 'login' }) {
     const button = document.getElementById('yandexAuthBtn');
@@ -17,12 +18,14 @@ export function initYandexAuth({ clientId, redirectUri, authType = 'login' }) {
                 window.location.origin
             ).then(({ handler }) => handler());
 
+            if (!data?.access_token) {
+                throw new Error('Не удалось получить токен');
+            }
+
             await sendYandexTokenToServer(data.access_token, authType);
         } catch (error) {
             console.error('Yandex auth error:', error);
-            alert(error.type === 'access_denied'
-                ? 'Вы отменили авторизацию'
-                : 'Ошибка авторизации через Яндекс');
+            handleYandexError(error);
         }
     }
 
@@ -30,24 +33,28 @@ export function initYandexAuth({ clientId, redirectUri, authType = 'login' }) {
         const fingerprint = await getOrCreateFingerprint();
         const endpoint = authType === 'login' ? '/api/login/yandex' : '/api/register/yandex';
 
-        const response = await fetch(endpoint, {
+        await fetchWithAuth(endpoint, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-Device-Fingerprint': fingerprint,
-            },
-            body: JSON.stringify({ yandex_token: token, fingerprint })
+            body: JSON.stringify({ yandex_token: token })
         });
 
-        if (!response.ok) {
-            const error = await response.json();
-            throw new Error(error.detail || 'Auth failed');
-        }
-
-        return handleAuthSuccess();
+        handleAuthSuccess();
     }
 
     function handleAuthSuccess() {
-        window.location.href = '/pages/auth-to-client.html';
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('client_id') && params.get('redirect_url')) {
+            window.location.href = '/pages/auth-to-client.html';
+        } else {
+            window.location.href = '/pages/profile.html';
+        }
+    }
+
+    function handleYandexError(error) {
+        const message = error.type === 'access_denied'
+            ? 'Вы отменили авторизацию'
+            : error.message || 'Ошибка авторизации через Яндекс';
+
+        alert(message);
     }
 }
