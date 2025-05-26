@@ -37,7 +37,6 @@ export function initLoginForm() {
     }
 
     function handleAuthSuccess() {
-        // Параметры берутся из sessionStorage в auth-to-client.html
         window.location.href = '/pages/auth-to-client.html';
     }
 }
