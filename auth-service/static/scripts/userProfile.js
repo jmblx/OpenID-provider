@@ -2,7 +2,7 @@ import {
     setupReturnButton,
     openAvatarUpload, uploadAvatar
 } from './profileCommon.js';
-import {loadUserData, loadUserAvatar} from "./commonApi";
+import {loadUserData, loadUserAvatar} from "./commonApi.js";
 
 document.addEventListener('DOMContentLoaded', async () => {
     try {
