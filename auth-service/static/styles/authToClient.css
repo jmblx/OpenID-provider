@@ -1,4 +1,4 @@
-/* Стили только для страницы auth-to-client */
+/* Блок информации о пользователе */
 .user-info-block {
     position: fixed;
     top: 20px;
@@ -11,7 +11,6 @@
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     z-index: 1000;
-    cursor: pointer;
 }
 
 .user-info-block img {
@@ -26,6 +25,7 @@
     margin-right: 10px;
 }
 
+/* Иконка настроек */
 .gear-icon {
     width: 24px;
     height: 24px;
@@ -38,7 +38,7 @@
     opacity: 0.8;
 }
 
-/* Основная карточка */
+/* Основной контейнер */
 .auth-client-container {
     max-width: 400px;
     background: #fff;
@@ -46,14 +46,21 @@
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     text-align: center;
-    margin-top: 80px;
-}
-
-.permission-checkbox {
     margin-top: 20px;
 }
 
-/* Мобильные стили */
+/* Список ресурсов */
+.permission-list {
+    margin-top: 20px;
+}
+
+.permission-item {
+    text-align: left;
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+/* Адаптация для мобильных */
 @media (max-width: 576px) {
     .user-info-block {
         top: 10px;
