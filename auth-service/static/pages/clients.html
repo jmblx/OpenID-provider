@@ -16,6 +16,36 @@
     </div>
     <div id="clients-container" class="row card-grid"></div>
 
-    <script type="module" src="/scripts/clients.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", async function () {
+            const clients = await fetchClients();
+            if (clients) renderClients(clients);
+        });
+
+        async function fetchClients() {
+            try {
+                const response = await fetch("/api/client/ids_data");
+                if (!response.ok) throw new Error("Ошибка загрузки данных");
+                return await response.json();
+            } catch (error) {
+                console.error(error);
+                alert("Не удалось загрузить список клиентов.");
+                return null;
+            }
+        }
+
+        function renderClients(clients) {
+            const container = document.getElementById("clients-container");
+            container.innerHTML = "";
+
+            Object.entries(clients).forEach(([id, data]) => {
+                const clientCard = document.createElement("div");
+                clientCard.classList.add("col-md-3", "card-item", "client");
+                clientCard.textContent = data.name;
+                clientCard.onclick = () => window.location.href = `/pages/client.html?clientId=${id}`;
+                container.appendChild(clientCard);
+            });
+        }
+    </script>
 </body>
 </html>

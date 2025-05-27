@@ -1,23 +1,20 @@
 import { CardRenderer } from './cardsCommon.js';
 
-export class ClientsRenderer extends CardRenderer {
+export class ResourceServersRenderer extends CardRenderer {
     constructor() {
         super(
             'clients-container',
-            (client) => `
-                <div class="card-title">${client.name}</div>
-                <div class="card-meta">ID: ${client.client_id}</div>
-            `,
+            (server) => `<div class="card-title">${server.name}</div>`,
             '/api/client/ids_data'
         );
     }
 
     handleCardClick(id) {
-        window.location.href = `/pages/client.html?clientId=${id}`;
+        window.location.href = `/pages/client.html?rsId=${id}`;
     }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    const renderer = new ClientsRenderer();
+    const renderer = new ResourceServersRenderer();
     renderer.init();
 });
