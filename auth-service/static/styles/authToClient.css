@@ -1,3 +1,11 @@
+body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: #f8f9fa;
+    padding-top: 120px;
+}
+
 .user-info-block {
     position: fixed;
     top: 20px;
@@ -36,7 +44,7 @@
     opacity: 0.8;
 }
 
-.auth-client-container {
+.container {
     max-width: 400px;
     background: #fff;
     padding: 30px;
@@ -46,14 +54,8 @@
     margin-top: 20px;
 }
 
-.permission-list {
+.permission-checkbox {
     margin-top: 20px;
-}
-
-.permission-item {
-    text-align: left;
-    padding: 10px;
-    border-bottom: 1px solid #eee;
 }
 
 @media (max-width: 576px) {
@@ -76,7 +78,7 @@
         height: 20px;
     }
 
-    .auth-client-container {
+    .container {
         margin-top: 80px;
         padding: 20px;
     }
