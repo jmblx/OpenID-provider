@@ -16,36 +16,6 @@
     </div>
     <div id="rs-container" class="row card-grid"></div>
 
-    <script>
-        document.addEventListener("DOMContentLoaded", async function () {
-            const servers = await fetchResourceServers();
-            if (servers) renderResourceServers(servers);
-        });
-
-        async function fetchResourceServers() {
-            try {
-                const response = await fetch("/api/rs/ids_data");
-                if (!response.ok) throw new Error("Ошибка загрузки данных");
-                return await response.json();
-            } catch (error) {
-                console.error(error);
-                alert("Не удалось загрузить список ресурсных серверов.");
-                return null;
-            }
-        }
-
-       function renderResourceServers(servers) {
-            const container = document.getElementById("rs-container");
-            container.innerHTML = "";
-
-            Object.entries(servers).forEach(([id, data]) => {
-                const serverCard = document.createElement("div");
-                serverCard.classList.add("col-md-3", "card-item", "rs");
-                serverCard.textContent = data.name;
-                serverCard.onclick = () => window.location.href = `/pages/resourceServer.html?rsId=${id}`;
-                container.appendChild(serverCard);
-            });
-       }
-    </script>
+    <script type="module" src="/scripts/resourceServers.js"></script>
 </body>
 </html>
