@@ -1,27 +1,28 @@
-import { fetchData } from '../api/dataService.js';
+import { fetchData } from './dataService.js';
 
 export class CardRenderer {
-    constructor(containerId, cardTemplate, apiEndpoint) {
+    constructor(containerId, cardTemplate, apiEndpoint, options = {}) {
         this.container = document.getElementById(containerId);
         this.cardTemplate = cardTemplate;
         this.apiEndpoint = apiEndpoint;
+        this.cardClass = options.cardClass || 'card-item';
+        this.emptyMessage = options.emptyMessage || 'Нет данных для отображения';
+        this.errorMessage = options.errorMessage || 'Не удалось загрузить данные';
         this.currentPage = 1;
-        this.itemsPerPage = 12;
+        this.itemsPerPage = options.itemsPerPage || 12;
     }
 
     async init() {
         try {
             const data = await this.fetchItems();
             this.renderCards(data);
-            // this.setupPagination(data.length); // Задел для пагинации
         } catch (error) {
             console.error('Error initializing cards:', error);
-            this.showError('Не удалось загрузить данные');
+            this.showError(this.errorMessage);
         }
     }
 
     async fetchItems() {
-        // TODO: Добавить параметры пагинации, когда API будет поддерживать
         return await fetchData(this.apiEndpoint);
     }
 
@@ -41,31 +42,27 @@ export class CardRenderer {
 
     createCard(id, itemData) {
         const card = document.createElement('div');
-        card.className = 'card-item';
+        card.className = this.cardClass;
         card.innerHTML = this.cardTemplate(itemData);
         card.onclick = () => this.handleCardClick(id, itemData);
         return card;
     }
 
     handleCardClick(id, itemData) {
-        // Базовый обработчик, можно переопределить
         console.log('Card clicked:', id, itemData);
     }
 
     showEmptyState() {
-        this.container.innerHTML = '<div class="col-12 text-center py-5 text-muted">Нет данных для отображения</div>';
+        this.container.innerHTML = `
+            <div class="col-12 text-center py-5 text-muted">
+                ${this.emptyMessage}
+            </div>`;
     }
 
     showError(message) {
-        this.container.innerHTML = `<div class="col-12 text-center py-5 text-danger">${message}</div>`;
+        this.container.innerHTML = `
+            <div class="col-12 text-center py-5 text-danger">
+                ${message}
+            </div>`;
     }
-
-    /* Задел для пагинации
-    setupPagination(totalItems) {
-        const totalPages = Math.ceil(totalItems / this.itemsPerPage);
-        if (totalPages <= 1) return;
-
-        // TODO: Реализовать создание элементов пагинации
-    }
-    */
 }
