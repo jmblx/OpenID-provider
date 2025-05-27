@@ -126,3 +126,21 @@ button {
     color: #007bff;
     text-decoration: none;
 }
+
+.hidden {
+    display: none;
+}
+
+.editable-field {
+    margin-bottom: 15px;
+}
+
+.editable-field label {
+    font-weight: bold;
+    display: block;
+    margin-bottom: 5px;
+}
+
+.create-mode .form-control {
+    disabled: false;
+}
