@@ -19,7 +19,7 @@
     <script>
         document.addEventListener("DOMContentLoaded", async function () {
             const resourcesServers = await fetchResourcesServers();
-            if (resourcesServers) renderClients(resourcesServers);
+            if (resourcesServers) renderResourcesServers(resourcesServers);
         });
 
         async function fetchResourcesServers() {
