@@ -38,26 +38,41 @@
     opacity: 0.8;
 }
 
-/* Основной контейнер */
-.auth-client-container {
-    max-width: 400px;
-    background: #fff;
-    padding: 30px;
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    text-align: center;
-    margin-top: 20px;
+/* Блок разрешения */
+.permission-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 25px 0;
 }
 
-/* Список ресурсов */
-.permission-list {
-    margin-top: 20px;
+.permission-checkbox {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 15px;
 }
 
-.permission-item {
-    text-align: left;
-    padding: 10px;
-    border-bottom: 1px solid #eee;
+.permission-checkbox input {
+    margin-right: 10px;
+}
+
+.permission-checkbox label {
+    margin: 0;
+    font-size: 1em;
+}
+
+/* Кнопка авторизации */
+.authorize-button-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+#authorize-button {
+    width: 80%;
+    max-width: 300px;
+    margin-top: 10px;
 }
 
 /* Адаптация для мобильных */

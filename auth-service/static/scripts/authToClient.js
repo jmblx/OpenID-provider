@@ -93,12 +93,7 @@ function addResourceItem(container, title, content) {
 }
 
 function goToProfilePage() {
-    const params = getStoredParams();
     const profileUrl = new URL('/pages/profile.html', window.location.origin);
-
-    for (const [key, value] of Object.entries(params)) {
-        profileUrl.searchParams.append(key, value);
-    }
 
     if (!profileUrl.searchParams.has('client_name')) {
         const clientName = document.getElementById('client-name').textContent;
