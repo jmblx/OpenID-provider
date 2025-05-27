@@ -1,87 +1,115 @@
-        body {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            background-color: #f8f9fa;
-            padding-top: 120px;
-        }
+.auth-client-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    padding-top: 120px;
+    background-color: #f8f9fa;
+}
 
-        .user-info-block {
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            align-items: center;
-            background: #fff;
-            padding: 10px 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            z-index: 1000;
-        }
+.permission-control {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    display: flex;
+    align-items: center;
+    z-index: 1000;
+}
 
-        .user-info-block img {
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            margin-right: 10px;
-        }
+.permission-control label {
+    margin-left: 8px;
+    font-size: 14px;
+    cursor: pointer;
+}
 
-        .user-info-block span {
-            font-size: 1.1em;
-            margin-right: 10px;
-        }
+.user-info-block {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    background: #fff;
+    padding: 10px 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+}
 
-        .gear-icon {
-            width: 24px;
-            height: 24px;
-            cursor: pointer;
-            transition: transform 0.3s ease, opacity 0.3s ease;
-        }
+.user-info-block img {
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    margin-right: 10px;
+}
 
-        .gear-icon:hover {
-            transform: rotate(30deg);
-            opacity: 0.8;
-        }
+.user-info-block span {
+    font-size: 1.1em;
+    margin-right: 10px;
+}
 
-        /* Основная карточка */
-        .container {
-            max-width: 400px;
-            background: #fff;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            text-align: center;
-            margin-top: 20px; /* Отступ от блока с аватаркой */
-        }
+/* Иконка настроек */
+.gear-icon {
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
 
-        .permission-checkbox {
-            margin-top: 20px;
-        }
+.gear-icon:hover {
+    transform: rotate(30deg);
+    opacity: 0.8;
+}
 
-        /* Стили для мобильных устройств */
-        @media (max-width: 576px) {
-            .user-info-block {
-                top: 10px;
-                padding: 8px 16px;
-            }
+.auth-client-container {
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 14px 28px rgba(0, 0, 0, .25), 0 10px 10px rgba(0, 0, 0, .22);
+    width: 100%;
+    max-width: 400px;
+    padding: 30px;
+    margin-top: 20px;
+}
 
-            .user-info-block img {
-                width: 40px;
-                height: 40px;
-            }
+.permission-list {
+    margin-top: 20px;
+}
 
-            .user-info-block span {
-                font-size: 1em;
-            }
+.permission-item {
+    text-align: left;
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+}
 
-            .gear-icon {
-                width: 20px;
-                height: 20px;
-            }
+/* Адаптация для мобильных */
+@media (max-width: 576px) {
+    .permission-control {
+        top: 10px;
+        left: 10px;
+    }
 
-            .container {
-                margin-top: 80px; /* Увеличиваем отступ для мобильных устройств */
-                padding: 20px;
-            }
-        }
+
+    .user-info-block {
+        top: 10px;
+        padding: 8px 16px;
+    }
+
+    .user-info-block img {
+        width: 40px;
+        height: 40px;
+    }
+
+    .user-info-block span {
+        font-size: 1em;
+    }
+
+    .gear-icon {
+        width: 20px;
+        height: 20px;
+    }
+
+    .auth-client-container {
+        margin-top: 80px;
+        padding: 20px;
+    }
+}
