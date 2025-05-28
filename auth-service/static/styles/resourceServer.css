@@ -2,11 +2,8 @@
     border: 1px solid #ddd;
     border-radius: 8px;
     padding: 15px;
-    margin: 0 0 15px 15px;
-    position: relative;
+    margin-bottom: 15px;
     background-color: #f9f9f9;
-    flex: 0 0 calc(50% - 15px);
-    box-sizing: border-box;
 }
 
 .roles-row {
@@ -23,6 +20,20 @@
 
 .role-name-container {
     flex-grow: 1;
+}
+
+.hidden {
+    display: none;
+}
+
+.editable-field {
+    margin-bottom: 15px;
+}
+
+.editable-field label {
+    font-weight: bold;
+    display: block;
+    margin-bottom: 5px;
 }
 
 .scope-checkboxes {
@@ -51,6 +62,10 @@
 
 .disabled-section {
     color: #999;
+}
+
+.create-mode .form-control {
+    disabled: false;
 }
 
 .empty-roles-message {

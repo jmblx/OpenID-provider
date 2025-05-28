@@ -40,6 +40,20 @@
     background-color: #45a049;
 }
 
+.hidden {
+    display: none;
+}
+
+.editable-field {
+    margin-bottom: 15px;
+}
+
+.editable-field label {
+    font-weight: bold;
+    display: block;
+    margin-bottom: 5px;
+}
+
 .edit-icon-container {
     cursor: pointer;
     display: inline-block;
@@ -53,4 +67,10 @@
 .edit-icon {
     width: 20px;
     height: 20px;
+}
+
+.create-mode .form-control,
+.create-mode .add-url-btn {
+    /* В режиме создания все поля сразу доступны для редактирования */
+    disabled: false;
 }
