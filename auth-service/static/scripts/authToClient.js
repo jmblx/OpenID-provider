@@ -1,10 +1,9 @@
 import { fetchWithAuth, loadUserAvatar } from './commonApi.js';
-import { getStoredParams, saveInitialQueryParams } from './manageParamsMod.js';
+import { getStoredParams } from './manageParamsMod.js';
 import { logoutClient } from "./commonApi.js";
 
 export async function initAuthToClient() {
     try {
-        saveInitialQueryParams();
         const params = getStoredParams();
         const fingerprint = localStorage.getItem('deviceFingerprint') || '';
 
