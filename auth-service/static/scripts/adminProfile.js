@@ -7,7 +7,6 @@ import {loadUserData, loadUserAvatar, logoutClient} from "./commonApi.js";
 document.addEventListener('DOMContentLoaded', async () => {
     try {
         const userData = await loadUserData('user-email');
-        document.getElementById('user-email-admin').textContent = userData.email;
 
         await loadUserAvatar('user-avatar');
 
