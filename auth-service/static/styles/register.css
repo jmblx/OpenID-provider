@@ -1,4 +1,14 @@
-/* Уникальные стили для страницы регистрации */
+body {
+    font-family: 'Montserrat', sans-serif;
+    background: #f6f5f7;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
 .client-name span {
     font-size: 18px;
     color: #4fadf3;

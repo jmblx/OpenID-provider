@@ -2,7 +2,7 @@ import {
     setupReturnButton,
     openAvatarUpload, uploadAvatar
 } from './profileCommon.js';
-import {loadUserData, loadUserAvatar} from "./commonApi.js";
+import {loadUserData, loadUserAvatar, logoutClient} from "./commonApi.js";
 
 document.addEventListener('DOMContentLoaded', async () => {
     try {
@@ -28,3 +28,5 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.error('Admin profile initialization error:', error);
     }
 });
+
+document.getElementById("logout-button")?.addEventListener("click", logoutClient);

@@ -91,3 +91,26 @@ function redirectToLogin() {
 
     window.location.href = loginUrl.toString();
 }
+
+export async function logoutClient() {
+    try {
+        const response = await fetch("/api/auth-service/revoke", {
+            method: "POST",
+            credentials: "include",
+            headers: {
+                "Content-Type": "application/json"
+            }
+        });
+
+        if (response.ok) {
+            window.location.href = "/pages/login.html"; // перенаправление после выхода
+        } else {
+            const data = await response.json();
+            alert(data.detail || "Logout failed");
+        }
+    } catch (error) {
+        console.error("Logout error:", error);
+        alert("Network error during logout");
+    }
+}
+

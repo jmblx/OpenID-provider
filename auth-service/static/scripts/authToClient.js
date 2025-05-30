@@ -1,5 +1,6 @@
 import { fetchWithAuth, loadUserAvatar } from './commonApi.js';
 import { getStoredParams, saveInitialQueryParams } from './manageParamsMod.js';
+import { logoutClient } from "./commonApi.js";
 
 export async function initAuthToClient() {
     try {
@@ -119,24 +120,4 @@ function handleAuthError(error) {
 
 document.addEventListener('DOMContentLoaded', initAuthToClient);
 
-document.getElementById("logout-button")?.addEventListener("click", async () => {
-    try {
-        const response = await fetch("/api/auth-service/revoke", {
-            method: "POST",
-            credentials: "include",
-            headers: {
-                "Content-Type": "application/json"
-            }
-        });
-
-        if (response.ok) {
-            window.location.href = "/login";
-        } else {
-            const data = await response.json();
-            alert(data.detail || "Logout failed");
-        }
-    } catch (error) {
-        console.error("Logout error:", error);
-        alert("Network error during logout");
-    }
-});
+document.getElementById("logout-button")?.addEventListener("click", logoutClient);
