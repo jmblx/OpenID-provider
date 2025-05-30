@@ -121,7 +121,7 @@ document.addEventListener('DOMContentLoaded', initAuthToClient);
 
 document.getElementById("logout-button")?.addEventListener("click", async () => {
     try {
-        const response = await fetch("/api/client/revoke", {
+        const response = await fetch("/api/auth-service/revoke", {
             method: "POST",
             credentials: "include",
             headers: {
