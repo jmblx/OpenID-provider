@@ -14,7 +14,7 @@ from application.auth_for_client.code_to_token_handler import CodeToTokenHandler
 from application.auth_for_client.get_me_page_data_handler import GetMeDataHandler, GetMeDataCommand, MeData
 from application.common.auth_server_token_types import Fingerprint
 from presentation.web_api.routes.auth.models import GetMePageDataSchema
-from presentation.web_api.utils import set_auth_server_tokens, set_client_tokens
+from presentation.web_api.response_token import set_auth_server_tokens, set_client_tokens
 
 auth_router = APIRouter(route_class=DishkaRoute, tags=["auth"])
 # jinja_loader = PackageLoader("presentation.web_api.registration")

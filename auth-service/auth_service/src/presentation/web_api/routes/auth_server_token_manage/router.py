@@ -17,7 +17,7 @@ from application.auth_as.revoke_token_handler import (
     RevokeTokenHandler,
 )
 from application.common.auth_server_token_types import RefreshToken, Fingerprint
-from presentation.web_api.utils import set_auth_server_tokens
+from presentation.web_api.response_token import set_auth_server_tokens
 
 token_manage_router = APIRouter(route_class=DishkaRoute, tags=["auth-server-code-manage"], prefix="/auth-service")
 

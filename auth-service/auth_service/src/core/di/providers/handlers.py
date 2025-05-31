@@ -30,7 +30,7 @@ from application.client.add_allowed_url import (
 from application.client.client_queries import (
     ClientAuthValidationQueryHandler,
 )
-from application.client.get_all_clients import GetAllClientsIdsHandler
+from application.client.get_all_clients import GetClientsIdsHandler
 from application.client.read_client_view_handler import (
     ReadClientPageViewQueryHandler,
 )
@@ -114,7 +114,7 @@ class HandlerProvider(Provider):
         ReadClientPageViewQueryHandler, scope=Scope.REQUEST
     )
     get_all_clients_ids_handler = provide(
-        GetAllClientsIdsHandler, scope=Scope.REQUEST
+        GetClientsIdsHandler, scope=Scope.REQUEST
     )
     identify_by_cookies_query_handler = provide(
         IdentifyByCookiesQueryHandler, scope=Scope.REQUEST

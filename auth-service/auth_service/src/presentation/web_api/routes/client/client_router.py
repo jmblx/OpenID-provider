@@ -17,7 +17,7 @@ from application.client.client_queries import (
     ClientAuthValidationQueryHandler,
     ClientAuthResponse,
 )
-from application.client.get_all_clients import GetAllClientsIdsHandler
+from application.client.get_all_clients import GetClientsIdsHandler, GetClientsIdsQuery
 from application.common.views.client_view import ClientsIdsData
 from application.client.read_client_view_handler import (
     ReadClientPageViewQueryHandler,
@@ -33,6 +33,7 @@ from application.client.update_client import (
 )
 from application.dtos.client import ClientCreateDTO
 from domain.entities.client.value_objects import ClientID
+from presentation.web_api.common.schemas import PaginationData
 from presentation.web_api.routes.client.models import (
     ClientAuthResponseModel,
     ClientViewModel,
@@ -89,9 +90,11 @@ async def add_allowed_redirect_url(
 
 @client_router.get("/ids_data")
 async def get_client_ids(
-    handler: FromDishka[GetAllClientsIdsHandler],
+    handler: FromDishka[GetClientsIdsHandler],
+    pagination_data: Annotated[PaginationData, Param()],
 ) -> dict[ClientID, ClientsIdsData]:
-    client_ids_data = await handler.handle()
+    query = GetClientsIdsQuery(**pagination_data.model_dump())
+    client_ids_data = await handler.handle(query)
     return client_ids_data
 
 

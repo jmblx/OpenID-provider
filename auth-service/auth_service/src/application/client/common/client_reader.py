@@ -24,5 +24,5 @@ class ClientReader(ABC):
 
     @abstractmethod
     async def read_all_clients_ids_data(
-        self,
+        self, from_: int, limit: int
     ) -> dict[ClientID, ClientsIdsData]: ...

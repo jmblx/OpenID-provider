@@ -64,9 +64,9 @@ class ClientReaderImpl(ClientReader):
         return client_data
 
     async def read_all_clients_ids_data(
-        self,
+        self, from_: int, limit: int
     ) -> dict[ClientID, ClientsIdsData]:
-        query = select(Client.id, Client.name)
+        query = select(Client.id, Client.name).where(Client.id > from_).limit(limit)
         data = await self.session.execute(query)
         clients_data = data.mappings().all()
         result = {
