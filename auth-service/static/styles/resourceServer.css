@@ -4,16 +4,14 @@
     padding: 15px;
     margin-bottom: 15px;
     background-color: #f9f9f9;
+    height: 100%;
 }
+
 
 .roles-row {
     display: flex;
     flex-wrap: wrap;
-    gap: 15px; /* вместо margin-left */
-    margin: 0; /* убираем смещение */
-    padding-left: 0; /* опционально */
 }
-
 
 .role-header {
     display: flex;
