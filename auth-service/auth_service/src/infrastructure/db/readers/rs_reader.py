@@ -50,9 +50,9 @@ class ResourceServerReaderImpl(ResourceServerReader):
         return resource_server_data
 
     async def read_all_resource_server_ids_data(
-        self,
+        self, from_: int, limit: int
     ) -> dict[ResourceServerID, ResourceServerIdsData]:
-        query = select(ResourceServer.id, ResourceServer.name)
+        query = select(ResourceServer.id, ResourceServer.name).where(ResourceServer.id > from_).limit(limit)
         data = await self.session.execute(query)
         resource_servers_data = data.mappings().all()
         result = {

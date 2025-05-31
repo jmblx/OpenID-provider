@@ -18,5 +18,5 @@ class ResourceServerReader(ABC):
 
     @abstractmethod
     async def read_all_resource_server_ids_data(
-        self,
+        self, from_: int, limit: int
     ) -> dict[ResourceServerID, ResourceServerIdsData]: ...
