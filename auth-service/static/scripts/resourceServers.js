@@ -1,20 +1,12 @@
-import { CardRenderer } from './cardsCommon.js';
+import { setupPagination } from "/scripts/paginator.js";
+import { renderCards } from "/scripts/renderers.js";
 
-export class ResourceServersRenderer extends CardRenderer {
-    constructor() {
-        super(
-            'rs-container',
-            (server) => `<div class="card-title">${server.name}</div>`,
-            '/api/rs/ids_data'
-        );
-    }
-
-    handleCardClick(id) {
-        window.location.href = `/pages/resourceServer.html?rsId=${id}`;
-    }
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-    const renderer = new ResourceServersRenderer();
-    renderer.init();
+document.addEventListener("DOMContentLoaded", () => {
+    setupPagination({
+        containerId: "rs-container",
+        fetchUrl: "/api/rs/ids_data",
+        renderFn: renderCards,
+        itemLinkBase: "/pages/resourceServer.html",
+        queryParam: "rsId"
+    });
 });
