@@ -12,4 +12,5 @@ class IdentifyByCookiesQueryHandler:
             "email": user.email.value,
             "id": user.id.value,
             "avatar_path": user.avatar_path,
+            "is_admin": user.is_admin,
         }
