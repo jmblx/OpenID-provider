@@ -1,5 +1,5 @@
-import { setupPagination } from "/scripts/paginator.js";
-import { renderCards } from "/scripts/renderers.js";
+import { setupPagination } from "./paginator.js";
+import { renderCards } from "./renderers.js";
 
 document.addEventListener("DOMContentLoaded", () => {
     setupPagination({
