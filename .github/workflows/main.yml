@@ -16,14 +16,9 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Debug files structure
-        run: |
-          echo "Содержимое репозитория:"
-          ls -laR ./auth-service/
-
-      - name: Cleanup Docker
-        run: |
-          docker system prune -f
+      - name: Extract commit SHA
+        id: vars
+        run: echo "TAG=${GITHUB_SHA::8}" >> $GITHUB_ENV
 
       - name: Log in to Docker Hub
         uses: docker/login-action@v2
@@ -34,46 +29,38 @@ jobs:
       - name: Build and Push API Service
         run: |
           cd ./auth-service/auth_service
-          export TAG=$(date +%Y%m%d-%H%M%S)
-          docker build \
-            --pull \
-            --no-cache \
-            -t backend_service.api:$TAG \
-            -t backend_service.api:latest .
-          
-          docker tag backend_service.api:latest menoitami/backend_service.api:latest
-          docker tag backend_service.api:$TAG menoitami/backend_service.api:$TAG
-          
-          echo "Собранные образы:"
-          docker images | grep backend_service.api
-          
-          docker push menoitami/backend_service.api:latest
-          docker push menoitami/backend_service.api:$TAG
+          docker build -t menoitami/backend_service.api:${TAG} .
+          docker push menoitami/backend_service.api:${TAG}
 
       - name: Build and Push Notification Service
         run: |
           cd ./auth-service/notification
-          export TAG=$(date +%Y%m%d-%H%M%S)
-          docker build \
-            --pull \
-            --no-cache \
-            -t backend_service.notification_app:$TAG \
-            -t backend_service.notification_app:latest .
-          
-          docker tag backend_service.notification_app:latest menoitami/backend_service.notification_app:latest
-          docker tag backend_service.notification_app:$TAG menoitami/backend_service.notification_app:$TAG
-          
-          echo "Собранные образы:"
-          docker images | grep backend_service.notification_app
-          
-          docker push menoitami/backend_service.notification_app:latest
-          docker push menoitami/backend_service.notification_app:$TAG
+          docker build -t menoitami/backend_service.notification_app:${TAG} .
+          docker push menoitami/backend_service.notification_app:${TAG}
+
+      - name: Save tag for deploy step
+        run: echo "${TAG}" > tag.txt
+
+      - name: Upload tag artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: image-tag
+          path: tag.txt
 
   deploy:
     needs: build
     runs-on: ubuntu-latest
-    
+
     steps:
+      - name: Download tag artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: image-tag
+
+      - name: Read tag
+        id: read_tag
+        run: echo "TAG=$(cat tag.txt)" >> $GITHUB_ENV
+
       - name: Deploy to Server
         uses: appleboy/ssh-action@master
         with:
@@ -84,11 +71,9 @@ jobs:
           script: |
             cd OpenID-provider/auth-service/
             git pull origin main
+            echo "TAG=${TAG}" > .env
             docker compose down
             docker compose pull
             docker compose build --no-cache
             docker compose up -d --force-recreate
-            echo "Статус контейнеров:"
-            docker ps -a
-            echo "Логи (первые 50 строк):"
-            docker compose logs -f | head -n 50
+            docker image prune -af

@@ -93,7 +93,10 @@ async def get_client_ids(
     handler: FromDishka[GetClientsIdsHandler],
     pagination_data: Annotated[PaginationData, Param()],
 ) -> dict[ClientID, ClientsIdsData]:
-    query = GetClientsIdsQuery(**pagination_data.model_dump())
+    query = GetClientsIdsQuery(
+        after_id=pagination_data.after_id,
+        page_size=pagination_data.page_size
+    )
     client_ids_data = await handler.handle(query)
     return client_ids_data
 

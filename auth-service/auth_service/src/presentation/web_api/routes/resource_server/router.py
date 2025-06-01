@@ -10,7 +10,7 @@ from starlette import status
 from starlette.responses import Response
 
 from application.common.views.rs_view import ResourceServerIdsData
-from application.resource_server.get_all_resource_servers import GetAllRSIdsHandler
+from application.resource_server.get_all_resource_servers import GetAllRSIdsHandler, GetRSIdsQuery
 from application.resource_server.read_rs_view_handler import ReadResourceServerPageViewQueryHandler, \
     ReadResourceServerPageViewQuery
 from application.resource_server.register_rs_handler import RegisterResourceServerCommand, \
@@ -44,7 +44,12 @@ async def get_rs_ids(
     handler: FromDishka[GetAllRSIdsHandler],
     pagination_data: Annotated[PaginationData, Param()],
 ) -> dict[ResourceServerID, ResourceServerIdsData]:
-    resource_server_ids_data = await handler.handle()
+    resource_server_ids_data = await handler.handle(
+        GetRSIdsQuery(
+            after_id=pagination_data.after_id,
+            page_size=pagination_data.page_size,
+        )
+    )
     return resource_server_ids_data
 
 

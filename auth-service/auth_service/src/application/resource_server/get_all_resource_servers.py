@@ -10,7 +10,7 @@ logger = getLogger(__name__)
 
 @dataclass
 class GetRSIdsQuery:
-    page: int
+    after_id: int
     page_size: int
 
 
@@ -19,6 +19,6 @@ class GetAllRSIdsHandler:
         self.rs_reader = rs_reader
 
     async def handle(self, query: GetRSIdsQuery) -> dict[ResourceServerID, ResourceServerIdsData]:
-        rs_ids_data = await self.rs_reader.read_all_resource_server_ids_data(from_=query.page_size * (query.page - 1), limit=query.page_size)
+        rs_ids_data = await self.rs_reader.read_all_resource_server_ids_data(from_=query.after_id, limit=query.page_size)
         # logger.info("clients_ids_data: %s", clients_ids_data)
         return rs_ids_data
