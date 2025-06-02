@@ -23,7 +23,7 @@ services:
     env_file:
       - .env-prod
     environment:
-      POSTGRES_PASSWORD: $${PG_PWD}
+      POSTGRES_PASSWORD: ${PG_PWD}
     volumes:
       - db-data:/var/lib/postgresql/data
     healthcheck:
@@ -59,7 +59,7 @@ services:
     env_file:
       - .env-prod
     environment:
-      DB_PASS: $${PG_PWD}
+      DB_PASS: ${PG_PWD}
     #    build:
     #      context: auth_service
     #      dockerfile: Dockerfile
@@ -115,7 +115,7 @@ services:
     env_file:
       - .env-prod
     environment:
-      DB_PASS: $${PG_PWD}
+      DB_PASS: ${PG_PWD}
     command: [ "sh", "/backend-service.auth_service/docker/migrate.sh" ]
 
   minio:
