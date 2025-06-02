@@ -62,8 +62,7 @@ jobs:
             cd OpenID-provider/auth-service/
             git pull origin main
 
-            export DB_PASS='${{ secrets.PG_PWD }}'
-            export POSTGRES_PASSWORD='${{ secrets.PG_PWD }}'
+            export PG_PWD='${{ secrets.PG_PWD }}'
 
             docker compose down
             docker compose pull
