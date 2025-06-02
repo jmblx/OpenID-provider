@@ -28,6 +28,7 @@ client_table = sa.Table(
         sa.Enum(ClientTypeEnum, name="client_type_enum"),
         nullable=False,
     ),
+    sa.Column("search_name", sa.String, nullable=False),
 )
 
 mapper_registry.map_imperatively(
@@ -41,6 +42,7 @@ mapper_registry.map_imperatively(
             AllowedRedirectUrls, client_table.c.allowed_redirect_urls
         ),
         "type": composite(ClientType, client_table.c.type),
+        "search_name": client_table.c.search_name,
         # "roles": relationship("Role", back_populates="client", uselist=True),
         # "resource_servers": relationship(
         #     "ResourceServer",

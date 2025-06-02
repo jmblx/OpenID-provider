@@ -28,3 +28,6 @@ class ResourceServerViewModel(BaseModel):
 #     base_url: str | None
 #     allowed_urls: list[str] | None
 #     client_type: ClientTypeEnum | None
+class UpdateResourceServerModel(BaseModel):
+    new_name: str | None
+    new_type: ResourceServerType | None

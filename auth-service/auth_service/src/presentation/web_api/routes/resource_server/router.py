@@ -5,7 +5,6 @@ from dishka.integrations.fastapi import DishkaRoute
 from fastapi import APIRouter
 from fastapi.params import Param
 from fastapi.responses import ORJSONResponse
-from pydantic import BaseModel
 from starlette import status
 from starlette.responses import Response
 
@@ -17,9 +16,9 @@ from application.resource_server.register_rs_handler import RegisterResourceServ
     RegisterResourceServerHandler
 from application.resource_server.dtos import ResourceServerCreateDTO
 from application.resource_server.update_rs_handler import UpdateResourceServerHandler, UpdateResourceServerCommand
-from domain.entities.resource_server.value_objects import ResourceServerType, ResourceServerID
+from domain.entities.resource_server.value_objects import ResourceServerID
 from presentation.web_api.common.schemas import PaginationData
-from presentation.web_api.routes.resource_server.models import ResourceServerViewModel
+from presentation.web_api.routes.resource_server.models import ResourceServerViewModel, UpdateResourceServerModel
 
 rs_router = APIRouter(route_class=DishkaRoute, tags=["resource_server"], prefix="/rs")
 
@@ -32,11 +31,6 @@ async def register_rs(
     response.status_code = status.HTTP_201_CREATED
     rs = await handler.handle(command)
     return rs
-
-
-class UpdateResourceServerModel(BaseModel):
-    new_name: str | None
-    new_type: ResourceServerType | None
 
 
 @rs_router.get("/ids_data")
