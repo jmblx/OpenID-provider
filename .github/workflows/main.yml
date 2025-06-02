@@ -60,6 +60,8 @@ jobs:
           port: 22
           script: |
             cd OpenID-provider/auth-service/
+            echo "DB_PASS=${{ secrets.PG_PWD }}" >> .env-prod
+            echo "POSTGRES_PASSWORD=${{ secrets.PG_PWD }}" >> .env-prod
             git pull origin main
             docker compose down
             docker compose pull
