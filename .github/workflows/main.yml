@@ -49,7 +49,7 @@ jobs:
   deploy:
     needs: build
     runs-on: ubuntu-latest
-    
+      
     steps:
       - name: Deploy to Server
         uses: appleboy/ssh-action@master
@@ -60,11 +60,11 @@ jobs:
           port: 22
           script: |
             cd OpenID-provider/auth-service/
-            git stash -u
             git pull origin main
-            git stash pop
-            echo "DB_PASS=${{ secrets.PG_PWD }}" > .env-prod
-            echo "POSTGRES_PASSWORD=${{ secrets.PG_PWD }}" >> .env-prod
+
+            export DB_PASS='${{ secrets.PG_PWD }}'
+            export POSTGRES_PASSWORD='${{ secrets.PG_PWD }}'
+
             docker compose down
             docker compose pull
             docker compose up -d --force-recreate
