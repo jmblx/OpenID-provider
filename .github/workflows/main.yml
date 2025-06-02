@@ -60,9 +60,11 @@ jobs:
           port: 22
           script: |
             cd OpenID-provider/auth-service/
-            echo "DB_PASS=${{ secrets.PG_PWD }}" >> .env-prod
-            echo "POSTGRES_PASSWORD=${{ secrets.PG_PWD }}" >> .env-prod
+            git stash -u
             git pull origin main
+            git stash pop
+            echo "DB_PASS=${{ secrets.PG_PWD }}" > .env-prod
+            echo "POSTGRES_PASSWORD=${{ secrets.PG_PWD }}" >> .env-prod
             docker compose down
             docker compose pull
             docker compose up -d --force-recreate
