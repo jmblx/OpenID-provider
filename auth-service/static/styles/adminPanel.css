@@ -24,6 +24,11 @@
     background-color: #495057;
 }
 
+/* Стилизуем активную вкладку */
+.admin-panel a.active-tab {
+    background-color: #495057;
+}
+
 .logout-button {
     background: none;
     border: none;
@@ -40,5 +45,5 @@
 }
 
 body {
-    padding-top: 60px;
+    padding-top: 60px; /* чтобы контент не перекрывался панелью */
 }
