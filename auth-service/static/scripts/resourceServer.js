@@ -211,7 +211,6 @@ function renderRoles(roles) {
                 <button class="btn btn-danger btn-sm mt-2" onclick="deleteRole(${role.id})">Удалить</button>
             </div>
         `;
-
         col.appendChild(roleCard);
         row.appendChild(col);
     });
