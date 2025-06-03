@@ -1,4 +1,4 @@
-import {loadUserAvatar} from "./commonApi";
+import {loadUserAvatar} from "./commonApi.js";
 
 async function renderAdminPanel() {
     const page = window.location.pathname.split("/").pop().split(".")[0]; // "clients", "profile" и т.п.
