@@ -1,6 +1,6 @@
 import {loadUserAvatar} from "./commonApi";
 
-export async function renderAdminPanel() {
+async function renderAdminPanel() {
     const page = window.location.pathname.split("/").pop().split(".")[0]; // "clients", "profile" и т.п.
 
     const panel = document.createElement("div");
@@ -60,4 +60,8 @@ export async function renderAdminPanel() {
     document.body.prepend(panel);
 
     await loadUserAvatar("user-avatar");
+}
+
+document.addEventListener('DOMContentLoaded', async () => {
+    renderAdminPanel()
 }
