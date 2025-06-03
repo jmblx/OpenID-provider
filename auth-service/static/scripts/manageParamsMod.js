@@ -1,12 +1,10 @@
 export function saveInitialQueryParams() {
     const urlParams = new URLSearchParams(window.location.search);
-    if (!sessionStorage.getItem('initialParams')) {
-        const params = {};
-        for (const [key, value] of urlParams.entries()) {
-            params[key] = value;
-        }
-        sessionStorage.setItem('initialParams', JSON.stringify(params));
+    const params = {};
+    for (const [key, value] of urlParams.entries()) {
+        params[key] = value;
     }
+    sessionStorage.setItem('initialParams', JSON.stringify(params));
 }
 
 export function getStoredParams() {

@@ -32,6 +32,7 @@ mapper_registry.map_imperatively(
             "Role", back_populates="resource_server", uselist=True
         ),
         "users_rss": relationship("User", back_populates="resource_servers", uselist=True, secondary=user_rs_association_table),
+
     },
     column_prefix="_",
 )

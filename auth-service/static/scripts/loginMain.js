@@ -13,9 +13,4 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
     initLoginForm();
     initPasswordReset();
-
-    const registerLink = document.getElementById('register-link');
-    if (registerLink) {
-        registerLink.href = '/pages/register.html';
-    }
 });

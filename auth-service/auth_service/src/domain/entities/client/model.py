@@ -20,6 +20,7 @@ class Client:
     base_url: ClientBaseUrl
     allowed_redirect_urls: AllowedRedirectUrls
     type: ClientType
+    search_name: str
 
     @classmethod
     def create(
@@ -34,6 +35,7 @@ class Client:
             ClientBaseUrl(base_url),
             AllowedRedirectUrls(allowed_redirect_urls),
             ClientType(type),
+            cls.make_search_name(name, base_url)
         )
         return client
 
@@ -54,3 +56,11 @@ class Client:
             self.allowed_redirect_urls.value
             + [ClientRedirectUrl(new_allowed_redirect_url).value]
         )
+
+    @staticmethod
+    def make_search_name(name: str, base_url: str | None) -> str:
+        """
+        Объединяет name и base_url в строку для поиска, приводя к нижнему регистру.
+        """
+        base_url = base_url or ""
+        return f"{name.strip()} {base_url.strip()}".lower()

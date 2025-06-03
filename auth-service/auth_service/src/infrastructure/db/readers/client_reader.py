@@ -1,6 +1,6 @@
 import logging
 
-from sqlalchemy import select
+from sqlalchemy import select, text, func, or_
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from application.common.interfaces.role_repo import RoleRepository
@@ -13,7 +13,7 @@ from application.client.common.client_reader import (
     ClientReader,
     ClientAuthData,
 )
-
+from infrastructure.db.readers.common import change_layout
 
 logger = logging.getLogger(__name__)
 
@@ -74,3 +74,26 @@ class ClientReaderImpl(ClientReader):
             for client in clients_data
         }
         return result
+
+    async def find_by_marks(
+        self, input: str, similarity: float = 0.3
+    ) -> dict[ClientID, ClientsIdsData] | None:
+        await self.session.execute(
+            text(f"SET LOCAL pg_trgm.similarity_threshold = {similarity};")
+        )
+        marks_converted = change_layout(input)
+        query = select(Client.id, Client.name).where(
+            or_(
+                client_table.search_name.op("%")(input),
+                client_table.search_name.op("%")(marks_converted),
+            )
+        )
+        clients_data = (await self.session.execute(query)).mappings().all()
+        result = {
+            client["id"]: ClientsIdsData(name=client["name"].value)
+            for client in clients_data
+        }
+        return result
+
+    # async def search_clients(self, search_term: str) -> list[ClientView]:
+

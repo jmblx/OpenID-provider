@@ -127,91 +127,62 @@ function renderRoles(roles) {
 
     emptyMessage.classList.add('hidden');
 
-    const rolesRow = document.createElement('div');
-    rolesRow.className = 'roles-row';
-    container.appendChild(rolesRow);
+    const row = document.createElement('div');
+    row.className = 'row g-3'; // g-3 добавляет горизонтальные и вертикальные отступы
+    container.appendChild(row);
 
-    roles.forEach((role, index) => {
+    roles.forEach((role) => {
+        const col = document.createElement('div');
+        col.className = 'col-md-6 col-lg-4'; // 2 карточки на md, 3 на lg и выше
+
         const roleCard = document.createElement("div");
-        roleCard.classList.add("role-card");
-        roleCard.id = `role-${role.id}`;
-
-        function createScopeCheckbox(scopeKey, scopeValue, bitPosition, label) {
-            return `
-                <div class="form-check">
-                    <input class="form-check-input scope-checkbox" type="checkbox"
-                           data-scope-key="${scopeKey}" data-bit-pos="${bitPosition}"
-                           ${scopeValue[bitPosition] === "1" ? "checked" : ""}
-                           onchange="checkRoleChanges(${role.id})">
-                    <label class="form-check-label">${label}</label>
-                </div>`;
-        }
-
-        let scopeManagement = '';
-        if (!rolesDisabled) {
-            scopeManagement = `
-                <div class="scope-management mt-3">
-                    <button class="btn btn-sm btn-outline-primary" onclick="addScopeToRole(${role.id})">
-                        Добавить scope
-                    </button>
-                    <div id="new-scopes-${role.id}" class="mt-2"></div>
-                </div>
-            `;
-        }
+        roleCard.classList.add("role-card", "h-100"); // h-100 помогает растянуть по высоте
 
         let scopeCheckboxes = "";
         const scopeLabels = ["Создание", "Чтение", "Обновление", "Удаление"];
 
         role.base_scopes.forEach(scope => {
-            const scopeEntries = scope.split(":");
-            if (scopeEntries.length !== 2) return;
+            const [scopeKey, scopeValue] = scope.split(":");
+            if (!scopeKey || !scopeValue) return;
 
-            const scopeKey = scopeEntries[0];
-            const scopeValue = scopeEntries[1];
-
-            scopeCheckboxes += `
-                <div class="scope-item mb-3">
-                    <div class="d-flex align-items-center mb-1">
-                        <strong>${scopeKey}</strong>
-                        ${!rolesDisabled ? `<button class="btn btn-sm btn-outline-danger ms-2" onclick="removeScope('${role.id}', '${scopeKey}')">×</button>` : ''}
-                    </div>
-            `;
-
-            scopeLabels.forEach((label, idx) => {
-                scopeCheckboxes += createScopeCheckbox(scopeKey, scopeValue, idx, label);
-            });
-
-            scopeCheckboxes += `</div>`;
+            for (let i = 0; i < scopeValue.length; i++) {
+                if (scopeLabels[i]) {
+                    scopeCheckboxes += `
+                        <div class="form-check">
+                            <input class="form-check-input scope-checkbox" type="checkbox"
+                                   data-scope-key="${scopeKey}" data-bit-pos="${i}"
+                                   ${scopeValue[i] === "1" ? "checked" : ""}
+                                   onchange="checkRoleChanges(${role.id})"
+                                   ${rolesDisabled ? "disabled" : ""}>
+                            <label class="form-check-label">${scopeLabels[i]}</label>
+                        </div>`;
+                }
+            }
         });
 
+        const isBaseChecked = role.is_base ? 'checked' : '';
+        const isBaseDisabled = rolesDisabled ? 'disabled' : '';
+
         roleCard.innerHTML = `
-            <div class="role-header">
-                <h5 class="role-name-container">
-                    <input type="text" value="${role.name}" class="form-control role-name"
-                           oninput="checkRoleChanges(${role.id})">
-                </h5>
+            <div class="role-header mb-2">
+                <input type="text" class="form-control role-name" value="${role.name}" 
+                       oninput="checkRoleChanges(${role.id})"
+                       ${rolesDisabled ? "disabled" : ""}>
+                <div class="form-check ms-2">
+                    <input class="form-check-input is-base-checkbox" type="checkbox"
+                           ${isBaseChecked} ${isBaseDisabled}
+                           onchange="checkRoleChanges(${role.id})">
+                    <label class="form-check-label">Базовая</label>
+                </div>
             </div>
-            <div class="form-check">
-                <input class="form-check-input is-base-checkbox" type="checkbox"
-                       ${role.is_base ? "checked" : ""}
-                       onchange="checkRoleChanges(${role.id})">
-                <label class="form-check-label">Базовая роль</label>
-            </div>
-            <div class="scopes-container">
-                ${scopeCheckboxes}
-            </div>
-            ${scopeManagement}
-            <div class="action-buttons">
-                <button class="btn btn-success btn-sm mt-2 hidden save-btn"
-                        id="save-role-${role.id}"
-                        onclick="saveRole(${index}, ${role.id})">Сохранить</button>
-                <button class="btn btn-danger btn-sm mt-2" onclick="deleteRole(${role.id})">Удалить</button>
-            </div>
+            <div class="scope-checkboxes">${scopeCheckboxes}</div>
         `;
 
-        rolesRow.appendChild(roleCard);
+        col.appendChild(roleCard);
+        row.appendChild(col);
     });
 }
+
 
 function addScopeToRole(roleId) {
     const container = document.getElementById(`new-scopes-${roleId}`);
