@@ -1,15 +1,19 @@
-import {loadUserAvatar, logoutClient} from "./commonApi.js";
+import {fetchWithAuth, loadUserAvatar, loadUserData, logoutClient} from "./commonApi.js";
 
-document.addEventListener('DOMContentLoaded', () => {
-    renderAdminPanel();
-    loadUserAvatar('admin-panel-user-avatar');
+document.addEventListener('DOMContentLoaded', async () => {
+    const userData = await loadUserData();
+    if (userData.is_admin) {
+        await renderAdminPanel();
+        await loadUserAvatar('admin-panel-user-avatar');
+    }
 });
 
-function renderAdminPanel() {
-    // Определяем текущую страницу без расширения
-    const path = window.location.pathname;                          // e.g. "/pages/clients.html"
-    const filename = path.substring(path.lastIndexOf('/') + 1);     // "clients.html"
-    const pageName = filename.split('.')[0];                         // "clients"
+async function renderAdminPanel() {
+    const response = await fetchWithAuth('/api/me');
+    const userData = await response.json();
+    const path = window.location.pathname;
+    const filename = path.substring(path.lastIndexOf('/') + 1);
+    const pageName = filename.split('.')[0];
 
     // Список вкладок: name совпадает с pageName
     const tabs = [
@@ -17,7 +21,6 @@ function renderAdminPanel() {
         { name: 'clients',         label: 'Clients',          href: '/pages/clients.html'         },
     ];
 
-    // Создаём корневой контейнер
     const panel = document.createElement('div');
     panel.className = 'admin-panel';
 
@@ -40,7 +43,6 @@ function renderAdminPanel() {
     rightDiv.style.alignItems = 'center';
     rightDiv.style.gap = '10px';
 
-    // Аватар пользователя
     const profileLink = document.createElement('a');
     profileLink.href = '/pages/profile.html';
 
@@ -55,7 +57,6 @@ function renderAdminPanel() {
     profileLink.appendChild(avatarImg);
     rightDiv.appendChild(profileLink);
 
-    // Кнопка выхода
     const logoutBtn = document.createElement('button');
     logoutBtn.id = 'logout-button';
     logoutBtn.className = 'logout-button';
@@ -73,6 +74,5 @@ function renderAdminPanel() {
 
     panel.appendChild(rightDiv);
 
-    // Вставляем панель в body (с самого верха)
     document.body.prepend(panel);
 }

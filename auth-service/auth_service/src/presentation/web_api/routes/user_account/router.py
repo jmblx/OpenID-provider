@@ -20,6 +20,7 @@ from application.user.delete_user_handler import (
     DeleteUserCommand,
 )
 from application.user.set_user_avatar_handler import SetUserAvatarHandler, SetUserAvatarCommand
+from presentation.web_api.common.schemas import UserSchema
 from presentation.web_api.routes.user_account.schemas import ClientGetUserDataInfo
 
 user_account_router = APIRouter(route_class=DishkaRoute, tags=["user_account"])
@@ -46,8 +47,8 @@ async def add_role_to_user(
 
 
 @user_account_router.get("/me")
-async def get_me(handler: FromDishka[IdentifyByCookiesQueryHandler]):
-    return await handler.handle()
+async def get_me(handler: FromDishka[IdentifyByCookiesQueryHandler]) -> UserSchema:
+    return UserSchema(**await handler.handle())
 
 @user_account_router.post("/set-avatar")
 async def set_avatar(handler: FromDishka[SetUserAvatarHandler], file: UploadFile = File(...)) -> ORJSONResponse:
