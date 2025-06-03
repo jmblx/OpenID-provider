@@ -46,7 +46,6 @@ async function renderAdminPanel() {
     logoutBtn.innerHTML = `<img src="/icons/logout.svg" alt="Logout">`;
 
     logoutBtn.onclick = () => {
-        // Можно адаптировать
         localStorage.clear();
         window.location.href = "/login.html";
     };
@@ -63,5 +62,5 @@ async function renderAdminPanel() {
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
-    renderAdminPanel()
+    await renderAdminPanel();
 });
