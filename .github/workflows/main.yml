@@ -9,7 +9,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
+    if: |
+      !contains(github.event.head_commit.message, 'skip b')
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3

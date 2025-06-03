@@ -64,4 +64,4 @@ async function renderAdminPanel() {
 
 document.addEventListener('DOMContentLoaded', async () => {
     renderAdminPanel()
-}
+});
