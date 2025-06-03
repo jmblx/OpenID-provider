@@ -1,7 +1,6 @@
 from uuid import UUID
 
-from pydantic import BaseModel
-from pydantic.v1 import HttpUrl
+from pydantic import BaseModel, HttpUrl
 
 
 class PaginationData(BaseModel):
