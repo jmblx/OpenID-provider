@@ -127,14 +127,13 @@ function renderRoles(roles) {
 
     emptyMessage.classList.add('hidden');
 
-    // Создаем Bootstrap row с отступами
     const row = document.createElement('div');
-    row.className = 'row g-3'; // g-3 добавляет горизонтальные и вертикальные отступы между колонками
+    row.className = 'row g-3';
     container.appendChild(row);
 
     roles.forEach((role, index) => {
         const col = document.createElement('div');
-        col.className = 'col-md-6 col-lg-4'; // адаптивно: по 2 карточки на md и по 3 карточки на lg
+        col.className = 'col-md-6 col-lg-4';
 
         const roleCard = document.createElement("div");
         roleCard.classList.add("role-card", "h-100");
@@ -186,23 +185,25 @@ function renderRoles(roles) {
             scopeCheckboxes += `</div>`;
         });
 
+        const baseChecked = role.is_base ? "checked" : "";
+        const baseDisabled = rolesDisabled ? "disabled" : "";
+
         roleCard.innerHTML = `
-            <div class="role-header mb-2 justify-content-between">
-                <input type="text" value="${role.name}" class="form-control role-name flex-grow-1"
-                       oninput="checkRoleChanges(${role.id})"
-                       ${rolesDisabled ? "disabled" : ""}>
-                <div class="form-check ms-2 mb-0">
-                    <input class="form-check-input is-base-checkbox" type="checkbox"
-                           id="base-${role.id}"
-                           ${baseChecked} ${baseDisabled}
-                           onchange="checkRoleChanges(${role.id})">
-                    <label class="form-check-label" for="base-${role.id}">Базовая</label>
-                </div>
-            </div>
-            <div class="scopes-container">
-                ${scopeCheckboxes}
-            </div>
+        <div class="role-header mb-2 justify-content-between">
+        <input type="text" value="${role.name}" class="form-control role-name flex-grow-1"
+               oninput="checkRoleChanges(${role.id})"
+               ${rolesDisabled ? "disabled" : ""}>
+        <div class="form-check ms-2 mb-0">
+            <input class="form-check-input is-base-checkbox" type="checkbox"
+                   id="base-${role.id}"
+                   ${baseChecked} ${baseDisabled}
+                   onchange="checkRoleChanges(${role.id})">
+            <label class="form-check-label" for="base-${role.id}">Базовая</label>
+        </div>
+        </div>
+
             ${scopeManagement}
+
             <div class="action-buttons">
                 <button class="btn btn-success btn-sm mt-2 hidden save-btn"
                         id="save-role-${role.id}"
@@ -215,6 +216,7 @@ function renderRoles(roles) {
         row.appendChild(col);
     });
 }
+
 
 function addScopeToRole(roleId) {
     const container = document.getElementById(`new-scopes-${roleId}`);
