@@ -2,7 +2,7 @@ import {loadUserAvatar, logoutClient} from "./commonApi.js";
 
 document.addEventListener('DOMContentLoaded', () => {
     renderAdminPanel();
-    loadUserAvatar('user-avatar');
+    loadUserAvatar('admin-panel-user-avatar');
 });
 
 function renderAdminPanel() {
@@ -45,7 +45,7 @@ function renderAdminPanel() {
     profileLink.href = '/pages/profile.html';
 
     const avatarImg = document.createElement('img');
-    avatarImg.id = 'user-avatar';
+    avatarImg.id = 'admin-panel-user-avatar';
     avatarImg.alt = 'User Avatar';
     avatarImg.style.width = '32px';
     avatarImg.style.height = '32px';
