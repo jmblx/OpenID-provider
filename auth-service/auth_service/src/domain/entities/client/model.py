@@ -63,4 +63,4 @@ class Client:
         Объединяет name и base_url в строку для поиска, приводя к нижнему регистру.
         """
         base_url = base_url or ""
-        return f"{name.strip()} {base_url.strip()}".lower()
+        return f"{name.strip().lower()} {base_url.strip()}".lower()

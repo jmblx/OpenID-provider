@@ -12,6 +12,7 @@ class ResourceServer:
     id: ResourceServerID = field(init=False)
     name: str
     type: ResourceServerType
+    search_name: str
 
     @classmethod
     def create(
@@ -22,6 +23,7 @@ class ResourceServer:
         resource_server = cls(
             name,
             type,
+            search_name=name.strip().lower(),
         )
         return resource_server
 
