@@ -30,6 +30,7 @@ from application.client.add_allowed_url import (
 from application.client.client_queries import (
     ClientAuthValidationQueryHandler,
 )
+from application.client.find_clients import FindClientsHandler
 from application.client.get_all_clients import GetClientsIdsHandler
 from application.client.read_client_view_handler import (
     ReadClientPageViewQueryHandler,
@@ -40,6 +41,7 @@ from application.client.register_client_hadler import (
 from application.client.update_client import (
     UpdateClientCommandHandler,
 )
+from application.resource_server.find_rs import FindRSHandler
 from application.resource_server.get_all_resource_servers import GetAllRSIdsHandler
 from application.resource_server.read_rs_view_handler import ReadResourceServerPageViewQueryHandler
 from application.resource_server.register_rs_handler import RegisterResourceServerHandler
@@ -132,3 +134,5 @@ class HandlerProvider(Provider):
     yandex_login_handler = provide(YandexLoginHandler, scope=Scope.REQUEST)
     yandex_register_handler = provide(YandexRegisterHandler, scope=Scope.REQUEST)
     get_user_info_query_handler = provide(GetUserInfoQueryHandler, scope=Scope.REQUEST)
+    find_clients_handler = provide(FindClientsHandler, scope=Scope.REQUEST)
+    find_rs_handler = provide(FindRSHandler, scope=Scope.REQUEST)

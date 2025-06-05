@@ -71,8 +71,8 @@ class ResourceServerReaderImpl(ResourceServerReader):
         marks_converted = change_layout(search_input)
         query = select(ResourceServer.id, ResourceServer.name).where(
             or_(
-                rs_table.search_name.op("%")(search_input),
-                rs_table.search_name.op("%")(marks_converted),
+                rs_table.c.search_name.op("%")(search_input),
+                rs_table.c.search_name.op("%")(marks_converted),
             )
         )
         rss_data = (await self.session.execute(query)).mappings().all()

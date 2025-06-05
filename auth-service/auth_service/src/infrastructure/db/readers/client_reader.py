@@ -84,8 +84,8 @@ class ClientReaderImpl(ClientReader):
         marks_converted = change_layout(search_input)
         query = select(Client.id, Client.name).where(
             or_(
-                client_table.search_name.op("%")(search_input),
-                client_table.search_name.op("%")(marks_converted),
+                client_table.c.search_name.op("%")(search_input),
+                client_table.c.search_name.op("%")(marks_converted),
             )
         )
         clients_data = (await self.session.execute(query)).mappings().all()
