@@ -26,3 +26,8 @@ class ClientReader(ABC):
     async def read_all_clients_ids_data(
         self, from_: int, limit: int
     ) -> dict[ClientID, ClientsIdsData]: ...
+
+    @abstractmethod
+    async def find_by_marks(
+        self, search_input: str, similarity: float = 0.3
+    ) -> dict[ClientID, ClientsIdsData] | None: ...

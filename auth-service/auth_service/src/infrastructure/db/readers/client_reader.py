@@ -76,15 +76,15 @@ class ClientReaderImpl(ClientReader):
         return result
 
     async def find_by_marks(
-        self, input: str, similarity: float = 0.3
+        self, search_input: str, similarity: float = 0.3
     ) -> dict[ClientID, ClientsIdsData] | None:
         await self.session.execute(
             text(f"SET LOCAL pg_trgm.similarity_threshold = {similarity};")
         )
-        marks_converted = change_layout(input)
+        marks_converted = change_layout(search_input)
         query = select(Client.id, Client.name).where(
             or_(
-                client_table.search_name.op("%")(input),
+                client_table.search_name.op("%")(search_input),
                 client_table.search_name.op("%")(marks_converted),
             )
         )
@@ -94,6 +94,3 @@ class ClientReaderImpl(ClientReader):
             for client in clients_data
         }
         return result
-
-    # async def search_clients(self, search_term: str) -> list[ClientView]:
-

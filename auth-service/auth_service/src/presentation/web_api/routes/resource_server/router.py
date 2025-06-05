@@ -9,6 +9,7 @@ from starlette import status
 from starlette.responses import Response
 
 from application.common.views.rs_view import ResourceServerIdsData
+from application.resource_server.find_rs import FindRSQuery, FindRSHandler
 from application.resource_server.get_all_resource_servers import GetAllRSIdsHandler, GetRSIdsQuery
 from application.resource_server.read_rs_view_handler import ReadResourceServerPageViewQueryHandler, \
     ReadResourceServerPageViewQuery
@@ -67,3 +68,11 @@ async def get_rs(
         ReadResourceServerPageViewQuery(rs_id=rs_id)
     )
     return ResourceServerViewModel(**rs_view)
+
+
+@rs_router.get("/search")
+async def search_client_by_input(
+    pagination_data: Annotated[FindRSQuery, Param()],
+    handler: FromDishka[FindRSHandler],
+) -> dict[ResourceServerID, ResourceServerIdsData]:
+    return await handler.handle(pagination_data)

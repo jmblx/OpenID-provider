@@ -1,6 +1,6 @@
 import typing
 
-from sqlalchemy import select
+from sqlalchemy import select, text, or_
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from application.common.interfaces.role_repo import RoleRepository
@@ -11,6 +11,7 @@ from domain.entities.resource_server.model import ResourceServer
 from domain.entities.resource_server.value_objects import ResourceServerID, ResourceServerType
 from domain.exceptions.resource_server import ResourceServerNotFoundError
 from infrastructure.db.models import rs_table
+from infrastructure.db.readers.common import change_layout
 
 
 class ResourceServerReaderImpl(ResourceServerReader):
@@ -58,5 +59,25 @@ class ResourceServerReaderImpl(ResourceServerReader):
         result = {
             resource_server["id"]: ResourceServerIdsData(name=resource_server["name"])
             for resource_server in resource_servers_data
+        }
+        return result
+    
+    async def find_by_marks(
+        self, search_input: str, similarity: float = 0.3
+    ) -> dict[ResourceServerID, ResourceServerIdsData] | None:
+        await self.session.execute(
+            text(f"SET LOCAL pg_trgm.similarity_threshold = {similarity};")
+        )
+        marks_converted = change_layout(search_input)
+        query = select(ResourceServer.id, ResourceServer.name).where(
+            or_(
+                rs_table.search_name.op("%")(search_input),
+                rs_table.search_name.op("%")(marks_converted),
+            )
+        )
+        rss_data = (await self.session.execute(query)).mappings().all()
+        result = {
+            rs["id"]: ResourceServerIdsData(name=rs["name"].value)
+            for rs in rss_data
         }
         return result

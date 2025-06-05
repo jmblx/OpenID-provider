@@ -17,6 +17,7 @@ from application.client.client_queries import (
     ClientAuthValidationQueryHandler,
     ClientAuthResponse,
 )
+from application.client.find_clients import FindClientsQuery, FindClientsHandler
 from application.client.get_all_clients import GetClientsIdsHandler, GetClientsIdsQuery
 from application.common.views.client_view import ClientsIdsData
 from application.client.read_client_view_handler import (
@@ -109,3 +110,11 @@ async def get_client(
         ReadClientPageViewQuery(client_id=client_id)
     )
     return ClientViewModel(**client_view)
+
+
+@client_router.get("/search")
+async def search_client_by_input(
+    pagination_data: Annotated[FindClientsQuery, Param()],
+    handler: FromDishka[FindClientsHandler],
+) -> dict[ClientID, ClientsIdsData]:
+    return await handler.handle(pagination_data)
