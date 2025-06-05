@@ -54,10 +54,10 @@ async def create_client(
 
 @client_router.get("/search")
 async def search_client_by_input(
-    pagination_data: Annotated[FindClientsQuery, Param()],
+    search_input: str,
     handler: FromDishka[FindClientsHandler],
 ) -> dict[ClientID, ClientsIdsData]:
-    return await handler.handle(pagination_data)
+    return await handler.handle(FindClientsQuery(search_input=search_input))
 
 
 @client_router.get("/auth", response_model=ClientAuthResponseModel)

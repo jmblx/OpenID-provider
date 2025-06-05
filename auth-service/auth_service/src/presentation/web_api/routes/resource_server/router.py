@@ -36,10 +36,10 @@ async def register_rs(
 
 @rs_router.get("/search")
 async def search_client_by_input(
-    pagination_data: Annotated[FindRSQuery, Param()],
+    search_input: str,
     handler: FromDishka[FindRSHandler],
 ) -> dict[ResourceServerID, ResourceServerIdsData]:
-    return await handler.handle(pagination_data)
+    return await handler.handle(FindRSQuery(search_input=search_input))
 
 
 @rs_router.get("/ids_data")
