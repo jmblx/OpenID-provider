@@ -34,6 +34,14 @@ async def register_rs(
     return rs
 
 
+@rs_router.get("/search")
+async def search_client_by_input(
+    pagination_data: Annotated[FindRSQuery, Param()],
+    handler: FromDishka[FindRSHandler],
+) -> dict[ResourceServerID, ResourceServerIdsData]:
+    return await handler.handle(pagination_data)
+
+
 @rs_router.get("/ids_data")
 async def get_rs_ids(
     handler: FromDishka[GetAllRSIdsHandler],
@@ -68,11 +76,3 @@ async def get_rs(
         ReadResourceServerPageViewQuery(rs_id=rs_id)
     )
     return ResourceServerViewModel(**rs_view)
-
-
-@rs_router.get("/search")
-async def search_client_by_input(
-    pagination_data: Annotated[FindRSQuery, Param()],
-    handler: FromDishka[FindRSHandler],
-) -> dict[ResourceServerID, ResourceServerIdsData]:
-    return await handler.handle(pagination_data)

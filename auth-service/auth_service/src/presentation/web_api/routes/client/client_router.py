@@ -52,6 +52,14 @@ async def create_client(
     return client
 
 
+@client_router.get("/search")
+async def search_client_by_input(
+    pagination_data: Annotated[FindClientsQuery, Param()],
+    handler: FromDishka[FindClientsHandler],
+) -> dict[ClientID, ClientsIdsData]:
+    return await handler.handle(pagination_data)
+
+
 @client_router.get("/auth", response_model=ClientAuthResponseModel)
 async def register_page(
     data: Annotated[ValidateClientRequest, Param()],
@@ -110,11 +118,3 @@ async def get_client(
         ReadClientPageViewQuery(client_id=client_id)
     )
     return ClientViewModel(**client_view)
-
-
-@client_router.get("/search")
-async def search_client_by_input(
-    pagination_data: Annotated[FindClientsQuery, Param()],
-    handler: FromDishka[FindClientsHandler],
-) -> dict[ClientID, ClientsIdsData]:
-    return await handler.handle(pagination_data)
