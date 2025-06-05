@@ -4,7 +4,6 @@ export function initSearchPanel({ apiUrl, resultPageUrl }) {
     container.style.marginTop = '60px';
     container.style.zIndex = 999;
 
-    // Создание поля ввода
     const input = document.createElement('input');
     input.type = 'text';
     input.placeholder = 'Поиск...';
@@ -13,7 +12,6 @@ export function initSearchPanel({ apiUrl, resultPageUrl }) {
     input.style.margin = '10px auto';
     input.style.display = 'block';
 
-    // Контейнер для результатов
     const resultsBox = document.createElement('div');
     resultsBox.style.position = 'absolute';
     resultsBox.style.top = '100%';
