@@ -17,8 +17,15 @@
         </button>
     </div>
     <div id="rs-container" class="row card-grid"></div>
-    <script type="module" src="/scripts/resourceServers.js">
+    <script type="module" src="/scripts/resourceServers.js"></script>
+    <script type="module">
+        import { initSearchPanel } from '../scripts/searchPanel.js';
 
+        initSearchPanel({
+            apiUrl: '/api/rs/search',
+            resultPageUrl: '/pages/resourceServer.html',
+            idNaming: "rsId"
+        });
     </script>
 </body>
 </html>

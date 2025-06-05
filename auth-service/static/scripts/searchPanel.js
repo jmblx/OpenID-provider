@@ -1,17 +1,39 @@
-export function initSearchPanel({ apiUrl, resultPageUrl }) {
+export function initSearchPanel({ apiUrl, resultPageUrl, idNaming }) {
     const container = document.createElement('div');
     container.style.position = 'relative';
     container.style.marginTop = '60px';
     container.style.zIndex = 999;
 
+    // Обёртка для инпута и иконки
+    const inputWrapper = document.createElement('div');
+    inputWrapper.style.position = 'relative';
+    inputWrapper.style.maxWidth = '500px';
+    inputWrapper.style.margin = '10px auto';
+
+    // Поле ввода
     const input = document.createElement('input');
     input.type = 'text';
     input.placeholder = 'Поиск...';
     input.className = 'form-control';
-    input.style.maxWidth = '500px';
-    input.style.margin = '10px auto';
-    input.style.display = 'block';
+    input.style.paddingRight = '40px';
 
+    // Иконка лупы
+    const icon = document.createElement('img');
+    icon.src = '/icons/lupa.png';
+    icon.alt = 'Поиск';
+    icon.style.position = 'absolute';
+    icon.style.top = '50%';
+    icon.style.right = '10px';
+    icon.style.transform = 'translateY(-50%)';
+    icon.style.width = '20px';
+    icon.style.height = '20px';
+    icon.style.pointerEvents = 'none';
+    icon.style.opacity = '0.6';
+
+    inputWrapper.appendChild(input);
+    inputWrapper.appendChild(icon);
+
+    // Контейнер для результатов
     const resultsBox = document.createElement('div');
     resultsBox.style.position = 'absolute';
     resultsBox.style.top = '100%';
@@ -27,9 +49,9 @@ export function initSearchPanel({ apiUrl, resultPageUrl }) {
     resultsBox.style.zIndex = 1001;
     resultsBox.style.display = 'none';
 
-    container.appendChild(input);
+    container.appendChild(inputWrapper);
     container.appendChild(resultsBox);
-    document.body.insertBefore(container, document.body.firstChild.nextSibling); // сразу под adminPanel
+    document.body.insertBefore(container, document.body.firstChild.nextSibling); // сразу под админ-панелью
 
     let timeout = null;
 
@@ -58,7 +80,7 @@ export function initSearchPanel({ apiUrl, resultPageUrl }) {
                         item.style.cursor = 'pointer';
                         item.style.borderBottom = '1px solid #ccc';
                         item.addEventListener('click', () => {
-                            window.location.href = `${resultPageUrl}?clientId=${id}`;
+                            window.location.href = `${resultPageUrl}?${idNaming}=${id}`;
                         });
                         resultsBox.appendChild(item);
                     });
