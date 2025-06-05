@@ -17,6 +17,14 @@
         </button>
     </div>
     <div id="clients-container" class="row card-grid"></div>
+    <script type="module">
+        import { initSearchPanel } from '../scripts/searchPanel.js';
+
+        initSearchPanel({
+            apiUrl: '/api/client/search',
+            resultPageUrl: '/pages/client.html'
+        });
+    </script>
     <script type="module" src="/scripts/clients.js"></script>
 </body>
 </html>

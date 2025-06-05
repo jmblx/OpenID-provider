@@ -77,7 +77,7 @@ class ResourceServerReaderImpl(ResourceServerReader):
         )
         rss_data = (await self.session.execute(query)).mappings().all()
         result = {
-            rs["id"]: ResourceServerIdsData(name=rs["name"].value)
+            rs["id"]: ResourceServerIdsData(name=rs["name"])
             for rs in rss_data
         }
         return result
