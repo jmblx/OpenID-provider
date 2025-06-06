@@ -20,9 +20,6 @@ from infrastructure.db.config import (
     DB_PASS,
 )
 
-print("Registered tables:", mapper_registry.metadata.tables.keys())
-
-# Настройка конфигурации Alembic
 config = context.config
 
 section = config.config_ini_section
@@ -38,7 +35,6 @@ if config.config_file_name is not None:
 target_metadata = mapper_registry.metadata
 
 
-# Получаем URL базы данных
 def get_url():
     return config.get_main_option("sqlalchemy.url")
 
@@ -61,10 +57,10 @@ def run_migrations_online() -> None:
     """Выполнение миграций в 'онлайн' режиме."""
     url = get_url()
 
-    if "asyncpg" in url:  # Если URL асинхронный, заменяем его на синхронный
+    if "asyncpg" in url:
         sync_url = url.replace("asyncpg", "psycopg2").replace(
             "?async_fallback=True", ""
-        )  # Заменяем на синхронный драйвер
+        )
         connectable = create_engine(sync_url, poolclass=pool.NullPool)
     else:
         connectable = engine_from_config(
