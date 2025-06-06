@@ -10,7 +10,7 @@ endpoint_url = os.getenv("MINIO_ENDPOINT_URL")
 
 
 class MinIOConfig(BaseModel):
-    endpoint_url = (
+    endpoint_url: str = (
         endpoint_url
         if endpoint_url.startswith(("http://", "https://"))
         else f"http://{endpoint_url}"
