@@ -3,7 +3,7 @@ from datetime import timedelta
 from io import BytesIO
 
 from PIL import Image
-import aiobotocore
+from aiobotocore.session import get_session
 from botocore.exceptions import ClientError
 
 from application.common.interfaces.imedia_storage import StorageService
@@ -13,7 +13,7 @@ from infrastructure.external_services.storage.config import MinIOConfig
 class MinIOService(StorageService):
     def __init__(self, config: MinIOConfig):
         self.config = config
-        self.session = aiobotocore.get_session()
+        self.session = get_session()
         self.s3_client = None  # Инициализируется при первом вызове
 
     async def _get_client(self):
