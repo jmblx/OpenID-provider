@@ -2,7 +2,7 @@ from typing import TypedDict
 from uuid import UUID
 
 from application.common.id_provider import UserIdentityProvider
-from application.common.interfaces.imedia_storage import StorageService
+from application.common.interfaces.imedia_storage import StorageService, UserS3StorageService
 
 
 class UserData(TypedDict):
@@ -12,7 +12,7 @@ class UserData(TypedDict):
     is_admin: bool
 
 class IdentifyByCookiesQueryHandler:
-    def __init__(self, idp: UserIdentityProvider, s3_storage: StorageService):
+    def __init__(self, idp: UserIdentityProvider, s3_storage: UserS3StorageService):
         self.idp = idp
         self.s3_storage = s3_storage
 

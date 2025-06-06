@@ -141,21 +141,18 @@ services:
     image: minio/mc
     depends_on:
       - minio
-    environment:
-      - MINIO_ALIAS=myminio
-      - MINIO_URL=http://minio:9000
-      - MINIO_ACCESS_KEY=minio-key
-      - MINIO_SECRET_KEY=17471747
-      - BUCKET_NAME=avatars
+    env_file:
+      - .env-prod
 #     mc policy set private $${MINIO_ALIAS}/$${BUCKET_NAME}
     entrypoint: >
       /bin/sh -c "
       sleep 10;
       mc alias set $${MINIO_ALIAS} $${MINIO_URL} $${MINIO_ACCESS_KEY} $${MINIO_SECRET_KEY};
-      mc mb $${MINIO_ALIAS}/$${BUCKET_NAME} || true;
-      mc anonymous set download $${MINIO_ALIAS}/$${BUCKET_NAME}
+      mc mb $${MINIO_ALIAS}/$${MINIO_USER_AVATAR_BUCKET_NAME} || true;
+      mc anonymous set download $${MINIO_ALIAS}/$${MINIO_USER_AVATAR_BUCKET_NAME}
+      mc mb $${MINIO_ALIAS}/$${MINIO_CLIENT_AVATAR_BUCKET_NAME} || true;
+      mc anonymous set download $${MINIO_ALIAS}/$${MINIO_CLIENT_AVATAR_BUCKET_NAME}
       "
-
   nginx:
     image: menoitami/custom-openresty-jwt
     container_name: nginx_app

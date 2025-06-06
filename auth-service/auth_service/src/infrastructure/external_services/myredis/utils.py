@@ -17,7 +17,7 @@ async def save_refresh_token_to_redis(
     auth_settings: "JWTSettings",
 ) -> None:
     jti = str(refresh_token_data.pop("jti"))
-    user_id = refresh_token_data["user_id"]
+    user_id = refresh_token_data["object_id"]
     fingerprint = refresh_token_data["fingerprint"]
     created_at = datetime.fromisoformat(
         refresh_token_data["created_at"]
@@ -32,7 +32,7 @@ async def save_refresh_token_to_redis(
         await redis.zrem(f"refresh_tokens:{user_id}", existing_jti)
     else:
         logging.info(
-            "No existing code found for user_id: %s and fingerprint: %s",
+            "No existing code found for object_id: %s and fingerprint: %s",
             user_id,
             fingerprint,
         )
@@ -53,7 +53,7 @@ async def save_refresh_token_to_redis(
             await redis.delete(f"refresh_token:{oldest_jti}")
     else:
         logging.info(
-            "Number of tokens for user_id %s is within limit: %s",
+            "Number of tokens for object_id %s is within limit: %s",
             user_id,
             num_tokens,
         )

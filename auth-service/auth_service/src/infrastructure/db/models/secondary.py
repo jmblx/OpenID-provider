@@ -10,7 +10,7 @@ user_client_association_table = Table(
     mapper_registry.metadata,
     Column("id", sa.Integer, primary_key=True, autoincrement=True),
     Column(
-        "user_id", PGUUID(as_uuid=True), ForeignKey("user.id"), nullable=False
+        "object_id", PGUUID(as_uuid=True), ForeignKey("user.id"), nullable=False
     ),
     Column("client_id", sa.Integer, ForeignKey("client.id"), nullable=False),
 )
@@ -20,7 +20,7 @@ user_role_association = Table(
     mapper_registry.metadata,
     Column("id", sa.Integer, primary_key=True, autoincrement=True),
     Column(
-        "user_id", PGUUID(as_uuid=True), ForeignKey("user.id"), nullable=False
+        "object_id", PGUUID(as_uuid=True), ForeignKey("user.id"), nullable=False
     ),
     Column("role_id", sa.Integer, ForeignKey("role.id"), nullable=False),
 )
@@ -40,7 +40,7 @@ user_rs_association_table = Table(
     mapper_registry.metadata,
     Column("id", sa.Integer, primary_key=True, autoincrement=True),
     Column("rs_id", sa.Integer, ForeignKey("resource_server.id"), nullable=False),
-    Column("user_id", PGUUID(as_uuid=True), ForeignKey("user.id"), nullable=False),
+    Column("object_id", PGUUID(as_uuid=True), ForeignKey("user.id"), nullable=False),
 )
 
 # user_strategy_association_table = Table(
@@ -48,7 +48,7 @@ user_rs_association_table = Table(
 #     mapper_registry.metadata,
 #     Column("id", sa.Integer, primary_key=True, autoincrement=True),
 #     Column(
-#         "user_id", PGUUID(as_uuid=True), ForeignKey("user.id"), nullable=False
+#         "object_id", PGUUID(as_uuid=True), ForeignKey("user.id"), nullable=False
 #     ),
 #     Column(
 #         "strategy_id",

@@ -65,7 +65,7 @@ class GetMeDataHandler:
             code_challenge_method=command.code_challenge_method,
         )
         auth_code_data: AuthCodeData = {
-            "user_id": str(user.id.value),
+            "object_id": str(user.id.value),
             "client_id": str(command.client_id),
             "code_challenger": self.pkce_service.generate_code_challenge(
                 pkce_data

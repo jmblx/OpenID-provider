@@ -76,7 +76,7 @@ class CodeToTokenHandler:
             raise HTTPException(status_code=400, detail="Invalid PKCE")
 
         user = await self.user_repository.get_by_id(
-            UserID(UUID(auth_code_data["user_id"]))
+            UserID(UUID(auth_code_data["object_id"]))
         )
         if not user:
             raise HTTPException(status_code=404, detail="User not found")

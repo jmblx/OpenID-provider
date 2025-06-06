@@ -90,14 +90,14 @@ def upgrade() -> None:
     op.create_table(
         "user_client_association",
         sa.Column("id", sa.Integer(), autoincrement=True, nullable=False),
-        sa.Column("user_id", sa.UUID(), nullable=False),
+        sa.Column("object_id", sa.UUID(), nullable=False),
         sa.Column("client_id", sa.Integer(), nullable=False),
         sa.ForeignKeyConstraint(
             ["client_id"],
             ["client.id"],
         ),
         sa.ForeignKeyConstraint(
-            ["user_id"],
+            ["object_id"],
             ["user.id"],
         ),
         sa.PrimaryKeyConstraint("id"),
@@ -105,14 +105,14 @@ def upgrade() -> None:
     op.create_table(
         "user_role_association",
         sa.Column("id", sa.Integer(), autoincrement=True, nullable=False),
-        sa.Column("user_id", sa.UUID(), nullable=False),
+        sa.Column("object_id", sa.UUID(), nullable=False),
         sa.Column("role_id", sa.Integer(), nullable=False),
         sa.ForeignKeyConstraint(
             ["role_id"],
             ["role.id"],
         ),
         sa.ForeignKeyConstraint(
-            ["user_id"],
+            ["object_id"],
             ["user.id"],
         ),
         sa.PrimaryKeyConstraint("id"),
@@ -136,9 +136,9 @@ def upgrade() -> None:
         'user_rs_association_table',
         sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
         sa.Column('rs_id', sa.Integer(), nullable=False),
-        sa.Column('user_id', sa.UUID(), nullable=False),
+        sa.Column('object_id', sa.UUID(), nullable=False),
         sa.ForeignKeyConstraint(['rs_id'], ['resource_server.id'], ),
-        sa.ForeignKeyConstraint(['user_id'], ['user.id'], ),
+        sa.ForeignKeyConstraint(['object_id'], ['user.id'], ),
         sa.PrimaryKeyConstraint('id')
     )
 

@@ -1,14 +1,9 @@
 from dataclasses import dataclass
-from uuid import UUID
 
 from application.common.id_provider import UserIdentityProvider
-from application.common.interfaces.imedia_storage import (
-    StorageService,
-)
 from application.common.interfaces.user_repo import UserRepository
-from application.common.uow import Uow
 from application.dtos.set_image import ImageDTO
-from domain.entities.user.value_objects import UserID
+from application.common.interfaces.imedia_storage import UserS3StorageService
 
 
 @dataclass
@@ -20,7 +15,7 @@ class SetUserAvatarHandler:
     def __init__(
         self,
         user_repo: UserRepository,
-        media_storage: StorageService,
+        media_storage: UserS3StorageService,
         idp: UserIdentityProvider,
     ):
         self.user_repo = user_repo
@@ -36,6 +31,6 @@ class SetUserAvatarHandler:
             filename=command.image.filename,
             content=command.image.content,
             content_type=command.image.content_type,
-            user_id=str(user.id.value),
+            object_id=str(user.id.value),
         )
         return avatar_path

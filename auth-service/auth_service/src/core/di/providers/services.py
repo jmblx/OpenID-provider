@@ -1,3 +1,4 @@
+import os
 
 import argon2
 from dishka import Provider, Scope, provide
@@ -8,7 +9,7 @@ from application.common.interfaces.email_confirmation_service import (
     EmailConfirmationServiceI,
 )
 from application.common.interfaces.http_auth import HttpAuthServerService, HttpClientService
-from application.common.interfaces.imedia_storage import StorageService
+from application.common.interfaces.imedia_storage import StorageService, UserS3StorageService, ClientS3StorageService
 from application.common.interfaces.jwt_service import JWTService
 from application.common.interfaces.notify_service import NotifyService
 from application.common.interfaces.auth_server_token_creation import AuthServerTokenCreationService
@@ -29,6 +30,7 @@ from domain.common.services.pwd_service import PasswordHasher
 from infrastructure.external_services.message_routing.notify_service import (
     NotifyServiceImpl,
 )
+from infrastructure.external_services.storage.config import MinIOConfig
 from infrastructure.external_services.storage.minio_service import MinIOService
 
 from infrastructure.services.auth.auth_code import (
@@ -125,6 +127,17 @@ class ServiceProvider(Provider):
     auth_server_token_service = provide(AuthServerTokenWhitelistServiceImpl, scope=Scope.REQUEST, provides=AuthServerTokenWhitelistService)
     oauth_identity_provider = provide(YandexIdentityProvider, scope=Scope.REQUEST, provides=YandexIdentityProvider)
     third_party_notification_service = provide(ThirdPartyNotificationServiceImpl, scope=Scope.REQUEST, provides=ThirdPartyNotificationService)
+
+
+    @provide(scope=Scope.REQUEST, provides=UserS3StorageService)
+    def provide_user_minio_service(self, config: MinIOConfig) -> UserS3StorageService:
+        return MinIOService(config, bucket_name=os.getenv("MINIO_USER_AVATAR_BUCKET_NAME"))
+
+
+    @provide(scope=Scope.REQUEST, provides=ClientS3StorageService)
+    def provide_client_minio_service(self, config: MinIOConfig) -> ClientS3StorageService:
+        return MinIOService(config, bucket_name=os.getenv("MINIO_CLIENT_AVATAR_BUCKET_NAME"))
+
     # reg_validation_service = provide(
     #     RegUserValidationService,
     #     scope=Scope.REQUEST,

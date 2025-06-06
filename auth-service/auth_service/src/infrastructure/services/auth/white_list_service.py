@@ -20,7 +20,7 @@ class AuthServerTokenWhitelistServiceImpl(AuthServerTokenWhitelistService):
     def _serialize_refresh_token_data(self, refresh_token_data: AuthServerRefreshTokenWithData) -> dict[str, str]:
         return {
             "jti": str(refresh_token_data.jti),
-            "user_id": str(refresh_token_data.user_id),
+            "object_id": str(refresh_token_data.user_id),
             "fingerprint": refresh_token_data.fingerprint,
             "created_at": refresh_token_data.created_at.isoformat(),
         }
@@ -79,7 +79,7 @@ class ClientTokenWhitelistServiceImpl(ClientTokenWhitelistService):
     def _serialize_refresh_token_data(self, refresh_token_data: ClientRefreshTokenData) -> dict[str, str]:
         return {
             "jti": str(refresh_token_data.jti),
-            "user_id": str(refresh_token_data.user_id),
+            "object_id": str(refresh_token_data.user_id),
             "created_at": refresh_token_data.created_at.isoformat(),
         }
 

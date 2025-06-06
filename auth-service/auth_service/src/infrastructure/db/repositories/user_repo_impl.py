@@ -64,7 +64,7 @@ class UserRepositoryImpl(UserRepository):
             return
 
         values = [
-            {"user_id": user_id.value, "role_id": role_id}
+            {"object_id": user_id.value, "role_id": role_id}
             for role_id in role_ids
         ]
 
