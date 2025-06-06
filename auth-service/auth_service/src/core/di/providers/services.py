@@ -128,14 +128,14 @@ class ServiceProvider(Provider):
     oauth_identity_provider = provide(YandexIdentityProvider, scope=Scope.REQUEST, provides=YandexIdentityProvider)
     third_party_notification_service = provide(ThirdPartyNotificationServiceImpl, scope=Scope.REQUEST, provides=ThirdPartyNotificationService)
 
-
+    @staticmethod
     @provide(scope=Scope.REQUEST, provides=UserS3StorageService)
-    def provide_user_minio_service(self, config: MinIOConfig) -> UserS3StorageService:
+    def provide_user_minio_service(config: MinIOConfig) -> UserS3StorageService:
         return MinIOService(config, bucket_name=os.getenv("MINIO_USER_AVATAR_BUCKET_NAME"))
 
-
+    @staticmethod
     @provide(scope=Scope.REQUEST, provides=ClientS3StorageService)
-    def provide_client_minio_service(self, config: MinIOConfig) -> ClientS3StorageService:
+    def provide_client_minio_service(config: MinIOConfig) -> ClientS3StorageService:
         return MinIOService(config, bucket_name=os.getenv("MINIO_CLIENT_AVATAR_BUCKET_NAME"))
 
     # reg_validation_service = provide(
