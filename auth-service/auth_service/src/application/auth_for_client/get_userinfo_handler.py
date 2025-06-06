@@ -30,7 +30,7 @@ class GetUserInfoQueryHandler:
         result["id"] = user.id.value
         try:
             if "avatar_path" in available_data:
-                result["avatar_path"] = await self.s3_storage.get_presigned_avatar_url(str(user.id.value))
+                result["avatar_path"] = self.s3_storage.get_presigned_avatar_url(str(user.id.value))
         except ValueError: ...
         return result
         # result = {

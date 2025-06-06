@@ -7,14 +7,17 @@ load_dotenv()
 
 
 endpoint_url = os.getenv("MINIO_ENDPOINT_URL")
-
-
-class MinIOConfig(BaseModel):
+try:
+    import aiobotocore
     endpoint_url: str = (
         endpoint_url
         if endpoint_url.startswith(("http://", "https://"))
         else f"http://{endpoint_url}"
     )
+except ImportError as e:
+    pass
+
+class MinIOConfig(BaseModel):
     access_key: str = os.getenv("MINIO_ACCESS_KEY")
     secret_key: str = os.getenv("MINIO_SECRET_KEY")
     user_avatar_bucket_name: str = os.getenv("MINIO_USER_AVATAR_BUCKET_NAME")

@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 
 class StorageService(ABC):
     @abstractmethod
-    async def set_avatar(self, filename: str, content: bytes, content_type: str, user_id: str) -> str:
+    def set_avatar(self, filename: str, content: bytes, content_type: str, user_id: str) -> str:
         """
         Загружает файл в указанный бакет.
 
@@ -16,4 +16,4 @@ class StorageService(ABC):
         """
 
     @abstractmethod
-    async def get_presigned_avatar_url(self, filename: str) -> str: ...
+    def get_presigned_avatar_url(self, filename: str) -> str: ...
