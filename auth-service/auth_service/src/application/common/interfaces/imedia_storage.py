@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 
 
-class StorageServiceInterface(ABC):
+class StorageService(ABC):
     @abstractmethod
     def set_avatar(self, filename: str, content: bytes, content_type: str, user_id: str) -> str:
         """

@@ -3,7 +3,7 @@ from typing import TypedDict
 from uuid import UUID
 
 from application.common.id_provider import ClientIdentityProvider
-from application.common.interfaces.imedia_storage import StorageServiceInterface
+from application.common.interfaces.imedia_storage import StorageService
 from application.common.services.auth_code import ALLOWED_SCOPES
 from domain.entities.user.model import User
 
@@ -15,7 +15,7 @@ class UserData(TypedDict, total=False):
 
 
 class GetUserInfoQueryHandler:
-    def __init__(self, idp: ClientIdentityProvider, s3_storage: StorageServiceInterface):
+    def __init__(self, idp: ClientIdentityProvider, s3_storage: StorageService):
         self.idp = idp
         self.s3_storage = s3_storage
 

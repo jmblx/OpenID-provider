@@ -1,30 +1,35 @@
 import os
 from datetime import timedelta
 from io import BytesIO
-from urllib.parse import urlunparse, urlparse
 
 from PIL import Image
-from minio import Minio
-from minio.error import S3Error
+import aiobotocore
+from botocore.exceptions import ClientError
 
-from application.common.interfaces.imedia_storage import StorageServiceInterface
+from application.common.interfaces.imedia_storage import StorageService
 from infrastructure.external_services.storage.config import MinIOConfig
 
 
-class MinIOService(StorageServiceInterface):
+class MinIOService(StorageService):
     def __init__(self, config: MinIOConfig):
         self.config = config
-        self.s3_client = Minio(
-            config.endpoint_url,
-            access_key=config.access_key,
-            secret_key=config.secret_key,
-            secure=False
-        )
+        self.session = aiobotocore.get_session()
+        self.s3_client = None  # Инициализируется при первом вызове
+
+    async def _get_client(self):
+        """Ленивая инициализация клиента (aiobotocore требует async-сессии)."""
+        if not self.s3_client:
+            self.s3_client = self.session.create_client(
+                "s3",
+                endpoint_url=self.config.endpoint_url,
+                aws_access_key_id=self.config.access_key,
+                aws_secret_access_key=self.config.secret_key,
+                use_ssl=False,
+            )
+        return self.s3_client
 
     def _process_avatar(self, content: bytes) -> bytes:
-        """
-        Обрезает и конвертирует изображение в webp.
-        """
+        """Обрезает и конвертирует изображение в webp (синхронный метод)."""
         with Image.open(BytesIO(content)) as img:
             img = img.convert("RGB")
             img = img.resize((256, 256), Image.LANCZOS)
@@ -35,37 +40,46 @@ class MinIOService(StorageServiceInterface):
     def _get_avatar_filename(self, user_id: str) -> str:
         return f"{user_id}.webp"
 
-    def set_avatar(self, filename: str, content: bytes, content_type: str, user_id: str) -> str:
-        """
-        Загружает аватарку в MinIO.
-        """
-        filename = f"{user_id}.webp"
+    async def set_avatar(self, filename: str, content: bytes, content_type: str, user_id: str) -> str:
+        """Загружает аватарку в MinIO (асинхронно)."""
+        client = await self._get_client()
+        filename = self._get_avatar_filename(user_id)
         try:
             processed_content = self._process_avatar(content)
-            self.s3_client.put_object(
-                self.config.user_avatar_bucket_name,  # Бакет
-                filename,  # Имя файла
-                BytesIO(processed_content),
-                length=len(processed_content),
-                content_type="image/webp"
+            await client.put_object(
+                Bucket=self.config.user_avatar_bucket_name,
+                Key=filename,
+                Body=processed_content,
+                ContentType="image/webp",
             )
-            return self.get_presigned_avatar_url(user_id)
-        except S3Error as e:
+            return await self.get_presigned_avatar_url(user_id)
+        except ClientError as e:
             raise Exception(f"Ошибка при загрузке файла в MinIO: {e}")
+        finally:
+            await client.close()  # Важно закрывать клиент после использования
 
-    def get_presigned_avatar_url(self, user_id: str) -> str:
-        """
-        Генерирует presigned URL для доступа к аватарке.
-        Заменяет хост в URL на public_url.
-        """
+    async def get_presigned_avatar_url(self, user_id: str) -> str:
+        """Генерирует presigned URL для доступа к аватарке (асинхронно)."""
+        client = await self._get_client()
         try:
-            presigned_url = self.s3_client.presigned_get_object(
-                self.config.user_avatar_bucket_name,
-                self._get_avatar_filename(user_id),
-                expires=timedelta(minutes=5)
+            presigned_url = await client.generate_presigned_url(
+                "get_object",
+                Params={
+                    "Bucket": self.config.user_avatar_bucket_name,
+                    "Key": self._get_avatar_filename(user_id),
+                },
+                ExpiresIn=300,  # 5 минут (в секундах)
             )
-            presigned_url = presigned_url.replace("minio:9000", os.getenv("HOST_ADDRESS"))
-
+            presigned_url = presigned_url.replace(
+                "minio:9000", os.getenv("HOST_ADDRESS")
+            )
             return presigned_url
-        except S3Error as e:
+        except ClientError as e:
             raise Exception(f"Ошибка при генерации presigned URL: {e}")
+        finally:
+            await client.close()
+
+    async def close(self):
+        """Закрывает клиент (вызывайте при завершении работы)."""
+        if self.s3_client:
+            await self.s3_client.close()

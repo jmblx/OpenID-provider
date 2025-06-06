@@ -7,7 +7,7 @@ from fastapi import HTTPException
 
 from application.auth_as.common.scopes_service import ScopesService
 from application.common.client_token_types import ClientAccessToken, ClientRefreshToken
-from application.common.interfaces.imedia_storage import StorageServiceInterface
+from application.common.interfaces.imedia_storage import StorageService
 from application.common.interfaces.role_repo import RoleRepository
 from application.common.interfaces.user_repo import UserRepository
 from application.common.services.auth_code import AuthorizationCodeStorage, AuthCodeData

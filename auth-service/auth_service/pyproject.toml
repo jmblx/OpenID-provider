@@ -35,6 +35,7 @@ prometheus-client = "^0.21.1"
 colorlog = "^6.9.0"
 pyyaml = "^6.0.2"
 docker = "^7.1.0"
+aiobotocore = "^2.22.0"
 
 [tool.poetry.group.dev.dependencies]
 setuptools = "^75.2.0"

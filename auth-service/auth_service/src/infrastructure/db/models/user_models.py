@@ -25,7 +25,6 @@ user_table = Table(
     Column("email", String, nullable=False),
     Column("is_email_confirmed", Boolean, default=False),
     Column("hashed_password", String, nullable=False),
-    Column("avatar_path", String, nullable=True),
     Column("is_admin", Boolean, nullable=False),
 )
 
@@ -39,7 +38,6 @@ mapper_registry.map_imperatively(
             HashedPassword, user_table.c.hashed_password
         ),
         "is_email_confirmed": user_table.c.is_email_confirmed,
-        "avatar_path": user_table.c.avatar_path,
         "roles": relationship(
             "Role",
             secondary=user_role_association,

@@ -8,7 +8,7 @@ from application.common.interfaces.email_confirmation_service import (
     EmailConfirmationServiceI,
 )
 from application.common.interfaces.http_auth import HttpAuthServerService, HttpClientService
-from application.common.interfaces.imedia_storage import StorageServiceInterface
+from application.common.interfaces.imedia_storage import StorageService
 from application.common.interfaces.jwt_service import JWTService
 from application.common.interfaces.notify_service import NotifyService
 from application.common.interfaces.auth_server_token_creation import AuthServerTokenCreationService
@@ -64,7 +64,7 @@ class ServiceProvider(Provider):
     # ) -> UserService:
     #     return UserServiceImpl(user_repo)
     # storage_service = provide(
-    #     MinIOService, scope=Scope.REQUEST, provides=StorageServiceInterface
+    #     MinIOService, scope=Scope.REQUEST, provides=StorageService
     # )
     ph = provide(
         lambda _: PasswordHasherImpl(argon2.PasswordHasher()),
@@ -120,7 +120,7 @@ class ServiceProvider(Provider):
         ScopesServiceImpl, scope=Scope.REQUEST, provides=ScopesService
     )
     http_client_service = provide(HttpClientServiceImpl, scope=Scope.REQUEST, provides=HttpClientService)
-    storage_service_interface = provide(MinIOService, scope=Scope.REQUEST, provides=StorageServiceInterface)
+    storage_service_interface = provide(MinIOService, scope=Scope.REQUEST, provides=StorageService)
     client_token_service = provide(ClientTokenWhitelistServiceImpl, scope=Scope.REQUEST, provides=ClientTokenWhitelistService)
     auth_server_token_service = provide(AuthServerTokenWhitelistServiceImpl, scope=Scope.REQUEST, provides=AuthServerTokenWhitelistService)
     oauth_identity_provider = provide(YandexIdentityProvider, scope=Scope.REQUEST, provides=YandexIdentityProvider)
