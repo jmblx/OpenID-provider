@@ -70,16 +70,16 @@ class RoleRepositoryImpl(RoleRepository):
         stmt = text("""
             SELECT r.*, rs.id AS rs_id FROM role r
             JOIN user_role_association ura ON r.id = ura.role_id
-            JOIN "user" u ON ura.object_id = u.id
+            JOIN "user" u ON ura.user_id = u.id
             JOIN resource_server rs ON r.rs_id = rs.id
-            WHERE u.id = :object_id
+            WHERE u.id = :user_id
               AND rs.id = ANY(:rs_ids)
               AND rs.type = :rs_type
               AND r.is_active = TRUE
         """)
 
         result = await self.session.execute(stmt, {
-            "object_id": str(user_id.value),
+            "user_id": str(user_id.value),
             "rs_ids": rs_ids,
             "rs_type": ResourceServerType.RBAC_BY_AS.value,
         })

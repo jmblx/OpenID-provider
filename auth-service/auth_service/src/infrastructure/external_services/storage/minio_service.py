@@ -53,7 +53,7 @@ class MinIOService(StorageService):
         except S3Error as e:
             raise Exception(f"Ошибка при загрузке файла в MinIO: {e}")
 
-    def get_presigned_avatar_url(self, user_id: str) -> str:
+    def get_presigned_avatar_url(self, object_id: str) -> str:
         """
         Генерирует presigned URL для доступа к аватарке.
         Заменяет хост в URL на public_url.
@@ -61,7 +61,7 @@ class MinIOService(StorageService):
         try:
             presigned_url = self.s3_client.presigned_get_object(
                 self.bucket_name,
-                self._get_avatar_filename(user_id),
+                self._get_avatar_filename(object_id),
                 expires=timedelta(minutes=5)
             )
             presigned_url = presigned_url.replace("minio:9000", os.getenv("HOST_ADDRESS"))

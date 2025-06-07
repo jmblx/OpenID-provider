@@ -26,7 +26,7 @@ async def login_with_yandex(handler: FromDishka[YandexLoginHandler], command: Ya
 async def register_with_yandex(handler: FromDishka[YandexRegisterHandler], command: YandexRegisterCommand):
     register_handler_response = await handler.handle(command)
     response = ORJSONResponse(
-        {"id": register_handler_response["object_id"]},
+        {"id": register_handler_response["user_id"]},
         status_code=status.HTTP_201_CREATED,
     )
     set_auth_server_tokens(response, register_handler_response)

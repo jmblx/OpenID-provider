@@ -63,5 +63,5 @@ class YandexRegisterHandler:
             notify_data
         )
         await self.uow.commit()
-        result = {**auth_tokens, "object_id": user_id}
+        result = {**auth_tokens, "user_id": user_id}
         return cast(RegisterUserResult, result)

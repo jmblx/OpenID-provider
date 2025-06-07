@@ -29,11 +29,11 @@ class UserReaderImpl(UserReader):
             FROM strategy
             JOIN user_strategy_association
                 ON strategy.id = user_strategy_association.strategy_id
-            WHERE user_strategy_association.object_id = :object_id
+            WHERE user_strategy_association.user_id = :user_id
         """
         )
 
-        result = await self.session.execute(query, {"object_id": user_id.value})
+        result = await self.session.execute(query, {"user_id": user_id.value})
         strategies = result.fetchall()
 
         if not strategies:
@@ -71,19 +71,19 @@ class UserReaderImpl(UserReader):
             """
             SELECT user_strategy_association.id, 
                    user_strategy_association.strategy_id, 
-                   user_strategy_association.object_id, 
+                   user_strategy_association.user_id, 
                    user_strategy_association.portfolio, 
                    user_strategy_association.current_balance, 
                    user_strategy_association.start_date, 
                    user_strategy_association.end_date
             FROM user_strategy_association
             WHERE user_strategy_association.strategy_id = :strategy_id 
-              AND user_strategy_association.object_id = :object_id
+              AND user_strategy_association.user_id = :user_id
         """
         )
 
         result = await self.session.execute(
-            query, {"strategy_id": strategy_id, "object_id": user_id.value}
+            query, {"strategy_id": strategy_id, "user_id": user_id.value}
         )
 
         user_strategy = result.fetchall()
