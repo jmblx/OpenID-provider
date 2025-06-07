@@ -55,7 +55,7 @@ export async function loadUserData(emailElementId = 'user-email') {
 }
 
 export async function loadUserAvatar(avatarElementId = 'user-avatar') {
-    const avatarUrl = '/avatars/jwt/';
+    const avatarUrl = '/user-avatars/jwt/';
     const localStorageKey = 'lastAvatarUpdate';
 
     try {
