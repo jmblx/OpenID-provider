@@ -68,13 +68,13 @@ class ServiceProvider(Provider):
     # storage_service = provide(
     #     MinIOService, scope=Scope.REQUEST, provides=StorageService
     # )
-    ph = provide(
-        lambda _: PasswordHasherImpl(argon2.PasswordHasher()),
-        scope=Scope.REQUEST,
-        provides=PasswordHasher,
-    )
+    @staticmethod
+    @provide(scope=Scope.REQUEST, provides=PasswordHasher)
+    def provide_ph() -> PasswordHasher:
+        return PasswordHasherImpl(argon2.PasswordHasher())
+
     pkce_service = provide(
-        lambda _: PKCEService(), scope=Scope.APP, provides=PKCEService
+        PKCEService, scope=Scope.APP
     )
     auth_code_service = provide(
         RedisAuthorizationCodeStorage,

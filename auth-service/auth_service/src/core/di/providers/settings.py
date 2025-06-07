@@ -9,12 +9,15 @@ from infrastructure.services.auth.config import JWTSettings
 
 class SettingsProvider(Provider):
     storage_settings = provide(
-        lambda *args: MinIOConfig(), scope=Scope.APP, provides=MinIOConfig
+        MinIOConfig, scope=Scope.APP
     )
-    jwt_settings = provide(
-        lambda *args: JWTSettings(), scope=Scope.APP, provides=JWTSettings
-    )
+
+    @staticmethod
+    @provide(scope=Scope.APP, provides=JWTSettings)
+    def provide_jwt_settings() -> JWTSettings:
+        return JWTSettings()
+
     admin_settings = provide(
-        lambda *args: AdminSettings(), scope=Scope.APP, provides=AdminSettings
+        AdminSettings, scope=Scope.APP
     )
     # firebase_config = provide(FirebaseConfig().from_env, scope=Scope.APP, provides=FirebaseConfig
