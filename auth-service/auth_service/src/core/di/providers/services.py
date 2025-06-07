@@ -122,7 +122,6 @@ class ServiceProvider(Provider):
         ScopesServiceImpl, scope=Scope.REQUEST, provides=ScopesService
     )
     http_client_service = provide(HttpClientServiceImpl, scope=Scope.REQUEST, provides=HttpClientService)
-    storage_service_interface = provide(MinIOService, scope=Scope.REQUEST, provides=StorageService)
     client_token_service = provide(ClientTokenWhitelistServiceImpl, scope=Scope.REQUEST, provides=ClientTokenWhitelistService)
     auth_server_token_service = provide(AuthServerTokenWhitelistServiceImpl, scope=Scope.REQUEST, provides=AuthServerTokenWhitelistService)
     oauth_identity_provider = provide(YandexIdentityProvider, scope=Scope.REQUEST, provides=YandexIdentityProvider)

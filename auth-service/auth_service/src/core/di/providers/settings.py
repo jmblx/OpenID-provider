@@ -1,5 +1,3 @@
-import os
-
 from dishka import Provider, Scope, provide
 
 from application.auth_as.common.admin_settings import AdminSettings
