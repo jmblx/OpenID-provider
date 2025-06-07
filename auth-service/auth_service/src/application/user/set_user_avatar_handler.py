@@ -31,6 +31,6 @@ class SetUserAvatarHandler:
             filename=command.image.filename,
             content=command.image.content,
             content_type=command.image.content_type,
-            user_id=str(user.id.value),
+            object_id=str(user.id.value),
         )
         return avatar_path
