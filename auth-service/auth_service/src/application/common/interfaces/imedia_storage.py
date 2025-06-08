@@ -4,7 +4,7 @@ from typing import NewType
 
 class StorageService(ABC):
     @abstractmethod
-    def set_avatar(self, filename: str, content: bytes, content_type: str, object_id: str) -> str:
+    def set_avatar(self, content: bytes, content_type: str, object_id: str) -> str:
         """
         Загружает файл в указанный бакет.
 

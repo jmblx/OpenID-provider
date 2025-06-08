@@ -9,7 +9,7 @@ export async function uploadAvatar() {
         const formData = new FormData();
         formData.append('file', fileInput.files[0]);
 
-        await fetchWithAuth('/api/set-avatar', {
+        await fetchWithAuth('/api/avatar', {
             method: 'POST',
             body: formData
         });

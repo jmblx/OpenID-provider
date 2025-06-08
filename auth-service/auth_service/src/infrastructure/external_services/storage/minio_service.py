@@ -35,7 +35,7 @@ class MinIOService(StorageService):
     def _get_avatar_filename(self, object_id: str) -> str:
         return f"{object_id}.webp"
 
-    def set_avatar(self, filename: str, content: bytes, content_type: str, object_id: str) -> str:
+    def set_avatar(self, content: bytes, content_type: str, object_id: str) -> str:
         """
         Загружает аватарку в MinIO.
         """

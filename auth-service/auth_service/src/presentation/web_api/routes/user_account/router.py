@@ -50,7 +50,7 @@ async def add_role_to_user(
 async def get_me(handler: FromDishka[IdentifyByCookiesQueryHandler]) -> UserSchema:
     return UserSchema(**await handler.handle())
 
-@user_account_router.post("/set-avatar")
+@user_account_router.post("/avatar")
 async def set_avatar(handler: FromDishka[SetUserAvatarHandler], file: UploadFile = File(...)) -> ORJSONResponse:
     if not file:
         raise HTTPException(status_code=400, detail="Файл не был передан")
@@ -58,7 +58,6 @@ async def set_avatar(handler: FromDishka[SetUserAvatarHandler], file: UploadFile
     content = await file.read()
 
     image_dto = ImageDTO(
-        filename=file.filename,
         content=content,
         content_type=file.content_type
     )

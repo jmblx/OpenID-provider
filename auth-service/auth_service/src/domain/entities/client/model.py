@@ -1,4 +1,5 @@
 from dataclasses import dataclass, field
+from datetime import datetime
 from typing import Self, Union
 
 from domain.entities.client.value_objects import (
@@ -21,6 +22,7 @@ class Client:
     allowed_redirect_urls: AllowedRedirectUrls
     type: ClientType
     search_name: str
+    avatar_upd_at: datetime
 
     @classmethod
     def create(

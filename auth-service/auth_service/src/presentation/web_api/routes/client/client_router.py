@@ -3,7 +3,7 @@ from urllib.parse import unquote
 
 from dishka import FromDishka
 from dishka.integrations.fastapi import DishkaRoute
-from fastapi import APIRouter
+from fastapi import APIRouter, UploadFile, File, HTTPException
 from fastapi.params import Param
 from fastapi.responses import ORJSONResponse
 from starlette.status import HTTP_204_NO_CONTENT
@@ -19,6 +19,7 @@ from application.client.client_queries import (
 )
 from application.client.find_clients import FindClientsQuery, FindClientsHandler
 from application.client.get_all_clients import GetClientsIdsHandler, GetClientsIdsQuery
+from application.client.set_client_avatar_handler import SetClientAvatarHandler, SetClientAvatarCommand
 from application.common.views.client_view import ClientsIdsData
 from application.client.read_client_view_handler import (
     ReadClientPageViewQueryHandler,
@@ -33,6 +34,7 @@ from application.client.update_client import (
     UpdateClientCommandHandler,
 )
 from application.dtos.client import ClientCreateDTO
+from application.dtos.set_image import ImageDTO
 from domain.entities.client.value_objects import ClientID
 from presentation.web_api.common.schemas import PaginationData
 from presentation.web_api.routes.client.models import (
@@ -118,3 +120,19 @@ async def get_client(
         ReadClientPageViewQuery(client_id=client_id)
     )
     return ClientViewModel(**client_view)
+
+
+@client_router.post("/{client_id}/avatar")
+async def set_avatar(handler: FromDishka[SetClientAvatarHandler], client_id: int, file: UploadFile = File(...)) -> ORJSONResponse:
+    if not file:
+        raise HTTPException(status_code=400, detail="Файл не был передан")
+
+    content = await file.read()
+
+    image_dto = ImageDTO(
+        content=content,
+        content_type=file.content_type
+    )
+    avatar_path = await handler.handle(SetClientAvatarCommand(image=image_dto, client_id=client_id))
+
+    return ORJSONResponse({"avatar_path": avatar_path})

@@ -48,7 +48,7 @@ jobs:
           docker push menoitami/backend_service.notification_app:latest
 
   deploy:
-
+    needs: build
     runs-on: ubuntu-latest
       
     steps:

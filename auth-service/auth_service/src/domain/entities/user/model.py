@@ -25,7 +25,6 @@ class User:
     is_admin: bool = field(default=False)
     roles: list[Role] = field(default_factory=list)
     is_email_confirmed: bool = field(default=False)
-    avatar_path: str = field(default=None)
     resource_servers: list[ResourceServer] = field(default_factory=list)
     clients: list[Client] = field(default_factory=list)
 
@@ -37,7 +36,6 @@ class User:
         raw_password: str,
         password_hasher: PasswordHasher,
         is_email_confirmed: bool = False,
-        avatar_path: str = None,
     ) -> "User":
         return cls(
             id=UserID(user_id),
@@ -46,7 +44,6 @@ class User:
                 RawPassword(raw_password)
             ),
             is_email_confirmed=is_email_confirmed,
-            avatar_path=avatar_path,
         )
 
     @staticmethod

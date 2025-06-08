@@ -1,4 +1,5 @@
 import sqlalchemy as sa
+from sqlalchemy import Index
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.orm import composite, relationship
 
@@ -29,6 +30,13 @@ client_table = sa.Table(
         nullable=False,
     ),
     sa.Column("search_name", sa.String, nullable=False),
+    sa.Column("avatar_upd_at", sa.DateTime(timezone=True), nullable=True),
+    Index(
+        'idx_client_search_name_trgm',
+        'search_name',
+        postgresql_using='gin',
+        postgresql_ops={'search_name': 'gin_trgm_ops'}
+    )
 )
 
 mapper_registry.map_imperatively(
@@ -43,6 +51,7 @@ mapper_registry.map_imperatively(
         ),
         "type": composite(ClientType, client_table.c.type),
         "search_name": client_table.c.search_name,
+        "avatar_upd_at": client_table.c.avatar_upd_at,
         # "roles": relationship("Role", back_populates="client", uselist=True),
         # "resource_servers": relationship(
         #     "ResourceServer",

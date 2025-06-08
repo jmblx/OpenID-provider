@@ -1,4 +1,5 @@
 import sqlalchemy as sa
+from sqlalchemy import Index
 from sqlalchemy.orm import relationship
 
 from domain.entities.resource_server.model import ResourceServer
@@ -17,6 +18,12 @@ rs_table = sa.Table(
         nullable=False,
     ),
     sa.Column("search_name", sa.String, nullable=False),
+    Index(
+        'idx_resource_server_search_name_trgm',
+        'search_name',
+        postgresql_using='gin',
+        postgresql_ops={'search_name': 'gin_trgm_ops'}
+    )
 )
 
 mapper_registry.map_imperatively(
@@ -32,7 +39,6 @@ mapper_registry.map_imperatively(
             "Role", back_populates="resource_server", uselist=True
         ),
         "users_rss": relationship("User", back_populates="resource_servers", uselist=True, secondary=user_rs_association_table),
-
     },
     column_prefix="_",
 )
