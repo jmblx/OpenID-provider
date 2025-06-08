@@ -15,11 +15,10 @@
         <div class="d-flex justify-content-end">
             <img src="/icons/edit.svg" class="edit-icon" id="edit-icon" onclick="enableClientEditing()">
         </div>
-        <div class="editable-field text-center">
-            <label>Аватар клиента:</label><br>
-            <div class="avatar-container position-relative d-inline-block">
-                <img id="client-avatar" class="rounded-circle border" src="/icons/default-avatar.png" alt="Аватар клиента">
-                <img src="/icons/edit.svg" class="edit-avatar-icon position-absolute" id="edit-avatar-icon">
+        <div class="text-center mb-4">
+            <div class="avatar-wrapper position-relative mx-auto">
+                <img id="client-avatar" class="rounded-circle border" width="150" height="150" style="object-fit: cover;">
+                <img src="/icons/edit.svg" class="edit-icon position-absolute bottom-0 end-0 bg-white rounded-circle p-1 shadow" id="edit-avatar-icon" style="cursor: pointer;">
                 <input type="file" id="avatar-file-input" accept="image/*" class="d-none">
             </div>
         </div>
