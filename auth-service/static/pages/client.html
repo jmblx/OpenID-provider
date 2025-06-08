@@ -15,6 +15,14 @@
         <div class="d-flex justify-content-end">
             <img src="/icons/edit.svg" class="edit-icon" id="edit-icon" onclick="enableClientEditing()">
         </div>
+        <div class="editable-field text-center">
+            <label>Аватар клиента:</label><br>
+            <div class="avatar-container position-relative d-inline-block">
+                <img id="client-avatar" class="rounded-circle border" src="/icons/default-avatar.png" alt="Аватар клиента">
+                <img src="/icons/edit.svg" class="edit-avatar-icon position-absolute" id="edit-avatar-icon">
+                <input type="file" id="avatar-file-input" accept="image/*" class="d-none">
+            </div>
+        </div>
         <div class="editable-field">
             <label for="client-name-input">Название клиента:</label>
             <input type="text" id="client-name-input" class="form-control" disabled>

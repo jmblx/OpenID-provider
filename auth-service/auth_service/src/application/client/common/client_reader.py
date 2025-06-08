@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 
-from application.common.views.client_view import ClientView, ClientsIdsData
+from application.common.views.client_view import ClientData, ClientsIdsData
 from domain.entities.client.value_objects import ClientID
 
 
@@ -20,7 +20,7 @@ class ClientReader(ABC):
     @abstractmethod
     async def read_for_client_page(
         self, client_id: ClientID
-    ) -> ClientView | None: ...
+    ) -> ClientData | None: ...
 
     @abstractmethod
     async def read_all_clients_ids_data(

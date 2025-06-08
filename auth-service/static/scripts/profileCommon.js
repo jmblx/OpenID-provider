@@ -1,7 +1,7 @@
 import { getStoredParams } from './manageParamsMod.js';
 import {fetchWithAuth, loadUserData, loadUserAvatar, logoutClient} from './commonApi.js';
 
-export async function uploadAvatar() {
+export async function uploadUserAvatar() {
     const fileInput = document.getElementById('avatar-upload');
     if (!fileInput?.files?.length) return false;
 

@@ -1,9 +1,14 @@
+import {fetchWithAuth} from "./commonApi";
+
 let isCreateMode = false;
 let initialClientData = null;
+const clientId = params.get("clientId");
+const avatar = document.getElementById('client-avatar');
+const editIcon = document.getElementById('edit-avatar-icon');
+const fileInput = document.getElementById('avatar-file-input');
 
 document.addEventListener("DOMContentLoaded", async function () {
     const params = new URLSearchParams(window.location.search);
-    const clientId = params.get("clientId");
 
     if (!clientId) {
         isCreateMode = true;
@@ -15,14 +20,21 @@ document.addEventListener("DOMContentLoaded", async function () {
         return;
     }
 
-    const clientData = await fetchClientData(clientId);
+    const clientData = await fetchClientData();
     if (clientData) {
         initialClientData = clientData;
         renderClientInfo(clientData);
     }
+
+    avatar.addEventListener('click', () => fileInput.click());
+    editIcon.addEventListener('click', () => fileInput.click());
+    fileInput.addEventListener('change', () => {
+        const file = fileInput.files[0];
+        if (file) uploadAvatar(file);
+    });
 });
 
-async function fetchClientData(clientId) {
+async function fetchClientData() {
     try {
         const response = await fetch(`/api/client/${clientId}`);
         if (!response.ok) throw new Error("Ошибка загрузки данных");
@@ -156,4 +168,30 @@ function disableClientEditing() {
 
     const urlInputs = document.querySelectorAll("#allowed-urls-list input");
     urlInputs.forEach(input => input.disabled = true);
+}
+
+function uploadAvatar(file) {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    fetch(`/api/client/${clientId}/avatar`, {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'Accept': 'application/json'
+        }
+    })
+    .then(res => {
+        if (!res.ok) throw new Error('Ошибка загрузки');
+        return res.json();
+    })
+    .then(data => {
+        if (data.avatar_path) {
+            avatar.src = data.avatar_path;
+        }
+    })
+    .catch(err => {
+        console.error('Ошибка обновления аватарки:', err);
+        alert('Не удалось обновить аватар');
+    });
 }

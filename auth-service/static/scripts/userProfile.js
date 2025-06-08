@@ -1,6 +1,6 @@
 import {
     setupReturnButton,
-    openAvatarUpload, uploadAvatar
+    openAvatarUpload, uploadUserAvatar
 } from './profileCommon.js';
 import {loadUserData, loadUserAvatar, logoutClient} from "./commonApi.js";
 
@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.querySelector('.edit-icon')?.addEventListener('click', openAvatarUpload);
         document.getElementById('avatar-upload')?.addEventListener('change', async () => {
             try {
-                await uploadAvatar();
+                await uploadUserAvatar();
                 alert('Avatar updated successfully!');
                 await loadUserAvatar('user-avatar');
             } catch {
