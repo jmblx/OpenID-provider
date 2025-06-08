@@ -38,6 +38,7 @@ from application.client.read_client_view_handler import (
 from application.client.register_client_hadler import (
     RegisterClientHandler,
 )
+from application.client.set_client_avatar_handler import SetClientAvatarHandler
 from application.client.update_client import (
     UpdateClientCommandHandler,
 )
@@ -136,3 +137,4 @@ class HandlerProvider(Provider):
     get_user_info_query_handler = provide(GetUserInfoQueryHandler, scope=Scope.REQUEST)
     find_clients_handler = provide(FindClientsHandler, scope=Scope.REQUEST)
     find_rs_handler = provide(FindRSHandler, scope=Scope.REQUEST)
+    set_client_avatar_handler = provide(SetClientAvatarHandler, scope=Scope.REQUEST)
