@@ -24,6 +24,7 @@ class ClientViewModel(BaseModel):
     allowed_redirect_urls: list[str]
     type: ClientTypeEnum
     roles: list[RoleViewWithIdModel] | None = None
+    avatar_url: str | None
 
 
 class UpdateClientModel(BaseModel):
