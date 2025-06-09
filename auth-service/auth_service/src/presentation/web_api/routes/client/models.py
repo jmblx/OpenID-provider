@@ -23,7 +23,7 @@ class ClientViewModel(BaseModel):
     base_url: str
     allowed_redirect_urls: list[str]
     type: ClientTypeEnum
-    avatar_url: str | None
+    avatar_url: str | None = None
 
 
 class UpdateClientModel(BaseModel):

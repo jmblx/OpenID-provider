@@ -1,11 +1,62 @@
 let isCreateMode = false;
 let initialClientData = null;
 
+// Ключи для localStorage
+const AVATAR_URL_KEY = clientId => `avatar_url_${clientId}`;
+const AVATAR_EXPIRY_KEY = clientId => `avatar_expiry_${clientId}`;
+
+// Парсит presigned URL и возвращает объект Date – момент, когда он истекает (с учётом -10 сек)
+function parsePresignedExpiry(url) {
+    try {
+        const params = new URL(url).searchParams;
+        const dateStr = params.get('X-Amz-Date');        // e.g. 20250609T181711Z
+        const expiresSec = parseInt(params.get('X-Amz-Expires') || '0', 10);
+        if (!dateStr || !expiresSec) return null;
+
+        const year   = +dateStr.slice(0, 4);
+        const month  = +dateStr.slice(4, 6) - 1;
+        const day    = +dateStr.slice(6, 8);
+        const hour   = +dateStr.slice(9, 11);
+        const minute = +dateStr.slice(11, 13);
+        const second = +dateStr.slice(13, 15);
+
+        const baseDate = new Date(Date.UTC(year, month, day, hour, minute, second));
+        baseDate.setSeconds(baseDate.getSeconds() + expiresSec - 10);
+        return baseDate;
+    } catch {
+        return null;
+    }
+}
+
+// Проверяем, нужно ли обновить avatar_url
+function shouldLoadAvatar(clientId) {
+    const url = localStorage.getItem(AVATAR_URL_KEY(clientId));
+    const expiry = localStorage.getItem(AVATAR_EXPIRY_KEY(clientId));
+    if (!url || !expiry) return true;
+    const expiresAt = new Date(expiry);
+    return Date.now() >= expiresAt.getTime();
+}
+
+// Сохраняем в localStorage новую ссылку и время истечения
+function cacheAvatar(clientId, url) {
+    const expiryDate = parsePresignedExpiry(url);
+    if (expiryDate) {
+        localStorage.setItem(AVATAR_URL_KEY(clientId), url);
+        localStorage.setItem(AVATAR_EXPIRY_KEY(clientId), expiryDate.toISOString());
+    }
+}
+
+// Получаем из cache или undefined
+function getCachedAvatar(clientId) {
+    return localStorage.getItem(AVATAR_URL_KEY(clientId)) || undefined;
+}
+
 document.addEventListener("DOMContentLoaded", async function () {
     const params = new URLSearchParams(window.location.search);
     const clientId = params.get("clientId");
 
     if (!clientId) {
+        // Страница создания
         isCreateMode = true;
         document.body.classList.add('create-mode');
         document.getElementById("client-name").textContent = "Создание нового клиента";
@@ -14,65 +65,31 @@ document.addEventListener("DOMContentLoaded", async function () {
         return;
     }
 
-    const needAvatar = shouldUpdateAvatar(clientId);
-    const clientData = await fetchClientData(clientId, needAvatar);
-
+    // Загружаем данные клиента, возможно с avatar
+    const clientData = await fetchClientData(clientId);
     if (clientData) {
         initialClientData = clientData;
-        renderClientInfo(clientData);
-        if (clientData.avatar_url) {
-            const expiresAt = parsePresignedUrlExpiration(clientData.avatar_url);
-            if (expiresAt) {
-                localStorage.setItem(`avatar_url_${clientId}`, clientData.avatar_url);
-                localStorage.setItem(`avatar_expires_${clientId}`, (expiresAt - 10).toString());
-            }
-            document.getElementById("client-avatar").src = clientData.avatar_url;
-        } else {
-            const cachedUrl = localStorage.getItem(`avatar_url_${clientId}`);
-            if (cachedUrl) {
-                document.getElementById("client-avatar").src = cachedUrl;
-            }
-        }
+        renderClientInfo(clientData, clientId);
     }
+
+    initAvatarUploadHandler(clientId);
 });
 
-function shouldUpdateAvatar(clientId) {
-    const expires = localStorage.getItem(`avatar_expires_${clientId}`);
-    if (!expires) return true;
-    const expiresTs = parseInt(expires, 10);
-    return isNaN(expiresTs) || Date.now() / 1000 > expiresTs;
-}
-
-function parsePresignedUrlExpiration(url) {
+// Переписанный fetchClientData:
+async function fetchClientData(clientId) {
     try {
-        const u = new URL(url);
-        const dateStr = u.searchParams.get("X-Amz-Date");
-        const expiresStr = u.searchParams.get("X-Amz-Expires");
-        if (!dateStr || !expiresStr) return null;
-
-        const date = new Date(
-            Date.UTC(
-                parseInt(dateStr.substring(0, 4)),
-                parseInt(dateStr.substring(4, 6)) - 1,
-                parseInt(dateStr.substring(6, 8)),
-                parseInt(dateStr.substring(9, 11)),
-                parseInt(dateStr.substring(11, 13)),
-                parseInt(dateStr.substring(13, 15))
-            )
-        );
-        return Math.floor(date.getTime() / 1000) + parseInt(expiresStr, 10);
-    } catch {
-        return null;
-    }
-}
-
-async function fetchClientData(clientId, loadAvatar = false) {
-    try {
-        const url = new URL(`/api/client/${clientId}`, window.location.origin);
-        if (loadAvatar) url.searchParams.set("load_avatar", "true");
-        const response = await fetch(url.toString());
+        const loadAvatar = shouldLoadAvatar(clientId);
+        const url = `/api/client/${clientId}?load_avatar=${loadAvatar}`;
+        const response = await fetch(url);
         if (!response.ok) throw new Error("Ошибка загрузки данных");
-        return await response.json();
+        const data = await response.json();
+
+        // Если сервер вернул avatar_url — кэшируем
+        if (data.avatar_url) {
+            cacheAvatar(clientId, data.avatar_url);
+        }
+
+        return data;
     } catch (error) {
         console.error(error);
         alert("Не удалось загрузить данные клиента.");
@@ -80,7 +97,8 @@ async function fetchClientData(clientId, loadAvatar = false) {
     }
 }
 
-function renderClientInfo(clientData) {
+// Рендерим информацию и ставим аватар
+function renderClientInfo(clientData, clientId) {
     document.getElementById("client-name").textContent = `Клиент: ${clientData.name}`;
     document.getElementById("client-name-input").value = clientData.name;
     document.getElementById("client-base-url-input").value = clientData.base_url;
@@ -88,24 +106,27 @@ function renderClientInfo(clientData) {
 
     const urlList = document.getElementById("allowed-urls-list");
     urlList.innerHTML = "";
-    clientData.allowed_redirect_urls.forEach(url => {
-        addUrlField(url, false);
-    });
+    clientData.allowed_redirect_urls.forEach(url => addUrlField(url, false));
+
+    // Ставим аватар из cache (если есть)
+    const avatarImg = document.getElementById("client-avatar");
+    const cached = getCachedAvatar(clientId);
+    if (cached) {
+        avatarImg.src = cached;
+    }
 }
 
-document.addEventListener("DOMContentLoaded", function () {
+// Инициализируем обработчики для обновления аватарки
+function initAvatarUploadHandler(clientId) {
     const editAvatarIcon = document.getElementById("edit-avatar-icon");
-    const avatarInput = document.getElementById("avatar-file-input");
+    const avatarInput     = document.getElementById("avatar-file-input");
+    const avatarImg       = document.getElementById("client-avatar");
 
     editAvatarIcon.addEventListener("click", () => avatarInput.click());
 
     avatarInput.addEventListener("change", async () => {
         const file = avatarInput.files[0];
         if (!file) return;
-
-        const params = new URLSearchParams(window.location.search);
-        const clientId = params.get("clientId");
-        if (!clientId) return alert("Клиент не выбран");
 
         const formData = new FormData();
         formData.append("file", file);
@@ -115,20 +136,19 @@ document.addEventListener("DOMContentLoaded", function () {
                 method: "POST",
                 body: formData
             });
-
             if (!response.ok) throw new Error("Ошибка загрузки аватарки");
 
             const data = await response.json();
-            document.getElementById("client-avatar").src = data.avatar_path;
-
-            localStorage.setItem(`avatar_url_${clientId}`, data.avatar_path);
-            localStorage.removeItem(`avatar_expires_${clientId}`);
+            const newUrl = data.avatar_path;
+            // Обновляем cache и на странице
+            cacheAvatar(clientId, newUrl);
+            avatarImg.src = newUrl;
         } catch (e) {
             console.error(e);
             alert("Не удалось обновить аватарку");
         }
     });
-});
+}
 
 function enableClientEditing() {
     document.getElementById("client-name-input").disabled = false;
