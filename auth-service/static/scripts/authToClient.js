@@ -2,20 +2,31 @@ import { fetchWithAuth, loadUserAvatar } from './commonApi.js';
 import { getStoredParams } from './manageParamsMod.js';
 import { logoutClient } from "./commonApi.js";
 
+
 export async function initAuthToClient() {
     try {
         const params = getStoredParams();
         const fingerprint = localStorage.getItem('deviceFingerprint') || '';
 
-        await loadUserData();
+        // 1) загрузили данные пользователя
+        const meRes = await fetchWithAuth('/api/me');
+        const userData = await meRes.json();
+        document.getElementById('user-email').textContent = userData.email;
+        await loadUserAvatar('user-avatar');
 
+        // 2) загрузили и вставили аватар клиента
+        const clientId = parseInt(params.client_id, 10);
+        await loadClientAvatar(clientId, 'client-avatar');
+
+        // 3) авторизуем и настраиваем UI
         const authData = await authorizeClient(params, fingerprint);
-
         setupUI(authData, params);
+
     } catch (error) {
         handleAuthError(error);
     }
 }
+
 
 async function loadUserData() {
     const response = await fetchWithAuth('/api/me');
@@ -118,5 +129,4 @@ function handleAuthError(error) {
 }
 
 document.addEventListener('DOMContentLoaded', initAuthToClient);
-
 document.getElementById("logout-button")?.addEventListener("click", logoutClient);
