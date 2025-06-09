@@ -12,6 +12,7 @@ from application.client.add_allowed_url import (
     AddAllowedRedirectUrlCommand,
     AddAllowedRedirectUrlCommandHandler,
 )
+from application.client.avatar_query import GetClientAvatarHandler
 from application.client.client_queries import (
     ValidateClientRequest,
     ClientAuthValidationQueryHandler,
@@ -136,3 +137,8 @@ async def set_avatar(handler: FromDishka[SetClientAvatarHandler], client_id: int
     avatar_path = await handler.handle(SetClientAvatarCommand(image=image_dto, client_id=client_id))
 
     return ORJSONResponse({"avatar_path": avatar_path})
+
+
+@client_router.get("/client/avatar_url")
+async def get_client_avatar_url(handler: FromDishka[GetClientAvatarHandler], client_id: int) -> {}:
+    return {"avatar_url": handler.handle(client_id)}

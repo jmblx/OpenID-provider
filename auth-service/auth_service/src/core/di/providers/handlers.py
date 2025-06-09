@@ -27,6 +27,7 @@ from application.auth_for_client.revoke_token_handler import RevokeClientTokenHa
 from application.client.add_allowed_url import (
     AddAllowedRedirectUrlCommandHandler,
 )
+from application.client.avatar_query import GetClientAvatarHandler
 from application.client.client_queries import (
     ClientAuthValidationQueryHandler,
 )
@@ -138,3 +139,4 @@ class HandlerProvider(Provider):
     find_clients_handler = provide(FindClientsHandler, scope=Scope.REQUEST)
     find_rs_handler = provide(FindRSHandler, scope=Scope.REQUEST)
     set_client_avatar_handler = provide(SetClientAvatarHandler, scope=Scope.REQUEST)
+    get_client_avatar_handler = provide(GetClientAvatarHandler, scope=Scope.REQUEST)
