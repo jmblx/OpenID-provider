@@ -1,9 +1,8 @@
-from collections import defaultdict
 from typing import TypedDict
 from uuid import UUID
 
 from application.common.id_provider import ClientIdentityProvider
-from application.common.interfaces.imedia_storage import StorageService, UserS3StorageService
+from application.common.interfaces.imedia_storage import UserS3StorageService
 from application.common.services.auth_code import ALLOWED_SCOPES
 from domain.entities.user.model import User
 

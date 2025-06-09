@@ -11,7 +11,7 @@ from fastapi.responses import ORJSONResponse
 
 from core.di.container import container
 from infrastructure.log.main import configure_logging
-from presentation.web_api.config import load_config, TRACING
+from presentation.web_api.config import load_config
 from presentation.web_api.middlewares import setup_middlewares
 from presentation.web_api.routes.auth.router import auth_router
 from presentation.web_api.routes.client.client_router import client_router

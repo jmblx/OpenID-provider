@@ -114,10 +114,10 @@ async def get_client_ids(
 
 @client_router.get("/{client_id}")
 async def get_client(
-    client_id: int, handler: FromDishka[ReadClientPageViewQueryHandler]
+    handler: FromDishka[ReadClientPageViewQueryHandler], client_id: int, load_avatar: bool = False
 ) -> ClientViewModel:
     client_view = await handler.handle(
-        ReadClientPageViewQuery(client_id=client_id)
+        ReadClientPageViewQuery(client_id=client_id, load_avatar=load_avatar)
     )
     return ClientViewModel(**client_view)
 

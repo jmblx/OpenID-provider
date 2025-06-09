@@ -17,7 +17,13 @@ class StorageService(ABC):
         """
 
     @abstractmethod
-    def get_presigned_avatar_url(self, filename: str) -> str: ...
+    def get_presigned_avatar_url(self, filename: str) -> str:
+        """
+        Возвращает подписанную ссылку на файл в бакете.
+
+        :param filename: Имя файла в бакете без расширения (id объекта в виде строки)
+        :return: Подписанная ссылка на файл
+        """
 
 
 UserS3StorageService = NewType("UserS3StorageService", StorageService)

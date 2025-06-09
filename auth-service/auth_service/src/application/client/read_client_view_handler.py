@@ -1,21 +1,28 @@
 from dataclasses import dataclass
 
 from application.client.common.client_reader import ClientReader
-from application.common.views.client_view import ClientData
+from application.common.interfaces.imedia_storage import ClientS3StorageService
+from application.common.views.client_view import ClientData, ClientView
 from domain.entities.client.value_objects import ClientID
 
 
 @dataclass
 class ReadClientPageViewQuery:
     client_id: int
+    load_avatar: bool
 
 
 class ReadClientPageViewQueryHandler:
-    def __init__(self, client_reader: ClientReader):
+    def __init__(self, client_reader: ClientReader, client_storage: ClientS3StorageService):
         self.client_reader = client_reader
+        self.client_storage = client_storage
 
-    async def handle(self, query: ReadClientPageViewQuery) -> ClientData:
-        client_view = await self.client_reader.read_for_client_page(
+    async def handle(self, query: ReadClientPageViewQuery) -> ClientView:
+        client_data: ClientData = await self.client_reader.read_for_client_page(
             ClientID(query.client_id)
         )
-        return client_view
+        if query.load_avatar:
+            presigned_url = self.client_storage.get_presigned_avatar_url(str(client_data))
+            client_data: ClientView = dict(**client_data, avatar_url=presigned_url)
+
+        return client_data
