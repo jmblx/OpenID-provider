@@ -4,7 +4,7 @@ from sqlalchemy import select, text, func, or_
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from application.common.interfaces.role_repo import RoleRepository
-from application.common.views.client_view import ClientData, ClientsIdsData
+from application.common.views.client_view import ClientView, ClientsIdsData
 from domain.entities.client.model import Client
 from domain.entities.client.value_objects import ClientID
 from domain.exceptions.client import ClientNotFound
@@ -37,11 +37,11 @@ class ClientReaderImpl(ClientReader):
 
     async def read_for_client_page(
         self, client_id: ClientID
-    ) -> ClientData | None:
+    ) -> ClientView | None:
         client = await self.session.get(Client, client_id)
         if not client:
             raise ClientNotFound()
-        client_data: ClientData = {
+        client_data: ClientView = {
             "name": client.name.value,
             "base_url": client.base_url.value,
             "allowed_redirect_urls": client.allowed_redirect_urls.value,
