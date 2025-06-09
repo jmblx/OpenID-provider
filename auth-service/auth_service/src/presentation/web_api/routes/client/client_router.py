@@ -139,6 +139,6 @@ async def set_avatar(handler: FromDishka[SetClientAvatarHandler], client_id: int
     return ORJSONResponse({"avatar_path": avatar_path})
 
 
-@client_router.get("/client/avatar_url")
-async def get_client_avatar_url(handler: FromDishka[GetClientAvatarHandler], client_id: int) -> {}:
-    return {"avatar_url": handler.handle(client_id)}
+@client_router.get("/{client_id}/avatar_url")
+async def get_client_avatar_url(handler: FromDishka[GetClientAvatarHandler], client_id: int) -> ORJSONResponse:
+    return ORJSONResponse({"avatar_url": handler.handle(client_id)})
