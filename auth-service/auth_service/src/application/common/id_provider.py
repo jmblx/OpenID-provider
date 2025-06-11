@@ -9,15 +9,15 @@ from application.common.client_token_types import ClientAccessToken, ClientRefre
 from application.common.interfaces.jwt_service import JWTService
 from application.common.interfaces.user_repo import UserRepository
 from application.common.auth_server_token_types import (
-    AccessToken,
-    RefreshToken,
-    Fingerprint,
+    AuthServerRefreshToken,
+    Fingerprint, NonActiveRefreshTokens, AuthServerAccessToken,
 )
 from application.common.interfaces.white_list import AuthServerTokenWhitelistService, ClientTokenWhitelistService
 from domain.entities.client.value_objects import ClientID
 from domain.entities.resource_server.value_objects import ResourceServerID
 from domain.entities.user.model import User
 from domain.entities.user.value_objects import UserID
+from domain.exceptions.auth import InvalidTokenError
 
 
 class UserIdentityProvider(ABC):
@@ -26,6 +26,11 @@ class UserIdentityProvider(ABC):
 
     @abstractmethod
     async def get_current_user(self) -> User: ...
+
+    @abstractmethod
+    async def get_non_active_user_accounts_ids(
+        self
+    ) -> list[UserID]: ...
 
 
 class ClientIdentityProvider(UserIdentityProvider):
@@ -56,8 +61,9 @@ class BaseTokenProvider(ABC):
 class UserIdentityProviderImpl(UserIdentityProvider, BaseTokenProvider):
     def __init__(
         self,
-        access_token: AccessToken,
-        refresh_token: RefreshToken,
+        access_token: AuthServerAccessToken,
+        refresh_token: AuthServerRefreshToken,
+        non_active_tokens: NonActiveRefreshTokens,
         jwt_service: JWTService,
         user_repo: UserRepository,
         token_whitelist_service: AuthServerTokenWhitelistService,
@@ -66,6 +72,7 @@ class UserIdentityProviderImpl(UserIdentityProvider, BaseTokenProvider):
         super().__init__(jwt_service)
         self.access_token = access_token
         self.refresh_token = refresh_token
+        self.non_active_tokens = non_active_tokens
         self.user_repo = user_repo
         self.token_whitelist_service = token_whitelist_service
         self.fingerprint = fingerprint
@@ -76,20 +83,30 @@ class UserIdentityProviderImpl(UserIdentityProvider, BaseTokenProvider):
     def _get_refresh_token_jti(self) -> UUID:
         return self._refresh_token_payload["jti"]
 
-    async def get_current_user_id(self) -> UserID:
-        jti = self._get_refresh_token_jti()
+    async def _validate_refresh_token(self, jti: UUID) -> UserID:
         token_data = await self.token_whitelist_service.get_refresh_token_data(jti)
         logger.info("code data: %s", token_data)
         if not token_data or token_data.fingerprint != self.fingerprint:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Invalid refresh code or fingerprint",
-            )
+            raise InvalidTokenError()
         return UserID(token_data.user_id)
+
+    async def get_current_user_id(self) -> UserID:
+        jti = self._get_refresh_token_jti()
+        return await self._validate_refresh_token(jti)
 
     async def get_current_user(self) -> User:
         user_id = await self.get_current_user_id()
         return await self.user_repo.get_by_id(user_id)
+
+    async def get_non_active_user_accounts_ids(self) -> list[UserID]:
+        user_ids = []
+        for expected_user_id, refresh_token in self.non_active_tokens:
+            jti = self._decode_token("refresh_token", refresh_token)["jti"]
+            user_id = await self._validate_refresh_token(jti)
+            if not user_id == expected_user_id:
+                raise InvalidTokenError()
+            user_ids.append(user_id)
+        return user_ids
 
 
 class ClientIdentityProviderImpl(ClientIdentityProvider, BaseTokenProvider):

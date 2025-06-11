@@ -1,13 +1,13 @@
 from dataclasses import dataclass
 
 from application.common.interfaces.http_auth import HttpAuthServerService
-from application.common.auth_server_token_types import RefreshToken, Fingerprint
+from application.common.auth_server_token_types import AuthServerRefreshToken, Fingerprint
 
 
 @dataclass
 class InvalidateOtherTokensCommand:
     fingerprint: Fingerprint
-    refresh_token: RefreshToken
+    refresh_token: AuthServerRefreshToken
 
 
 class InvalidateOtherTokensHandler:

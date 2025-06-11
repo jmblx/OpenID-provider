@@ -6,8 +6,8 @@ from uuid import UUID
 from application.common.auth_server_token_types import BaseToken, AuthServerRefreshTokenData, AuthServerAccessTokenPayload, \
     RefreshTokenPayload
 
-ClientAccessToken = NewType("AccessToken", BaseToken)
-ClientRefreshToken = NewType("RefreshToken", BaseToken)
+ClientAccessToken = NewType("AuthServerAccessToken", BaseToken)
+ClientRefreshToken = NewType("AuthServerRefreshToken", BaseToken)
 
 
 @dataclass

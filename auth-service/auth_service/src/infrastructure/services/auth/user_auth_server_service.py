@@ -1,13 +1,12 @@
 import logging
 from uuid import UUID
 
-from application.auth_as.common.types import AuthServerTokens
 from application.common.interfaces.http_auth import HttpAuthServerService
 from application.common.interfaces.jwt_service import JWTService
 from application.common.auth_server_token_types import (
     Fingerprint,
-    RefreshToken,
-    AuthServerAccessTokenPayload,
+    AuthServerRefreshToken,
+    AuthServerAccessTokenPayload, AuthServerTokens,
 )
 from application.common.interfaces.auth_server_token_creation import AuthServerTokenCreationService
 from application.common.interfaces.white_list import AuthServerTokenWhitelistService
@@ -34,16 +33,16 @@ class HttpAuthServerServiceImpl(HttpAuthServerService):
         self.jwt_settings = jwt_settings
         self.fingerprint = fingerprint
 
-    def _get_token_jti(self, refresh_token: RefreshToken) -> UUID:
+    def _get_token_jti(self, refresh_token: AuthServerRefreshToken) -> UUID:
         payload = self.jwt_service.decode(refresh_token)
         return payload["jti"]
 
-    async def revoke(self, refresh_token: RefreshToken) -> None:
+    async def revoke(self, refresh_token: AuthServerRefreshToken) -> None:
         jti = self._get_token_jti(refresh_token)
         await self.token_whitelist_service.remove_token(jti)
 
     async def invalidate_other_tokens(
-        self, refresh_token: RefreshToken
+        self, refresh_token: AuthServerRefreshToken
     ) -> None:
         payload: AuthServerAccessTokenPayload = self.jwt_service.decode(refresh_token)
         jti = payload["jti"]
@@ -59,7 +58,7 @@ class HttpAuthServerServiceImpl(HttpAuthServerService):
     #     fingerprint: Fingerprint,
     #     code_challenger: str,
     #     user_scopes: list[str],
-    # ) -> tuple[AccessToken, RefreshToken]:
+    # ) -> tuple[AuthServerAccessToken, AuthServerRefreshToken]:
     #     auth_code_data = await self.auth_code_storage.retrieve_auth_code_data(
     #         auth_code
     #     )

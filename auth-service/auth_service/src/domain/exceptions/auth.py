@@ -7,7 +7,7 @@ from domain.common.exceptions.base import DomainError
 @dataclass(eq=False)
 class InvalidTokenError(ApplicationError):
     def title(self) -> str:
-        return "Invalid code."
+        return "Invalid code fingerprint or user id mismatch"
 
 
 @dataclass(eq=False)

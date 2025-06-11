@@ -1,4 +1,4 @@
-from application.auth_as.common.types import AuthServerTokens
+from application.common.auth_server_token_types import AuthServerTokens
 from application.common.id_provider import UserIdentityProvider
 from application.common.interfaces.http_auth import HttpAuthServerService
 

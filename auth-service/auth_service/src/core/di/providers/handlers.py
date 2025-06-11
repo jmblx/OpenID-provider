@@ -1,6 +1,6 @@
 from dishka import provide, Provider, Scope
 
-from application.auth_as.login_user_auth_server import AuthenticateUserHandler
+from application.auth_as.login_user_auth_server import LoginUserHandler
 # from application.bold_code.old_code_to_token_handler import (
 #     CodeToTokenHandler,
 # )
@@ -74,7 +74,7 @@ class HandlerProvider(Provider):
         scope=Scope.REQUEST,
     )
     code_to_token_handler = provide(CodeToTokenHandler, scope=Scope.REQUEST)
-    login_handler = provide(AuthenticateUserHandler, scope=Scope.REQUEST)
+    login_handler = provide(LoginUserHandler, scope=Scope.REQUEST)
     create_role_handler = provide(CreateRoleHandler, scope=Scope.REQUEST)
     update_role_handler = provide(UpdateRoleHandler, scope=Scope.REQUEST)
     revoke_tokens_handler = provide(RevokeTokenHandler, scope=Scope.REQUEST)

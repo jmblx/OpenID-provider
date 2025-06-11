@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from uuid import UUID
 
 from application.common.auth_server_token_types import (
-    AccessToken,
+    AuthServerAccessToken,
     Fingerprint,
     AuthServerRefreshTokenWithData,
 )
@@ -15,11 +15,11 @@ class AuthServerTokenCreationService(ABC):
     @abstractmethod
     def create_auth_server_access_token(
         self, user_id: UUID, is_admin: bool
-    ) -> AccessToken:
-        """Создание AccessToken."""
+    ) -> AuthServerAccessToken:
+        """Создание AuthServerAccessToken."""
 
     @abstractmethod
     async def create_auth_server_refresh_token(
         self, user_id: UUID, fingerprint: Fingerprint
     ) -> AuthServerRefreshTokenWithData:
-        """Создание RefreshToken."""
+        """Создание AuthServerRefreshToken."""

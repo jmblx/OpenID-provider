@@ -14,7 +14,7 @@ from domain.exceptions.auth import (
 )
 from domain.exceptions.user import UserAlreadyExistsError
 from presentation.web_api.responses import ErrorResponse
-from presentation.web_api.response_token import set_auth_server_tokens
+from presentation.web_api.manage_tokens import set_auth_server_tokens
 
 reg_router = APIRouter(route_class=DishkaRoute, tags=["reg"])
 

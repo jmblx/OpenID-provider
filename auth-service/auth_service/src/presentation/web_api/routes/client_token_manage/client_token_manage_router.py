@@ -8,7 +8,7 @@ from starlette import status
 from application.auth_for_client.refresh_tokens_handler import RefreshClientTokensHandler
 from application.auth_for_client.revoke_token_handler import RevokeClientTokenHandler
 from application.common.client_token_types import ClientRefreshToken
-from presentation.web_api.response_token import set_client_tokens
+from presentation.web_api.manage_tokens import set_client_tokens
 
 client_token_manage_router = APIRouter(route_class=DishkaRoute, tags=["client-code-manage"], prefix="/client")
 

@@ -3,14 +3,13 @@ from dataclasses import dataclass
 from typing import TypedDict, cast
 from uuid import UUID
 
-from application.auth_as.common.types import AuthServerTokens
 from application.common.interfaces.email_confirmation_service import (
     UserRegisterNotifyData,
     EmailConfirmationServiceI,
 )
 from application.common.interfaces.http_auth import HttpAuthServerService
 from application.common.interfaces.user_repo import UserRepository
-from application.common.auth_server_token_types import AccessToken, RefreshToken
+from application.common.auth_server_token_types import AuthServerAccessToken, AuthServerRefreshToken, AuthServerTokens
 from application.common.uow import Uow
 from domain.common.services.pwd_service import PasswordHasher
 from domain.entities.user.model import User

@@ -8,13 +8,13 @@ from starlette import status
 
 from application.auth_as.login_user_auth_server import (
     AuthenticateUserCommand,
-    AuthenticateUserHandler,
+    LoginUserHandler,
 )
 from application.auth_for_client.code_to_token_handler import CodeToTokenHandler, CodeToTokenCommand
 from application.auth_for_client.get_me_page_data_handler import GetMeDataHandler, GetMeDataCommand, MeData
-from application.common.auth_server_token_types import Fingerprint
+from application.common.auth_server_token_types import AuthServerTokens
 from presentation.web_api.routes.auth.models import GetMePageDataSchema
-from presentation.web_api.response_token import set_auth_server_tokens, set_client_tokens
+from presentation.web_api.manage_tokens import set_auth_server_tokens, set_client_tokens, change_active_account
 
 auth_router = APIRouter(route_class=DishkaRoute, tags=["auth"])
 # jinja_loader = PackageLoader("presentation.web_api.registration")
@@ -27,15 +27,18 @@ logger = logging.getLogger(__name__)
 @auth_router.post("/login")
 async def login(
     command: AuthenticateUserCommand,
-    handler: FromDishka[AuthenticateUserHandler],
+    handler: FromDishka[LoginUserHandler],
+    prev_account_tokens: FromDishka[AuthServerTokens],
 ) -> ORJSONResponse:
-    tokens = await handler.handle(command)
+    new_jwt_tokens, prev_active_account_id = await handler.handle(command)
     response = ORJSONResponse(
-        # {"access_token": access_token, "refresh_token": refresh_token},
         {"status": "success"},
         status_code=status.HTTP_200_OK,
     )
-    set_auth_server_tokens(response, tokens)
+    if prev_active_account_id:
+        change_active_account(response, str(prev_active_account_id.value), prev_account_tokens, new_jwt_tokens)
+    else:
+        set_auth_server_tokens(response, new_jwt_tokens)
     return response
 
 

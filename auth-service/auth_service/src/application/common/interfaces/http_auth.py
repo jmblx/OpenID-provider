@@ -2,15 +2,9 @@ from abc import ABC, abstractmethod
 from typing import TypeVar, Generic, NewType
 from uuid import UUID
 
-from application.auth_as.common.types import (
-    AuthServerAccessToken,
-    AuthServerRefreshToken,
-    AuthServerTokens,
-)
 from application.common.auth_server_token_types import (
     Fingerprint,
-    AccessToken,
-    RefreshToken,
+    AuthServerTokens,
 )
 from application.common.client_token_types import ClientTokens, ClientRefreshToken
 from domain.entities.user.model import User
@@ -31,7 +25,7 @@ class HttpService(ABC, Generic[TokenType]):
     @abstractmethod
     async def revoke(self, refresh_token: TokenType) -> None:
         """
-        Инвалидация RefreshToken (logout пользователя).
+        Инвалидация AuthServerRefreshToken (logout пользователя).
 
         :param refresh_token: Токен, который необходимо аннулировать.
         """

@@ -7,13 +7,11 @@ from uuid import UUID
 from domain.entities.user.value_objects import UserID
 
 
-class BaseToken(str):
-    pass
-
-
-AccessToken = NewType("AccessToken", BaseToken)
-RefreshToken = NewType("RefreshToken", BaseToken)
+BaseToken = NewType("BaseToken", str)
 Fingerprint = NewType("Fingerprint", str)
+AuthServerRefreshToken = NewType("AuthServerRefreshToken", BaseToken)
+AuthServerAccessToken = NewType("AuthServerAccessToken", BaseToken)
+NonActiveRefreshTokens = NewType("NonActiveRefreshTokens", dict[UserID, AuthServerRefreshToken])
 
 class AuthServerAccessTokenPayload(TypedDict, total=False):
     """Типизированный словарь для представления данных в payload JWT."""
@@ -49,4 +47,9 @@ class RefreshTokenPayload(TypedDict):
 
 @dataclass
 class AuthServerRefreshTokenWithData(AuthServerRefreshTokenData):
-    token: RefreshToken
+    token: AuthServerRefreshToken
+
+
+class AuthServerTokens(TypedDict):
+    access_token: AuthServerAccessToken
+    refresh_token: AuthServerRefreshToken

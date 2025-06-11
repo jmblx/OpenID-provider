@@ -16,8 +16,8 @@ from application.auth_as.refresh_tokens_auth_server_handler import (
 from application.auth_as.revoke_token_handler import (
     RevokeTokenHandler,
 )
-from application.common.auth_server_token_types import RefreshToken, Fingerprint
-from presentation.web_api.response_token import set_auth_server_tokens
+from application.common.auth_server_token_types import AuthServerRefreshToken, Fingerprint
+from presentation.web_api.manage_tokens import set_auth_server_tokens
 
 token_manage_router = APIRouter(route_class=DishkaRoute, tags=["auth-server-code-manage"], prefix="/auth-service")
 
@@ -38,7 +38,7 @@ async def refresh_token(
 
 @token_manage_router.post("/revoke")
 async def revoke_token(
-    refresh_token: FromDishka[RefreshToken],
+    refresh_token: FromDishka[AuthServerRefreshToken],
     handler: FromDishka[RevokeTokenHandler],
 ) -> ORJSONResponse:
     await handler.handle(refresh_token)
@@ -52,7 +52,7 @@ async def revoke_token(
 @token_manage_router.post("/invalidate-others")
 async def invalidate_others(
     handler: FromDishka[InvalidateOtherTokensHandler],
-    refresh_token: FromDishka[RefreshToken],
+    refresh_token: FromDishka[AuthServerRefreshToken],
     fingerprint: FromDishka[Fingerprint],
     response: Response,
 ) -> ORJSONResponse:

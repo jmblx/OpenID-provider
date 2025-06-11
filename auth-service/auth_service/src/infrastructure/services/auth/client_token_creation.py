@@ -2,7 +2,7 @@ import logging
 from datetime import timedelta
 from uuid import UUID, uuid4
 
-from application.common.auth_server_token_types import AccessToken, Fingerprint
+from application.common.auth_server_token_types import AuthServerAccessToken, Fingerprint
 from application.common.client_token_types import ClientRefreshTokenWithData, ClientAccessToken
 from application.common.interfaces.client_token_creation import ClientTokenCreationService
 from application.common.interfaces.jwt_service import JWTService

@@ -12,8 +12,8 @@ from application.common.interfaces.role_repo import RoleRepository
 from application.common.interfaces.user_repo import UserRepository
 from application.common.services.auth_code import AuthorizationCodeStorage, AuthCodeData
 from application.common.auth_server_token_types import (
-    AccessToken,
-    RefreshToken,
+    AuthServerAccessToken,
+    AuthServerRefreshToken,
     Fingerprint,
 )
 from application.common.interfaces.http_auth import HttpClientService

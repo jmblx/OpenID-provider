@@ -6,7 +6,7 @@ from starlette import status
 
 from application.third_party_auth.yandex.login_handler import YandexLoginCommand, YandexLoginHandler
 from application.third_party_auth.yandex.register_handler import YandexRegisterCommand, YandexRegisterHandler
-from presentation.web_api.response_token import set_auth_server_tokens
+from presentation.web_api.manage_tokens import set_auth_server_tokens
 
 third_party_router = APIRouter(route_class=DishkaRoute, tags=["third-party-providers"])
 

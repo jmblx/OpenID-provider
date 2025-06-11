@@ -1,6 +1,3 @@
-from abc import ABC, abstractmethod
-from typing import Literal
-from uuid import UUID
 from application.common.auth_server_token_types import (
     AuthServerRefreshTokenWithData,
     AuthServerRefreshTokenData,
