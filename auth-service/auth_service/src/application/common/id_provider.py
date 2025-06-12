@@ -116,7 +116,6 @@ class UserIdentityProviderImpl(UserIdentityProvider, BaseTokenProvider):
         return user_ids
 
 
-
 class ClientIdentityProviderImpl(ClientIdentityProvider, BaseTokenProvider):
     def __init__(
         self,

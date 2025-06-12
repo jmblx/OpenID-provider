@@ -55,7 +55,7 @@ class LoginUserHandler:
         :return: возвращаем токены и аккаунт пользователя
          который был активным до логина в случае смены активного аккаунта
         """
-        current_active_account_id = self.idp.try_get_current_user_id()
+        current_active_account_id = await self.idp.try_get_current_user_id()
 
         user: User | None = await self.user_repository.get_by_email(Email(command.email))
         if not user:
