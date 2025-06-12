@@ -51,7 +51,6 @@ def create_app() -> FastAPI:
     app = FastAPI(
         lifespan=lifespan,
         root_path="/api",
-        default_response_class=ORJSONResponse,
     )
     app.include_router(third_party_router)
     app.include_router(reg_router)

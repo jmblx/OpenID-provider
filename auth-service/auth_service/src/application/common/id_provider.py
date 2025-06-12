@@ -32,6 +32,9 @@ class UserIdentityProvider(ABC):
         self
     ) -> list[UserID]: ...
 
+    @abstractmethod
+    async def try_get_current_user_id(self) -> UserID | None: ...
+
 
 class ClientIdentityProvider(UserIdentityProvider):
     @abstractmethod
@@ -93,6 +96,12 @@ class UserIdentityProviderImpl(UserIdentityProvider, BaseTokenProvider):
     async def get_current_user_id(self) -> UserID:
         jti = self._get_refresh_token_jti()
         return await self._validate_refresh_token(jti)
+
+    async def try_get_current_user_id(self) -> UserID | None:
+        try:
+            return await self.get_current_user_id()
+        except InvalidTokenError:
+            return None
 
     async def get_current_user(self) -> User:
         user_id = await self.get_current_user_id()
