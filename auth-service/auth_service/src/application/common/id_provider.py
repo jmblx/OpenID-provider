@@ -53,7 +53,7 @@ logger = logging.getLogger(__name__)
 class BaseTokenProvider(ABC):
     def __init__(self, jwt_service: JWTService):
         self.jwt_service = jwt_service
-        self._decoded_tokens = {}
+        self._decoded_tokens: dict[str, dict] = {}
 
     def _decode_token(self, token_name: str, token_value: str) -> dict:
         if token_name not in self._decoded_tokens:
@@ -80,15 +80,12 @@ class UserIdentityProviderImpl(UserIdentityProvider, BaseTokenProvider):
         self.token_whitelist_service = token_whitelist_service
         self.fingerprint = fingerprint
 
-        self._access_token_payload = self._decode_token("access_token", self.access_token)
-        self._refresh_token_payload = self._decode_token("refresh_token", self.refresh_token)
-
     def _get_refresh_token_jti(self) -> UUID:
-        return self._refresh_token_payload["jti"]
+        payload = self._decode_token("refresh_token", self.refresh_token)
+        return payload["jti"]
 
     async def _validate_refresh_token(self, jti: UUID) -> UserID:
         token_data = await self.token_whitelist_service.get_refresh_token_data(jti)
-        logger.info("code data: %s", token_data)
         if not token_data or token_data.fingerprint != self.fingerprint:
             raise InvalidTokenError()
         return UserID(token_data.user_id)
@@ -110,12 +107,14 @@ class UserIdentityProviderImpl(UserIdentityProvider, BaseTokenProvider):
     async def get_non_active_user_accounts_ids(self) -> list[UserID]:
         user_ids = []
         for expected_user_id, refresh_token in self.non_active_tokens:
-            jti = self._decode_token("refresh_token", refresh_token)["jti"]
+            payload = self._decode_token(f"refresh_token:{expected_user_id}", refresh_token)
+            jti = payload["jti"]
             user_id = await self._validate_refresh_token(jti)
-            if not user_id == expected_user_id:
+            if user_id != expected_user_id:
                 raise InvalidTokenError()
             user_ids.append(user_id)
         return user_ids
+
 
 
 class ClientIdentityProviderImpl(ClientIdentityProvider, BaseTokenProvider):
