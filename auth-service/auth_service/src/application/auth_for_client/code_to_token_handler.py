@@ -44,7 +44,6 @@ class CodeToTokenHandler:
         auth_code_storage: AuthorizationCodeStorage,
         user_repository: UserRepository,
         uow: Uow,
-
     ) -> None:
         self.auth_service = auth_service
         self.scopes_service = scopes_service

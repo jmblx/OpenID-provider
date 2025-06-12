@@ -30,7 +30,7 @@ class PresentationProvider(Provider):
     ) -> AuthServerAccessToken:
         return AuthServerAccessToken(request.headers.get("Authorization").replace("Bearer ", ""))
     
-    @provide(scope=Scope.REQUEST, provides=AuthServerAccessToken)
+    @provide(scope=Scope.REQUEST, provides=AuthServerTokens)
     def provide_auth_server_tokens(
         self, access_token: AuthServerAccessToken, refresh_token: AuthServerRefreshToken
     ) -> AuthServerTokens:
