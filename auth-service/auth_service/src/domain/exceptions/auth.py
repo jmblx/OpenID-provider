@@ -6,12 +6,14 @@ from domain.common.exceptions.base import DomainError
 
 @dataclass(eq=False)
 class InvalidTokenError(ApplicationError):
+    @property
     def title(self) -> str:
         return "Invalid code fingerprint or user id mismatch"
 
 
 @dataclass(eq=False)
 class TokenExpiredError(ApplicationError):
+    @property
     def title(self) -> str:
         return "Token expired."
 
