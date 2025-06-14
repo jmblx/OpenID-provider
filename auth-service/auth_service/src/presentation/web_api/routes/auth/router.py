@@ -87,12 +87,13 @@ async def switch_account(
     request: Request,
 ) -> ORJSONResponse:
     response = ORJSONResponse(content={"status": "success"}, status_code=status.HTTP_200_OK)
-    active_user_id = await idp.get_current_user_id()
+    prev_active_user_id = await idp.get_current_user_id()
     change_active_account(
         response,
-        str(active_user_id.value),
+        str(prev_active_user_id.value),
         {"access_token": active_access, "refresh_token": active_refresh},
-        get_tokens_by_user_id(request, str(new_active_user.new_active_user_id))
+        get_tokens_by_user_id(request, str(new_active_user.new_active_user_id)),
+        str(new_active_user.new_active_user_id)
     )
     return response
 
