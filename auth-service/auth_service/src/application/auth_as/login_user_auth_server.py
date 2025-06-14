@@ -64,4 +64,4 @@ class LoginUserHandler:
             RawPassword(command.password), password_hasher=self.password_hasher
         )
         tokens = await self.auth_server_service.create_and_save_tokens(user, is_admin=user.is_admin)
-        return tokens, current_active_account_id if current_active_account_id else None
+        return tokens, current_active_account_id if current_active_account_id and current_active_account_id != user.id else None

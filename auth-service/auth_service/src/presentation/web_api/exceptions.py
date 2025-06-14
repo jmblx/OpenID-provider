@@ -1,5 +1,6 @@
 import logging
 from collections.abc import Awaitable, Callable
+from dataclasses import asdict
 from functools import partial
 
 from fastapi import FastAPI
@@ -26,12 +27,6 @@ from presentation.web_api.middlewares.metrics.labels import EXCEPTIONS
 from presentation.web_api.responses import ErrorData, ErrorResponse
 
 logger = logging.getLogger(__name__)
-
-
-def error_handler(
-    status_code: int,
-) -> Callable[..., Awaitable[ORJSONResponse]]:
-    return partial(app_error_handler, status_code=status_code)
 
 
 def setup_exception_handlers(app: FastAPI):
@@ -88,7 +83,7 @@ async def app_error_handler(
             app_name=APP_NAME,
         ).inc()
 
-    return await handle_error(
+    return handle_error(
         request=request,
         err=err,
         err_data=ErrorData(title=err.title, data=err.title),
@@ -103,7 +98,6 @@ async def unknown_exception_handler(
     method = request.method
     path = request.url.path
 
-    # Логируем ошибку
     logger.error("Handle error", exc_info=err, extra={"error": err})
     logger.exception(
         "Unknown error occurred", exc_info=err, extra={"error": err}
@@ -117,7 +111,6 @@ async def unknown_exception_handler(
             app_name=APP_NAME,
         ).inc()
 
-    # Возвращаем ответ с ошибкой
     return ORJSONResponse(
         ErrorResponse(
             error=ErrorData(data=str(err), title="Unknown error"),
@@ -127,7 +120,7 @@ async def unknown_exception_handler(
     )
 
 
-async def handle_error(
+def handle_error(
     request: Request,
     err: Exception,
     err_data: ErrorData,
@@ -135,6 +128,6 @@ async def handle_error(
     status_code: int,
 ) -> ORJSONResponse:
     return ORJSONResponse(
-        ErrorResponse(error=err_data, status=status_code),
+        asdict(ErrorResponse(error=err_data, status=status_code)),
         status_code=status_code,
     )

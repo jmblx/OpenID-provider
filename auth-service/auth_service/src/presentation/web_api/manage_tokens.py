@@ -1,7 +1,11 @@
 import logging
+
 from fastapi.responses import ORJSONResponse
+from fastapi import Request
+
 from application.common.auth_server_token_types import AuthServerTokens
 from application.common.client_token_types import ClientTokens
+from domain.exceptions.auth import InvalidTokenError
 
 logger = logging.getLogger(__name__)
 
@@ -44,3 +48,14 @@ def change_active_account(response: ORJSONResponse, prev_account_id: str, prev_a
 def set_client_tokens(response: ORJSONResponse, tokens: ClientTokens):
     response.set_cookie(**base_refresh_token_settings, key="client_refresh_token", value=tokens.get("refresh_token"))
     response.set_cookie(**base_access_token_settings, key="client_access_token", value=tokens.get("access_token"))
+
+
+def get_tokens_by_user_id(request: Request, user_id: str) -> AuthServerTokens:
+    refresh_token = request.cookies.get(f"refresh_token:{user_id}")
+    if not refresh_token:
+        raise InvalidTokenError()
+    access_token = request.cookies.get(f"access_token:{user_id}")
+    return {
+        "access_token": access_token,
+        "refresh_token": refresh_token,
+    }

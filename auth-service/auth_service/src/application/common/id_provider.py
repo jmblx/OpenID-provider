@@ -28,11 +28,6 @@ class UserIdentityProvider(ABC):
     async def get_current_user(self) -> User: ...
 
     @abstractmethod
-    async def get_non_active_user_accounts_ids(
-        self
-    ) -> list[UserID]: ...
-
-    @abstractmethod
     async def try_get_current_user_id(self) -> UserID | None: ...
 
 
@@ -103,17 +98,6 @@ class UserIdentityProviderImpl(UserIdentityProvider, BaseTokenProvider):
     async def get_current_user(self) -> User:
         user_id = await self.get_current_user_id()
         return await self.user_repo.get_by_id(user_id)
-
-    async def get_non_active_user_accounts_ids(self) -> list[UserID]:
-        user_ids = []
-        for expected_user_id, refresh_token in self.non_active_tokens:
-            payload = self._decode_token(f"refresh_token:{expected_user_id}", refresh_token)
-            jti = payload["jti"]
-            user_id = await self._validate_refresh_token(jti)
-            if user_id != expected_user_id:
-                raise InvalidTokenError()
-            user_ids.append(user_id)
-        return user_ids
 
 
 class ClientIdentityProviderImpl(ClientIdentityProvider, BaseTokenProvider):

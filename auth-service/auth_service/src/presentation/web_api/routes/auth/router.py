@@ -1,20 +1,26 @@
 import logging
+from uuid import UUID
 
 from dishka import FromDishka
 from dishka.integrations.fastapi import DishkaRoute
-from fastapi import APIRouter
+from fastapi import APIRouter, Request
 from fastapi.responses import ORJSONResponse
 from starlette import status
 
+from application.auth_as.get_available_accounts_query import GetAvailableAccountsHandler, GetAvailableAccountsResponse, \
+    GetAvailableAccountsQuery
 from application.auth_as.login_user_auth_server import (
     AuthenticateUserCommand,
     LoginUserHandler,
 )
 from application.auth_for_client.code_to_token_handler import CodeToTokenHandler, CodeToTokenCommand
 from application.auth_for_client.get_me_page_data_handler import GetMeDataHandler, GetMeDataCommand, MeData
-from application.common.auth_server_token_types import AuthServerTokens
+from application.common.auth_server_token_types import AuthServerTokens, AuthServerRefreshToken, NonActiveRefreshTokens, \
+    AuthServerAccessToken
+from application.common.id_provider import UserIdentityProvider
 from presentation.web_api.routes.auth.models import GetMePageDataSchema
-from presentation.web_api.manage_tokens import set_auth_server_tokens, set_client_tokens, change_active_account
+from presentation.web_api.manage_tokens import set_auth_server_tokens, set_client_tokens, change_active_account, \
+    get_tokens_by_user_id
 
 auth_router = APIRouter(route_class=DishkaRoute, tags=["auth"])
 # jinja_loader = PackageLoader("presentation.web_api.registration")
@@ -48,7 +54,6 @@ async def code_to_token(
     command: CodeToTokenCommand,
 ) -> ORJSONResponse:
     response_data = await handler.handle(command)
-    logger.info("response_data: %s", response_data)
     tokens = {
         "access_token": response_data.pop("access_token", None),
         "refresh_token": response_data.pop("refresh_token", None),
@@ -70,9 +75,31 @@ async def auth_to_client(handler: FromDishka[GetMeDataHandler], command: GetMePa
         code_verifier=command.code_verifier,
         code_challenge_method=command.code_challenge_method,
     )
-
     return await handler.handle(command_data)
 
+
+@auth_router.post("/switch-account")
+async def switch_account(
+    idp: FromDishka[UserIdentityProvider],
+    active_refresh: FromDishka[AuthServerRefreshToken],
+    active_access: FromDishka[AuthServerAccessToken],
+    new_active_user_id: UUID,
+    request: Request,
+) -> ORJSONResponse:
+    response = ORJSONResponse(content={"status": "success"}, status_code=status.HTTP_200_OK)
+    active_user_id = await idp.get_current_user_id()
+    change_active_account(
+        response,
+        str(active_user_id.value),
+        {"access_token": active_access, "refresh_token": active_refresh},
+        get_tokens_by_user_id(request, str(new_active_user_id))
+    )
+    return response
+
+
+@auth_router.get("/available-accounts")
+async def get_available_accounts(handler: FromDishka[GetAvailableAccountsHandler], non_active_tokens: FromDishka[NonActiveRefreshTokens]) -> GetAvailableAccountsResponse:
+    return await handler.handle(GetAvailableAccountsQuery(non_active_tokens))
 
 # @auth_router.get("/pages/login")
 # async def login_page(  # type: ignore

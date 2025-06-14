@@ -1,5 +1,6 @@
 from dishka import provide, Provider, Scope
 
+from application.auth_as.get_available_accounts_query import GetAvailableAccountsHandler
 from application.auth_as.login_user_auth_server import LoginUserHandler
 # from application.bold_code.old_code_to_token_handler import (
 #     CodeToTokenHandler,
@@ -140,3 +141,4 @@ class HandlerProvider(Provider):
     find_rs_handler = provide(FindRSHandler, scope=Scope.REQUEST)
     set_client_avatar_handler = provide(SetClientAvatarHandler, scope=Scope.REQUEST)
     get_client_avatar_handler = provide(GetClientAvatarHandler, scope=Scope.REQUEST)
+    get_available_accounts_handler = provide(GetAvailableAccountsHandler, scope=Scope.REQUEST)
