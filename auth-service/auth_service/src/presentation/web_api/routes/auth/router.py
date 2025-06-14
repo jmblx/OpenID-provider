@@ -36,13 +36,13 @@ async def login(
     handler: FromDishka[LoginUserHandler],
     prev_account_tokens: FromDishka[AuthServerTokens],
 ) -> ORJSONResponse:
-    new_jwt_tokens, prev_active_account_id = await handler.handle(command)
+    new_jwt_tokens, prev_active_account_id, new_active_user_id = await handler.handle(command)
     response = ORJSONResponse(
         {"status": "success"},
         status_code=status.HTTP_200_OK,
     )
     if prev_active_account_id:
-        change_active_account(response, str(prev_active_account_id.value), prev_account_tokens, new_jwt_tokens)
+        change_active_account(response, str(prev_active_account_id.value), prev_account_tokens, new_jwt_tokens, str(new_active_user_id.value))
     else:
         set_auth_server_tokens(response, new_jwt_tokens)
     return response
