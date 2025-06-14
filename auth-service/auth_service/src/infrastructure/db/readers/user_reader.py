@@ -20,7 +20,7 @@ class UserReaderImpl(UserReader):
     async def get_user_card_data_by_id(
         self, user_ids: list[UserID]
     ) -> dict[UUID, UserCardData]:
-        query = select(User.id, User.email).where(User.id.in_([id_.value for id_ in user_ids]))
+        query = select(User.id, User.email).where(User.id.in_(user_ids))
         user_card_data = (await self.session.execute(query)).all()
         return {user.id.value: {"email": user.email.value} for user in user_card_data}
 
