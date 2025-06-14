@@ -128,7 +128,7 @@ def handle_error(
     status_code: int,
 ) -> ORJSONResponse:
     response = ErrorResponse(
-        status=status,
+        status=status_code,
         error=err_data
     )
     return ORJSONResponse(asdict(response), status_code=response.status)
