@@ -1,30 +1,28 @@
 import {fetchWithAuth, loadUserAvatar, loadUserData, logoutClient} from "./commonApi.js";
 
 document.addEventListener('DOMContentLoaded', async () => {
-    const userData = await loadUserData();
-    if (userData.is_admin) {
-        await renderAdminPanel();
-        await loadUserAvatar('admin-panel-user-avatar');
-    }
+    await renderUserPanel(); // отображается для всех
+    await loadUserAvatar('admin-panel-user-avatar');
 });
 
-async function renderAdminPanel() {
+async function renderUserPanel() {
     const response = await fetchWithAuth('/api/me');
     const userData = await response.json();
     const path = window.location.pathname;
     const filename = path.substring(path.lastIndexOf('/') + 1);
     const pageName = filename.split('.')[0];
 
-    // Список вкладок: name совпадает с pageName
-    const tabs = [
+    // Только для админов — вкладки
+    const isAdmin = userData.is_admin;
+    const tabs = isAdmin ? [
         { name: 'resourceServers', label: 'Resource Servers', href: '/pages/resourceServers.html' },
         { name: 'clients',         label: 'Clients',          href: '/pages/clients.html'         },
-    ];
+    ] : [];
 
     const panel = document.createElement('div');
     panel.className = 'admin-panel';
 
-    // Левая часть: ссылки-вкладки
+    // Левая часть — вкладки (если админ)
     const leftDiv = document.createElement('div');
     tabs.forEach(tab => {
         const a = document.createElement('a');
@@ -37,7 +35,7 @@ async function renderAdminPanel() {
     });
     panel.appendChild(leftDiv);
 
-    // Правая часть: ссылка на профиль (аватар) и кнопка logout
+    // Правая часть — профиль и выход
     const rightDiv = document.createElement('div');
     rightDiv.style.display = 'flex';
     rightDiv.style.alignItems = 'center';
@@ -52,7 +50,7 @@ async function renderAdminPanel() {
     avatarImg.style.width = '32px';
     avatarImg.style.height = '32px';
     avatarImg.style.borderRadius = '50%';
-    avatarImg.src = '/icons/defaultAvatar.svg'; // временно — пока loadUserAvatar не загрузит
+    avatarImg.src = '/icons/defaultAvatar.svg';
 
     profileLink.appendChild(avatarImg);
     rightDiv.appendChild(profileLink);
@@ -61,9 +59,7 @@ async function renderAdminPanel() {
     logoutBtn.id = 'logout-button';
     logoutBtn.className = 'logout-button';
     logoutBtn.title = 'Logout';
-    logoutBtn.onclick = () => {
-        logoutClient();
-    };
+    logoutBtn.onclick = () => logoutClient();
 
     const logoutImg = document.createElement('img');
     logoutImg.src = '/icons/logout.svg';
@@ -71,7 +67,6 @@ async function renderAdminPanel() {
     logoutBtn.appendChild(logoutImg);
 
     rightDiv.appendChild(logoutBtn);
-
     panel.appendChild(rightDiv);
 
     document.body.prepend(panel);
