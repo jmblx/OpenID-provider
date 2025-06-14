@@ -47,3 +47,11 @@
 body {
     padding-top: 60px; /* чтобы контент не перекрывался панелью */
 }
+
+.account-switcher img#user-panel-avatar:hover {
+    opacity: 0.8;
+}
+
+.account-menu .account-item:hover {
+    background-color: #f1f1f1;
+}
