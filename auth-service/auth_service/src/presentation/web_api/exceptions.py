@@ -128,6 +128,6 @@ def handle_error(
     status_code: int,
 ) -> ORJSONResponse:
     return ORJSONResponse(
-        asdict(ErrorResponse(error=err_data, status=status_code)),
+        ErrorResponse(error=err_data, status=status_code),
         status_code=status_code,
     )
