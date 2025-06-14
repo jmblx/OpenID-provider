@@ -127,6 +127,7 @@ def handle_error(
     status: int,
     status_code: int,
 ) -> ORJSONResponse:
+    print(ErrorResponse(error=err_data, status=status_code).__getattribute__("method"))
     return ORJSONResponse(
         ErrorResponse(error=err_data, status=status_code),
         status_code=status_code,
