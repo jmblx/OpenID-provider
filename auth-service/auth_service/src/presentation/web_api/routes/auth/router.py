@@ -1,9 +1,10 @@
 import logging
+from typing import Annotated
 from uuid import UUID
 
 from dishka import FromDishka
 from dishka.integrations.fastapi import DishkaRoute
-from fastapi import APIRouter, Request
+from fastapi import APIRouter, Request, Body
 from fastapi.responses import ORJSONResponse
 from starlette import status
 
@@ -83,7 +84,7 @@ async def switch_account(
     idp: FromDishka[UserIdentityProvider],
     active_refresh: FromDishka[AuthServerRefreshToken],
     active_access: FromDishka[AuthServerAccessToken],
-    new_active_user_id: UUID,
+    new_active_user_id: Annotated[UUID, Body],
     request: Request,
 ) -> ORJSONResponse:
     response = ORJSONResponse(content={"status": "success"}, status_code=status.HTTP_200_OK)
