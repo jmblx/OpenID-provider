@@ -23,6 +23,6 @@ class ErrorData(Generic[TError]):
 
 
 @dataclass(frozen=True)
-class ErrorResponse(Response, Generic[TError]):
+class ErrorResponse(Generic[TError]):
     status: int
     error: ErrorData[TError]
