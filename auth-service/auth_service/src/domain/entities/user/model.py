@@ -1,5 +1,7 @@
 from uuid import UUID, uuid4
 
+from sqlalchemy.ext.hybrid import hybrid_property
+
 from domain.common.services.pwd_service import PasswordHasher
 from domain.entities.client.model import Client
 from domain.entities.resource_server.model import ResourceServer
@@ -15,11 +17,24 @@ from dataclasses import dataclass, field
 
 from domain.exceptions.auth import InvalidCredentialsError
 from domain.exceptions.pwd_hasher import PasswordMismatchError
+from infrastructure.db.models import user_table
 
 
 @dataclass
 class User:
-    id: UserID
+    _id: UUID
+
+    @hybrid_property
+    def id(self) -> UserID:
+        # wrap the raw UUID into your UserID value object
+        return UserID(self._id)
+
+    @id.expression
+    def id(cls):
+        # this is how SQLAlchemy will get at the actual column when you
+        # do .where(User.id.in_(...)) or select(User.id)
+        return user_table.c.id
+
     email: Email
     hashed_password: HashedPassword
     is_admin: bool = field(default=False)
