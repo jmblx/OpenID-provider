@@ -1,10 +1,9 @@
 import logging
-from typing import Annotated
 from uuid import UUID
 
 from dishka import FromDishka
 from dishka.integrations.fastapi import DishkaRoute
-from fastapi import APIRouter, Request, Body
+from fastapi import APIRouter, Request
 from fastapi.responses import ORJSONResponse
 from starlette import status
 
@@ -19,7 +18,7 @@ from application.auth_for_client.get_me_page_data_handler import GetMeDataHandle
 from application.common.auth_server_token_types import AuthServerTokens, AuthServerRefreshToken, NonActiveRefreshTokens, \
     AuthServerAccessToken
 from application.common.id_provider import UserIdentityProvider
-from presentation.web_api.routes.auth.models import GetMePageDataSchema
+from presentation.web_api.routes.auth.models import GetMePageDataSchema, ChangeActiveUserSchema
 from presentation.web_api.manage_tokens import set_auth_server_tokens, set_client_tokens, change_active_account, \
     get_tokens_by_user_id
 
@@ -84,7 +83,7 @@ async def switch_account(
     idp: FromDishka[UserIdentityProvider],
     active_refresh: FromDishka[AuthServerRefreshToken],
     active_access: FromDishka[AuthServerAccessToken],
-    new_active_user_id: Annotated[UUID, Body],
+    new_active_user: ChangeActiveUserSchema,
     request: Request,
 ) -> ORJSONResponse:
     response = ORJSONResponse(content={"status": "success"}, status_code=status.HTTP_200_OK)
@@ -93,7 +92,7 @@ async def switch_account(
         response,
         str(active_user_id.value),
         {"access_token": active_access, "refresh_token": active_refresh},
-        get_tokens_by_user_id(request, str(new_active_user_id))
+        get_tokens_by_user_id(request, str(new_active_user.new_active_user_id))
     )
     return response
 

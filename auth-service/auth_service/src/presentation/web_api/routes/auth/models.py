@@ -1,4 +1,5 @@
 from typing import Literal
+from uuid import UUID
 
 from pydantic import BaseModel, HttpUrl
 
@@ -24,3 +25,7 @@ class GetMePageDataSchema(BaseModel):
 class CodeToTokenResponseSchema(BaseModel):
     email: str | None
     avatar_path: str | None
+
+
+class ChangeActiveUserSchema(BaseModel):
+    new_active_user_id: UUID
