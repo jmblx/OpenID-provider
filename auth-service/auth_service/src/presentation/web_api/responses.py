@@ -21,6 +21,9 @@ class ErrorData(Generic[TError]):
     title: str
     data: TError | None = None
 
+    def __post_init__(self):
+        data = str(self.data)
+
 
 @dataclass(frozen=True)
 class ErrorResponse(Generic[TError]):

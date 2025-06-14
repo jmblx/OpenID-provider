@@ -128,7 +128,7 @@ def handle_error(
     status_code: int,
 ) -> ORJSONResponse:
     response = ErrorResponse(
-        status=401,
-        error=ErrorData(title="Invalid token", data=str(err))  # или просто None
+        status=status,
+        error=err_data
     )
     return ORJSONResponse(asdict(response), status_code=response.status)
