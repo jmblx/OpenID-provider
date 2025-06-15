@@ -38,7 +38,7 @@ class MinIOService(StorageService):
     def _get_avatar_filename(self, object_id: str) -> str:
         return f"{object_id}.webp"
 
-    def set_avatar(self, content: bytes, content_type: str, object_id: str) -> str:
+    async def set_avatar(self, content: bytes, content_type: str, object_id: str) -> str:
         """
         Загружает аватарку в MinIO.
         """
@@ -46,13 +46,13 @@ class MinIOService(StorageService):
         try:
             processed_content = self._process_avatar(content)
             self.s3_client.put_object(
-                self.bucket_name,  # Бакет
-                filename,  # Имя файла
+                self.bucket_name,
+                filename,
                 BytesIO(processed_content),
                 length=len(processed_content),
                 content_type="image/webp"
             )
-            self.redis.set(f"user_avatar:{object_id}", int(time.time()))
+            await self.redis.set(f"user_avatar:{object_id}", int(time.time()))
             return self.get_presigned_avatar_url(object_id)
         except S3Error as e:
             raise Exception(f"Ошибка при загрузке файла в MinIO: {e}")

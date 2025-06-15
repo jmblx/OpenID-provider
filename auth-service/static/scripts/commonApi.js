@@ -50,21 +50,30 @@ export async function fetchWithAuth(url, options = {}) {
 }
 
 
+window.cachedUserDataPromise = window.cachedUserDataPromise || null;
+
 export async function loadUserData(emailElementId = 'user-email') {
-    try {
-        const response = await fetchWithAuth('/api/me');
-        const userData = await response.json();
+  if (!window.cachedUserDataPromise) {
+    window.cachedUserDataPromise = fetchWithAuth('/api/me')
+      .then(response => response.json())
+      .catch(err => {
+        window.cachedUserDataPromise = null;
+        throw err;
+      });
+  }
 
-        if (emailElementId && document.getElementById(emailElementId)) {
-            document.getElementById(emailElementId).textContent = userData.email;
-        }
+  const userData = await window.cachedUserDataPromise;
 
-        return userData;
-    } catch (error) {
-        console.error('Error loading user data:', error);
-        throw error;
+  if (emailElementId) {
+    const el = document.getElementById(emailElementId);
+    if (el) {
+      el.textContent = userData.email;
     }
+  }
+
+  return userData;
 }
+
 
 export async function loadUserAvatar(avatarElementId = 'user-avatar') {
     const avatarUrl = '/user-avatars/jwt/';

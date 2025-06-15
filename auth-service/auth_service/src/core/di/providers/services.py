@@ -2,6 +2,7 @@ import os
 
 import argon2
 from dishka import Provider, Scope, provide
+from redis import Redis
 
 from application.auth_as.common.scopes_service import ScopesService
 from application.common.interfaces.client_token_creation import ClientTokenCreationService
@@ -129,13 +130,13 @@ class ServiceProvider(Provider):
 
     @staticmethod
     @provide(scope=Scope.REQUEST, provides=UserS3StorageService)
-    def provide_user_minio_service(config: MinIOConfig) -> UserS3StorageService:
-        return MinIOService(config, bucket_name=os.getenv("MINIO_USER_AVATAR_BUCKET_NAME"))
+    def provide_user_minio_service(config: MinIOConfig, redis: Redis) -> UserS3StorageService:
+        return MinIOService(config, bucket_name=os.getenv("MINIO_USER_AVATAR_BUCKET_NAME"), redis=redis)
 
     @staticmethod
     @provide(scope=Scope.REQUEST, provides=ClientS3StorageService)
-    def provide_client_minio_service(config: MinIOConfig) -> ClientS3StorageService:
-        return MinIOService(config, bucket_name=os.getenv("MINIO_CLIENT_AVATAR_BUCKET_NAME"))
+    def provide_client_minio_service(config: MinIOConfig, redis: Redis) -> ClientS3StorageService:
+        return MinIOService(config, bucket_name=os.getenv("MINIO_CLIENT_AVATAR_BUCKET_NAME"), redis=redis)
 
     # reg_validation_service = provide(
     #     RegUserValidationService,

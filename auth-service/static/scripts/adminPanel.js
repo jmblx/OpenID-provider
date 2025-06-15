@@ -1,4 +1,4 @@
-import { fetchWithAuth, loadUserAvatar, logoutClient, redirectToLogin } from './commonApi.js';
+import {fetchWithAuth, loadUserAvatar, loadUserData, logoutClient, redirectToLogin} from './commonApi.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
     await renderUserPanel();
@@ -6,8 +6,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 async function renderUserPanel() {
-    const meResp = await fetchWithAuth('/api/me');
-    const me = await meResp.json();
+    const me = await loadUserData();
 
     const availResp = await fetchWithAuth('/api/available-accounts');
     const { accounts, active_account_id } = await availResp.json();
