@@ -6,7 +6,11 @@ import { fetchWithAuth } from './commonApi.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
     saveInitialQueryParams();
-    initYandexAuth({ /* ... */ });
+    initYandexAuth({
+        clientId: '83c64ffbf6db4ea282b7e4d0c5cfbb51',
+        redirectUri: 'https://menoitami.ru/pages/yandex-login.html',
+        authType: 'login'
+    });
     initLoginForm();
     initPasswordReset();
     await renderAccountSelector();
