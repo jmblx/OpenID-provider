@@ -9,7 +9,7 @@ class UserData(TypedDict):
     id: UUID
     email: str
     # avatar_path: str
-    avatar_timestamp: int
+    avatar_update_timestamp: int
     is_admin: bool
 
 class IdentifyByCookiesQueryHandler:
@@ -24,6 +24,6 @@ class IdentifyByCookiesQueryHandler:
             "email": user.email.value,
             "id": user.id.value,
             # "avatar_path": self.s3_storage.get_presigned_avatar_url(str(user.id.value)),
-            "avatar_timestamp": await self.s3_storage.get_user_avatar_update_timestamp(str(user.id.value)),
+            "avatar_update_timestamp": await self.s3_storage.get_user_avatar_update_timestamp(str(user.id.value)),
             "is_admin": user.is_admin,
         }
