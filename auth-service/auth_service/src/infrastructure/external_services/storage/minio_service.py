@@ -1,17 +1,19 @@
 import os
+import time
 from datetime import timedelta
 from io import BytesIO
 
 from PIL import Image
 from minio import Minio
 from minio.error import S3Error
+from redis.asyncio import Redis
 
 from application.common.interfaces.imedia_storage import StorageService
 from infrastructure.external_services.storage.config import MinIOConfig
 
 
 class MinIOService(StorageService):
-    def __init__(self, config: MinIOConfig, bucket_name: str):
+    def __init__(self, config: MinIOConfig, bucket_name: str, redis: Redis):
         self.config = config
         self.s3_client = Minio(
             config.endpoint_url,
@@ -20,6 +22,7 @@ class MinIOService(StorageService):
             secure=False
         )
         self.bucket_name = bucket_name
+        self.redis = redis
 
     def _process_avatar(self, content: bytes) -> bytes:
         """
@@ -49,6 +52,7 @@ class MinIOService(StorageService):
                 length=len(processed_content),
                 content_type="image/webp"
             )
+            self.redis.set(f"user_avatar:{object_id}", int(time.time()))
             return self.get_presigned_avatar_url(object_id)
         except S3Error as e:
             raise Exception(f"Ошибка при загрузке файла в MinIO: {e}")

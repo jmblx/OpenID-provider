@@ -1,3 +1,4 @@
+import logging
 from dataclasses import dataclass
 from typing import List, cast, TypedDict
 from uuid import UUID
@@ -23,6 +24,9 @@ class GetAvailableAccountsResponse(TypedDict):
     active_account_id: UUID | None
 
 
+log = logging.getLogger(__name__)
+
+
 class GetAvailableAccountsHandler:
     def __init__(self, idp: UserIdentityProvider, user_reader: UserReader, s3_storage: UserS3StorageService):
         self.idp = idp
@@ -32,6 +36,7 @@ class GetAvailableAccountsHandler:
     async def handle(self, query: GetAvailableAccountsQuery) -> GetAvailableAccountsResponse:
         current_user_id = await self.idp.try_get_current_user_id()
         users_ids = list(query.non_active_accounts.keys())
+        log.info("Current user id: %s", current_user_id)
         if current_user_id:
             users_ids.append(current_user_id)
         accounts_data = cast(
