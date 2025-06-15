@@ -106,7 +106,10 @@ async def switch_account(
 
 
 @auth_router.get("/available-accounts")
-async def get_available_accounts(handler: FromDishka[GetAvailableAccountsHandler], non_active_tokens: FromDishka[NonActiveRefreshTokens]) -> GetAvailableAccountsResponse:
+async def get_available_accounts(
+    handler: FromDishka[GetAvailableAccountsHandler],
+    non_active_tokens: FromDishka[NonActiveRefreshTokens]
+) -> GetAvailableAccountsResponse:
     return await handler.handle(GetAvailableAccountsQuery(non_active_tokens))
 
 @auth_router.post("/deactivate-current-account")

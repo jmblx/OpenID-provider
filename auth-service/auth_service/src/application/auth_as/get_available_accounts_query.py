@@ -19,8 +19,8 @@ class AvailableAccountData(TypedDict):
 
 
 class GetAvailableAccountsResponse(TypedDict):
-    accounts: dict[UUID, AvailableAccountData]
-    active_account_id: UUID
+    accounts: dict[UUID, AvailableAccountData] | None
+    active_account_id: UUID | None
 
 
 class GetAvailableAccountsHandler:
@@ -30,11 +30,16 @@ class GetAvailableAccountsHandler:
         self.s3_storage = s3_storage
 
     async def handle(self, query: GetAvailableAccountsQuery) -> GetAvailableAccountsResponse:
-        current_user_id = await self.idp.get_current_user_id()
-        users_ids = [k for k in query.non_active_accounts.keys()]
-        users_ids.append(current_user_id)
-        accounts_data = cast(dict[UUID, AvailableAccountData],  await self.user_reader.get_user_card_data_by_id(users_ids))
-        for account_id in accounts_data.keys():
-            accounts_data[account_id]["avatar_url"] = self.s3_storage.get_presigned_avatar_url(str(account_id))
-        response = GetAvailableAccountsResponse(accounts=accounts_data, active_account_id=current_user_id.value)
-        return response
+        current_user_id = await self.idp.try_get_current_user_id()
+        users_ids = list(query.non_active_accounts.keys())
+        if current_user_id:
+            users_ids.append(current_user_id)
+        accounts_data = cast(
+            dict[UUID, AvailableAccountData],
+            await self.user_reader.get_user_card_data_by_id(users_ids)
+        )
+        if accounts_data is not None:
+            for account_id in accounts_data.keys():
+                accounts_data[account_id]["avatar_url"] = self.s3_storage.get_presigned_avatar_url(str(account_id))
+            return GetAvailableAccountsResponse(accounts=accounts_data, active_account_id=current_user_id.value if current_user_id else None)
+        return GetAvailableAccountsResponse(accounts={}, active_account_id=None)
