@@ -132,7 +132,6 @@ document.addEventListener("DOMContentLoaded", async function () {
 
             const result = await response.json();
             const avatarUrl = result.avatar_path;
-            // Сохраняем новый presigned
             const expiresAt = getPresignedExpiry(avatarUrl);
             if (expiresAt) {
                 localStorage.setItem(`clientAvatar:${clientId}`, JSON.stringify({

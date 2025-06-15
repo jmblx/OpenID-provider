@@ -11,5 +11,4 @@ class PaginationData(BaseModel):
 class UserSchema(BaseModel):
     id: UUID
     email: str
-    avatar_path: HttpUrl
     is_admin: bool

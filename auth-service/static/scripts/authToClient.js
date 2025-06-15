@@ -1,6 +1,6 @@
 // authToClient.js
 
-import { fetchWithAuth, loadUserAvatar } from './commonApi.js';
+import {fetchWithAuth, loadUserAvatar, loadUserData} from './commonApi.js';
 import { getStoredParams } from './manageParamsMod.js';
 import { logoutClient } from "./commonApi.js";
 
@@ -47,10 +47,8 @@ async function loadClientAvatar(imgElementId = 'client-avatar') {
             }
         }
     } catch {
-        // парсинг не удался — сбросим кеш
     }
 
-    // Нужно получить новую ссылку
     try {
         const response = await fetchWithAuth(`/api/client/${clientId}/avatar`);
         if (!response.ok) throw new Error('Ошибка загрузки аватарки клиента');
@@ -66,7 +64,6 @@ async function loadClientAvatar(imgElementId = 'client-avatar') {
         document.getElementById(imgElementId).src = avatarUrl;
     } catch (e) {
         console.error(e);
-        // При ошибке можно оставить дефолт или ничего не показывать
     }
 }
 
@@ -75,8 +72,8 @@ export async function initAuthToClient() {
         const params = getStoredParams();
         const fingerprint = localStorage.getItem('deviceFingerprint') || '';
 
-        // Сначала загружаем данные пользователя и клиента
-        await loadUserData();
+        loadUserData("user-email")
+        await loadUserAvatar('user-avatar');
         await loadClientAvatar('client-avatar');
 
         const authData = await authorizeClient(params, fingerprint);
@@ -84,13 +81,6 @@ export async function initAuthToClient() {
     } catch (error) {
         handleAuthError(error);
     }
-}
-
-async function loadUserData() {
-    const response = await fetchWithAuth('/api/me');
-    const userData = await response.json();
-    document.getElementById('user-email').textContent = userData.email;
-    await loadUserAvatar('user-avatar');
 }
 
 async function authorizeClient(params, fingerprint) {
