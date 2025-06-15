@@ -27,5 +27,5 @@ class CodeToTokenResponseSchema(BaseModel):
     avatar_path: str | None
 
 
-class ChangeActiveUserSchema(BaseModel):
-    new_active_user_id: UUID
+class NewActiveUserSchema(BaseModel):
+    new_active_user_id: UUID | None

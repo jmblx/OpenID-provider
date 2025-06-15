@@ -18,9 +18,9 @@ from application.auth_for_client.get_me_page_data_handler import GetMeDataHandle
 from application.common.auth_server_token_types import AuthServerTokens, AuthServerRefreshToken, NonActiveRefreshTokens, \
     AuthServerAccessToken
 from application.common.id_provider import UserIdentityProvider
-from presentation.web_api.routes.auth.models import GetMePageDataSchema, ChangeActiveUserSchema
+from presentation.web_api.routes.auth.models import GetMePageDataSchema, NewActiveUserSchema
 from presentation.web_api.manage_tokens import set_auth_server_tokens, set_client_tokens, change_active_account, \
-    get_tokens_by_user_id
+    get_tokens_by_user_id, deactivate_account_tokens, activate_account
 
 auth_router = APIRouter(route_class=DishkaRoute, tags=["auth"])
 # jinja_loader = PackageLoader("presentation.web_api.registration")
@@ -87,17 +87,18 @@ async def auth_to_client(handler: FromDishka[GetMeDataHandler], command: GetMePa
 @auth_router.post("/switch-account")
 async def switch_account(
     idp: FromDishka[UserIdentityProvider],
-    active_refresh: FromDishka[AuthServerRefreshToken],
-    active_access: FromDishka[AuthServerAccessToken],
-    new_active_user: ChangeActiveUserSchema,
+    prev_account_tokens: FromDishka[AuthServerTokens],
+    new_active_user: NewActiveUserSchema,
     request: Request,
 ) -> ORJSONResponse:
-    response = ORJSONResponse(content={"status": "success"}, status_code=status.HTTP_200_OK)
     prev_active_user_id = await idp.get_current_user_id()
+    if new_active_user.new_active_user_id == prev_active_user_id:
+        raise status.HTTP_409_CONFLICT("accounts are the same")
+    response = ORJSONResponse(content={"status": "success"}, status_code=status.HTTP_200_OK)
     change_active_account(
         response,
         str(prev_active_user_id.value),
-        {"access_token": active_access, "refresh_token": active_refresh},
+        prev_account_tokens,
         get_tokens_by_user_id(request, str(new_active_user.new_active_user_id)),
         str(new_active_user.new_active_user_id)
     )
@@ -107,6 +108,33 @@ async def switch_account(
 @auth_router.get("/available-accounts")
 async def get_available_accounts(handler: FromDishka[GetAvailableAccountsHandler], non_active_tokens: FromDishka[NonActiveRefreshTokens]) -> GetAvailableAccountsResponse:
     return await handler.handle(GetAvailableAccountsQuery(non_active_tokens))
+
+@auth_router.post("/deactivate-current-account")
+async def deactivate_account(
+    idp: FromDishka[UserIdentityProvider],
+    prev_account_tokens: FromDishka[AuthServerTokens],
+):
+    response = ORJSONResponse(content={"status": "success"}, status_code=status.HTTP_200_OK)
+    deactivate_account_tokens(response, str((await idp.get_current_user_id()).value), prev_account_tokens)
+    return response
+
+
+@auth_router.post("/activate-account")
+async def activate_account_tokens(
+    new_active_user: NewActiveUserSchema,
+    request: Request,
+) -> ORJSONResponse:
+    response = ORJSONResponse(content={"status": "success"}, status_code=status.HTTP_200_OK)
+    new_active_user_tokens = get_tokens_by_user_id(request, str(new_active_user.new_active_user_id))
+    if not new_active_user_tokens:
+        raise status.HTTP_404_NOT_FOUND("there is no account with such id in your non-active accounts")
+    activate_account(
+        response,
+        str(new_active_user),
+        new_active_user_tokens,
+    )
+    return response
+
 
 # @auth_router.get("/pages/login")
 # async def login_page(  # type: ignore

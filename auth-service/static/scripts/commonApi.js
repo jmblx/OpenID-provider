@@ -23,11 +23,22 @@ export async function fetchWithAuth(url, options = {}) {
         }
     };
 
-    const response = await fetch(url, mergedOptions);
+    let response = await fetch(url, mergedOptions);
 
     if (response.status === 401) {
-        redirectToLogin();
-        throw new Error('Unauthorized');
+        const refreshResponse = await fetch("/api/auth-service/refresh", {
+            credentials: 'include',
+            headers: {
+                'X-Device-Fingerprint': fingerprint,
+            }
+        });
+
+        if (refreshResponse.ok) {
+            response = await fetch(url, mergedOptions);
+        } else {
+            redirectToLogin();
+            throw new Error('Unauthorized - refresh failed');
+        }
     }
 
     if (!response.ok) {
@@ -37,6 +48,7 @@ export async function fetchWithAuth(url, options = {}) {
 
     return response;
 }
+
 
 export async function loadUserData(emailElementId = 'user-email') {
     try {
