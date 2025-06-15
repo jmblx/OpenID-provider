@@ -2,7 +2,7 @@ import os
 
 import argon2
 from dishka import Provider, Scope, provide
-from redis import Redis
+from redis.asyncio import Redis
 
 from application.auth_as.common.scopes_service import ScopesService
 from application.common.interfaces.client_token_creation import ClientTokenCreationService
