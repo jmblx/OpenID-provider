@@ -4,20 +4,17 @@ export function initSearchPanel({ apiUrl, resultPageUrl, idNaming }) {
     container.style.marginTop = '60px';
     container.style.zIndex = 999;
 
-    // Обёртка для инпута и иконки
     const inputWrapper = document.createElement('div');
     inputWrapper.style.position = 'relative';
     inputWrapper.style.maxWidth = '500px';
     inputWrapper.style.margin = '10px auto';
 
-    // Поле ввода
     const input = document.createElement('input');
     input.type = 'text';
     input.placeholder = 'Поиск...';
     input.className = 'form-control';
     input.style.paddingRight = '40px';
 
-    // Иконка лупы
     const icon = document.createElement('img');
     icon.src = '/icons/lupa.png';
     icon.alt = 'Поиск';
@@ -33,7 +30,6 @@ export function initSearchPanel({ apiUrl, resultPageUrl, idNaming }) {
     inputWrapper.appendChild(input);
     inputWrapper.appendChild(icon);
 
-    // Контейнер для результатов
     const resultsBox = document.createElement('div');
     resultsBox.style.position = 'absolute';
     resultsBox.style.top = '100%';

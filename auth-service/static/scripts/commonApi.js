@@ -115,7 +115,7 @@ export async function logoutClient() {
         });
 
         if (response.ok) {
-            window.location.href = "/pages/login.html"; // перенаправление после выхода
+            redirectToLogin();
         } else {
             const data = await response.json();
             alert(data.detail || "Logout failed");

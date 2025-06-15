@@ -93,7 +93,7 @@ async function renderUserPanel() {
                 method: 'POST'
             });
             if (!resp.ok) throw new Error(`status ${resp.status}`);
-            window.location.href = '/pages/login.html';
+            redirectToLogin();
         } catch (e) {
             console.error('Не удалось деактивировать текущий аккаунт:', e);
             alert('Ошибка выхода для добавления аккаунта');
