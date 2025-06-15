@@ -8,12 +8,12 @@ from minio import Minio
 from minio.error import S3Error
 from redis.asyncio import Redis
 
-from application.common.interfaces.imedia_storage import StorageService
+from application.common.interfaces.imedia_storage import StorageService, UserS3StorageService
 from infrastructure.external_services.storage.config import MinIOConfig
 
 
 class MinIOService(StorageService):
-    def __init__(self, config: MinIOConfig, bucket_name: str, redis: Redis):
+    def __init__(self, config: MinIOConfig, bucket_name: str):
         self.config = config
         self.s3_client = Minio(
             config.endpoint_url,
@@ -22,7 +22,6 @@ class MinIOService(StorageService):
             secure=False
         )
         self.bucket_name = bucket_name
-        self.redis = redis
 
     def _process_avatar(self, content: bytes) -> bytes:
         """
@@ -52,7 +51,6 @@ class MinIOService(StorageService):
                 length=len(processed_content),
                 content_type="image/webp"
             )
-            await self.redis.set(f"user_avatar:{object_id}", int(time.time()))
             return self.get_presigned_avatar_url(object_id)
         except S3Error as e:
             raise Exception(f"Ошибка при загрузке файла в MinIO: {e}")
@@ -73,3 +71,20 @@ class MinIOService(StorageService):
             return presigned_url
         except S3Error as e:
             raise Exception(f"Ошибка при генерации presigned URL: {e}")
+
+
+class UserMinIOService(UserS3StorageService):
+    def __init__(self, config: MinIOConfig, bucket_name: str, redis: Redis):
+        super().__init__(config, bucket_name)
+        self.redis = redis
+
+    async def set_avatar(self, content: bytes, content_type: str, object_id: str) -> str:
+        """
+        Загружает аватарку в MinIO и сохраняет время загрузки в Redis.
+        """
+        avatar_presigned_url = super().set_avatar(content, content_type, object_id)
+        await self.redis.set(f"user_avatar:{object_id}", int(time.time()))
+        return avatar_presigned_url
+
+    async def get_user_avatar_update_timestamp(self, user_id: str) -> int:
+        return await self.redis.get(f"user_avatar:{user_id}")

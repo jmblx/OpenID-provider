@@ -77,10 +77,10 @@ export async function loadUserData(emailElementId = 'user-email') {
 
 export async function loadUserAvatar(avatarElementId = 'user-avatar') {
     const avatarUrl = '/user-avatars/jwt/';
-    const localStorageKey = 'lastAvatarUpdate';
 
     try {
-        const lastUpdate = localStorage.getItem(localStorageKey);
+        const userData = await window.cachedUserDataPromise;
+        const lastUpdate = userData.avatar_update_timestamp;
         const url = lastUpdate ? `${avatarUrl}?t=${lastUpdate}` : avatarUrl;
 
         const response = await fetchWithAuth(url);

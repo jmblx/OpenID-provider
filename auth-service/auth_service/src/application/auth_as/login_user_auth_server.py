@@ -3,26 +3,12 @@ from dataclasses import dataclass
 
 from application.common.id_provider import UserIdentityProvider
 from application.common.interfaces.http_auth import HttpAuthServerService
-from application.common.services.auth_code import (
-    AuthorizationCodeStorage,
-    AuthCodeData,
-)
 from application.common.services.multiacc import change_active_account_id
-from application.common.services.pkce import (
-    PKCEData,
-    PKCEService,
-    PKCECodeChallengeMethod,
-)
-from application.client.client_queries import ValidateClientRequest
-from application.common.services.client_service import ClientService
-from application.common.auth_server_token_types import AuthServerRefreshToken, AuthServerAccessToken, AuthServerTokens
-from application.common.uow import Uow
+from application.common.auth_server_token_types import AuthServerTokens
 from application.common.interfaces.user_repo import UserRepository
-from application.user.common.user_service import UserService
 from domain.common.services.pwd_service import PasswordHasher
 from domain.entities.user.model import User
 from domain.entities.user.value_objects import Email, RawPassword, UserID
-from domain.exceptions.client import ClientNotFound
 from domain.exceptions.user import UserNotFoundByEmailError
 
 

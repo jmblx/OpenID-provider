@@ -32,7 +32,7 @@ from infrastructure.external_services.message_routing.notify_service import (
     NotifyServiceImpl,
 )
 from infrastructure.external_services.storage.config import MinIOConfig
-from infrastructure.external_services.storage.minio_service import MinIOService
+from infrastructure.external_services.storage.minio_service import MinIOService, UserMinIOService
 
 from infrastructure.services.auth.auth_code import (
     RedisAuthorizationCodeStorage,
@@ -131,12 +131,12 @@ class ServiceProvider(Provider):
     @staticmethod
     @provide(scope=Scope.REQUEST, provides=UserS3StorageService)
     def provide_user_minio_service(config: MinIOConfig, redis: Redis) -> UserS3StorageService:
-        return MinIOService(config, bucket_name=os.getenv("MINIO_USER_AVATAR_BUCKET_NAME"), redis=redis)
+        return UserMinIOService(config, bucket_name=os.getenv("MINIO_USER_AVATAR_BUCKET_NAME"), redis=redis)
 
     @staticmethod
     @provide(scope=Scope.REQUEST, provides=ClientS3StorageService)
     def provide_client_minio_service(config: MinIOConfig, redis: Redis) -> ClientS3StorageService:
-        return MinIOService(config, bucket_name=os.getenv("MINIO_CLIENT_AVATAR_BUCKET_NAME"), redis=redis)
+        return MinIOService(config, bucket_name=os.getenv("MINIO_CLIENT_AVATAR_BUCKET_NAME"))
 
     # reg_validation_service = provide(
     #     RegUserValidationService,
