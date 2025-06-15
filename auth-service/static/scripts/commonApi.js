@@ -93,7 +93,7 @@ export async function loadUserAvatar(avatarElementId = 'user-avatar') {
     }
 }
 
-function redirectToLogin() {
+export function redirectToLogin() {
     const params = getStoredParams();
     const loginUrl = new URL('/pages/login.html', window.location.origin);
 
