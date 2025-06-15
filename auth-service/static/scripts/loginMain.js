@@ -22,16 +22,16 @@ async function renderAccountSelector() {
         resp = await fetchWithAuth('/api/available-accounts');
         if (!resp.ok) throw new Error(resp.statusText);
     } catch {
-        return; // нет прав/куки — не рисуем ничего
+        return;
     }
 
     const { accounts } = await resp.json();
     const keys = Object.keys(accounts || {});
-    if (keys.length === 0) return; // пусто — просто форма логина
+    if (keys.length === 0) return;
 
-    const container = document.querySelector('.form-container');
-    const selector = document.createElement('div');
-    selector.className = 'account-selector mt-4';
+    const section = document.getElementById('accountSection');
+    const selector = document.getElementById('accountSelector');
+    section.style.display = 'block';
 
     keys.forEach(id => {
         const info = accounts[id];
@@ -61,6 +61,4 @@ async function renderAccountSelector() {
         });
         selector.appendChild(btn);
     });
-
-    container.appendChild(selector);
 }
