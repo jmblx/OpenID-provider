@@ -133,7 +133,7 @@ async def activate_account_tokens(
         raise status.HTTP_404_NOT_FOUND("there is no account with such id in your non-active accounts")
     activate_account(
         response,
-        str(new_active_user),
+        str(new_active_user.new_active_user_id),
         new_active_user_tokens,
     )
     return response
