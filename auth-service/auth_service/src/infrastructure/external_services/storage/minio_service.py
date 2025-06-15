@@ -37,7 +37,7 @@ class MinIOService(StorageService):
     def _get_avatar_filename(self, object_id: str) -> str:
         return f"{object_id}.webp"
 
-    async def set_avatar(self, content: bytes, content_type: str, object_id: str) -> str:
+    def set_avatar(self, content: bytes, content_type: str, object_id: str) -> str:
         """
         Загружает аватарку в MinIO.
         """
@@ -73,7 +73,7 @@ class MinIOService(StorageService):
             raise Exception(f"Ошибка при генерации presigned URL: {e}")
 
 
-class UserMinIOService(UserS3StorageService):
+class UserMinIOService(UserS3StorageService, MinIOService):
     def __init__(self, config: MinIOConfig, bucket_name: str, redis: Redis):
         super().__init__(config, bucket_name)
         self.redis = redis
@@ -86,5 +86,6 @@ class UserMinIOService(UserS3StorageService):
         await self.redis.set(f"user_avatar:{object_id}", int(time.time()))
         return avatar_presigned_url
 
-    async def get_user_avatar_update_timestamp(self, user_id: str) -> int:
-        return await self.redis.get(f"user_avatar:{user_id}")
+    async def get_user_avatar_update_timestamp(self, user_id: str) -> int | None:
+        value = await self.redis.get(f"user_avatar:{user_id}")
+        return int(value) if value else None
