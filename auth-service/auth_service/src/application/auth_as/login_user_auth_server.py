@@ -7,6 +7,7 @@ from application.common.services.auth_code import (
     AuthorizationCodeStorage,
     AuthCodeData,
 )
+from application.common.services.multiacc import change_active_account_id
 from application.common.services.pkce import (
     PKCEData,
     PKCEService,
@@ -55,13 +56,16 @@ class LoginUserHandler:
         :return: возвращаем токены и аккаунт пользователя
          который был активным до логина в случае смены активного аккаунта
         """
-        current_active_account_id = await self.idp.try_get_current_user_id()
-
-        user: User | None = await self.user_repository.get_by_email(Email(command.email))
-        if not user:
+        new_active_user: User | None = await self.user_repository.get_by_email(Email(command.email))
+        if not new_active_user:
             raise UserNotFoundByEmailError(command.email)
-        user.check_pwd(
+        new_active_user.check_pwd(
             RawPassword(command.password), password_hasher=self.password_hasher
         )
-        tokens = await self.auth_server_service.create_and_save_tokens(user, is_admin=user.is_admin)
-        return tokens, current_active_account_id if current_active_account_id and current_active_account_id != user.id else None, user.id if current_active_account_id else None
+        tokens = await self.auth_server_service.create_and_save_tokens(
+            new_active_user,
+            is_admin=new_active_user.is_admin
+        )
+        previous_account_id, new_active_account_id = await change_active_account_id(self.idp, new_active_user)
+        return tokens, previous_account_id, new_active_account_id
+

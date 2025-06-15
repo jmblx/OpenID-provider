@@ -8,19 +8,15 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 async function renderUserPanel() {
-    // 1) Получаем информацию о пользователе
     const meResp = await fetchWithAuth('/api/me');
     const me = await meResp.json();
 
-    // 2) Получаем список доступных аккаунтов
     const availResp = await fetchWithAuth('/api/available-accounts');
     const { accounts, active_account_id } = await availResp.json();
 
-    // 3) Создаём блок панели
     const panel = document.createElement('div');
     panel.className = 'admin-panel';
 
-    // --- левая часть (для админов вкладки) omitted if not admin ---
     if (me.is_admin) {
         const path = window.location.pathname;
         const pageName = path.substring(path.lastIndexOf('/') + 1).split('.')[0];
@@ -41,13 +37,11 @@ async function renderUserPanel() {
         panel.appendChild(document.createElement('div')); // чтобы правый блок был справа
     }
 
-    // --- правая часть: аккаунты, профиль, логаут ---
     const right = document.createElement('div');
     right.style.display = 'flex';
     right.style.alignItems = 'center';
     right.style.gap = '10px';
 
-    // 3.1) Селектор аккаунтов
     const switcher = document.createElement('div');
     switcher.className = 'account-switcher';
     switcher.style.position = 'relative';
@@ -63,7 +57,6 @@ async function renderUserPanel() {
 
     switcher.appendChild(active);
 
-    // выпадающий список
     const menu = document.createElement('div');
     menu.className = 'account-menu';
     menu.style.position = 'absolute';
@@ -87,6 +80,18 @@ async function renderUserPanel() {
         `;
         item.addEventListener('click', () => switchAccount(id));
         menu.appendChild(item);
+        const addBtn = document.createElement('div');
+        addBtn.className = 'account-item d-flex align-items-center p-2';
+        addBtn.style.cursor = 'pointer';
+        addBtn.style.borderTop = '1px solid #e0e0e0';
+        addBtn.innerHTML = `
+            <img src="/icons/addAccount.svg" width="24" height="24" class="me-2">
+            <span>Добавить аккаунт</span>
+        `;
+        addBtn.addEventListener('click', () => {
+            window.location.href = '/pages/login.html';
+        });
+        menu.appendChild(addBtn);
     });
 
     switcher.appendChild(menu);

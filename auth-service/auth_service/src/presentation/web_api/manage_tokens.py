@@ -31,7 +31,13 @@ def set_auth_server_tokens(response: ORJSONResponse, tokens: AuthServerTokens):
     response.set_cookie(**base_access_token_settings, key="access_token", value=tokens.get("access_token"))
 
 
-def change_active_account(response: ORJSONResponse, prev_account_id: str, prev_account_tokens: AuthServerTokens, new_tokens: AuthServerTokens, new_active_account_id: str):
+def change_active_account(
+    response: ORJSONResponse,
+    prev_account_id: str,
+    prev_account_tokens: AuthServerTokens,
+    new_tokens: AuthServerTokens,
+    new_active_account_id: str
+):
     response.set_cookie(**base_refresh_token_settings,
         key=f"refresh_token:{prev_account_id}",
         value=prev_account_tokens.get("refresh_token")

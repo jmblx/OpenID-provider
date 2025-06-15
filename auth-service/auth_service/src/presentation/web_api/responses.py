@@ -1,6 +1,9 @@
 from dataclasses import dataclass, field
 from typing import Generic, TypeVar
 
+from fastapi.responses import ORJSONResponse
+from starlette import status
+
 TResult = TypeVar("TResult")
 TError = TypeVar("TError")
 
@@ -29,3 +32,9 @@ class ErrorData(Generic[TError]):
 class ErrorResponse(Generic[TError]):
     status: int
     error: ErrorData[TError]
+
+
+default_success = ORJSONResponse(
+        {"status": "success"},
+        status_code=status.HTTP_200_OK,
+    )

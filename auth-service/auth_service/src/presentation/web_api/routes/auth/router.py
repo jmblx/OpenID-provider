@@ -42,7 +42,13 @@ async def login(
         status_code=status.HTTP_200_OK,
     )
     if prev_active_account_id:
-        change_active_account(response, str(prev_active_account_id.value), prev_account_tokens, new_jwt_tokens, str(new_active_user_id.value))
+        change_active_account(
+            response,
+            str(prev_active_account_id.value),
+            prev_account_tokens,
+            new_jwt_tokens,
+            str(new_active_user_id.value)
+        )
     else:
         set_auth_server_tokens(response, new_jwt_tokens)
     return response

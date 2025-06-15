@@ -45,7 +45,7 @@
 }
 
 body {
-    padding-top: 60px; /* чтобы контент не перекрывался панелью */
+    padding-top: 60px;
 }
 
 .account-switcher img#user-panel-avatar:hover {
