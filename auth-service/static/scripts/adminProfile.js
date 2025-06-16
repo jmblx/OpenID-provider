@@ -1,8 +1,8 @@
 import {
     setupReturnButton,
-    openAvatarUpload, uploadUserAvatar
+    openAvatarUpload
 } from './profileCommon.js';
-import {loadUserData, loadUserAvatar, logoutClient} from "./commonApi.js";
+import {loadUserData, loadUserAvatar, logoutClient, uploadUserAvatar} from "./commonApi.js";
 
 document.addEventListener('DOMContentLoaded', async () => {
     try {
