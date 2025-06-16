@@ -94,7 +94,6 @@ services:
 
   notification_app:
     env_file:
-      - notification/.env-prod
       - .env-prod
 #    image: backend_service.notification_app
     image: menoitami/backend_service.notification_app

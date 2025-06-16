@@ -11,3 +11,6 @@ certbot/conf/**/*
 nginx-logs/**/*
 certs/**/*
 certbot/www/**/*
+
+**/.env
+**/.env-prod

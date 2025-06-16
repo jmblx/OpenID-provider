@@ -64,7 +64,7 @@ jobs:
             cd OpenID-provider/auth-service/
             git pull origin main
 
-            export PG_PWD='${{ secrets.PG_PWD }}'
+            echo "${{ secrets.ENV_PROD_FILE }}" > .env
 
             docker compose down
             docker compose pull

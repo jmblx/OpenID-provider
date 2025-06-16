@@ -15,9 +15,9 @@ from infrastructure.db.models.registry import mapper_registry
 from infrastructure.db.config import (
     DB_HOST,
     DB_PORT,
-    DB_NAME,
-    DB_USER,
-    DB_PASS,
+    POSTGRES_DB,
+    POSTGRES_USER,
+    POSTGRES_PASSWORD,
 )
 
 config = context.config
@@ -25,9 +25,9 @@ config = context.config
 section = config.config_ini_section
 config.set_section_option(section, "DB_HOST", DB_HOST)
 config.set_section_option(section, "DB_PORT", DB_PORT)
-config.set_section_option(section, "DB_USER", DB_USER)
-config.set_section_option(section, "DB_NAME", DB_NAME)
-config.set_section_option(section, "DB_PASS", DB_PASS)
+config.set_section_option(section, "POSTGRES_USER", POSTGRES_USER)
+config.set_section_option(section, "POSTGRES_DB", POSTGRES_DB)
+config.set_section_option(section, "POSTGRES_PASSWORD", POSTGRES_PASSWORD)
 
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
