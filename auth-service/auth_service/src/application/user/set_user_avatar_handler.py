@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from application.common.id_provider import UserIdentityProvider
 from application.common.interfaces.user_repo import UserRepository
 from application.dtos.set_image import ImageDTO
-from application.common.interfaces.imedia_storage import UserS3StorageService
+from application.common.interfaces.imedia_storage import UserS3StorageService, SetAvatarResponse
 
 
 @dataclass
@@ -28,7 +28,7 @@ class SetUserAvatarHandler:
     async def handle(
         self,
         command: SetUserAvatarCommand,
-    ) -> str:
+    ) -> SetAvatarResponse:
         user = await self.idp.get_current_user()
         new_avatar_data = await self.media_storage.set_avatar(
             content=command.image.content,

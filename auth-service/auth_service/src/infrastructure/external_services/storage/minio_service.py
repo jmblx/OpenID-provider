@@ -82,10 +82,11 @@ class UserMinIOService(UserS3StorageService, MinIOService):
         """
         Загружает аватарку в MinIO и сохраняет время загрузки в Redis.
         """
-        avatar_presigned_url = await super().set_avatar(content, content_type, object_id)
+        new_avatar_data = await super().set_avatar(content, content_type, object_id)
         avatar_update_timestamp = int(time.time())
         await self.redis.set(f"user_avatar:{object_id}", avatar_update_timestamp)
-        return {"avatar_presigned_url": avatar_presigned_url, "avatar_update_timestamp": avatar_update_timestamp}
+        new_avatar_data["avatar_update_timestamp"] = avatar_update_timestamp
+        return new_avatar_data
 
     async def get_user_avatar_update_timestamp(self, user_id: str) -> int | None:
         value = await self.redis.get(f"user_avatar:{user_id}")
