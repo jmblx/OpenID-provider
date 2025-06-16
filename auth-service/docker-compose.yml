@@ -21,7 +21,7 @@ services:
       - 5432
     restart: always
     env_file:
-      - .env-prod
+      - .env
     environment:
       POSTGRES_PASSWORD: ${PG_PWD}
     volumes:
@@ -57,7 +57,7 @@ services:
   auth_service:
     container_name: backend_service.api
     env_file:
-      - .env-prod
+      - .env
     environment:
       DB_PASS: ${PG_PWD}
     #    build:
@@ -94,7 +94,7 @@ services:
 
   notification_app:
     env_file:
-      - .env-prod
+      - .env
 #    image: backend_service.notification_app
     image: menoitami/backend_service.notification_app
 #    build:
@@ -112,7 +112,7 @@ services:
       db:
         condition: service_healthy
     env_file:
-      - .env-prod
+      - .env
     environment:
       DB_PASS: ${PG_PWD}
     command: [ "sh", "/backend-service.auth_service/docker/migrate.sh" ]
@@ -141,7 +141,7 @@ services:
     depends_on:
       - minio
     env_file:
-      - .env-prod
+      - .env
     entrypoint: >
       /bin/sh -c "
       sleep 10;
@@ -271,7 +271,7 @@ services:
 
 #  investments_service:
 #    env_file:
-#      - investments_src/.env-prod
+#      - investments_src/.env
 #    build:
 #      context: ./investments_src
 #      dockerfile: Dockerfile
