@@ -34,7 +34,7 @@ class SetClientAvatarHandler:
         if not client:
             raise ClientNotFound()
         client.avatar_upd_at = datetime.now()
-        avatar_path = self.media_storage.set_avatar(
+        avatar_path = await self.media_storage.set_avatar(
             content=command.image.content,
             content_type=command.image.content_type,
             object_id=str(client.id),
