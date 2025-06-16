@@ -19,6 +19,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 await uploadUserAvatar();
                 alert('Avatar updated successfully!');
                 await loadUserAvatar('user-avatar');
+                await loadUserAvatar('user-panel-avatar');
             } catch {
                 alert('Failed to upload avatar');
             }
