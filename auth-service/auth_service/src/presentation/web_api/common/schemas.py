@@ -12,4 +12,4 @@ class UserSchema(BaseModel):
     id: UUID
     email: str
     is_admin: bool
-    avatar_update_timestamp: int
+    avatar_update_timestamp: int | None = None

@@ -29,6 +29,6 @@ class StorageService(ABC):
 
 class UserS3StorageService(StorageService):
     @abstractmethod
-    async def get_user_avatar_update_timestamp(self, user_id: str) -> int: ...
+    async def get_user_avatar_update_timestamp(self, user_id: str) -> int | None: ...
 
 ClientS3StorageService = NewType("ClientS3StorageService", StorageService)

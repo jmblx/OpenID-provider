@@ -9,7 +9,7 @@ class UserData(TypedDict):
     id: UUID
     email: str
     # avatar_path: str
-    avatar_update_timestamp: int
+    avatar_update_timestamp: int | None
     is_admin: bool
 
 class IdentifyByCookiesQueryHandler:
