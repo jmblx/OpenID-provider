@@ -29,6 +29,36 @@
     background-color: #495057;
 }
 
+/* Убираем инлайновый gap у правой части */
+.admin-panel .right {
+  display: flex;
+  align-items: center;
+  /* gap: убрать или переопределить */
+}
+
+/* Универсальный стиль для всех иконок панели */
+.admin-panel .panel-icon {
+  width: 32px;
+  height: 32px;
+  margin: 0 12px; /* по 12px слева и справа — регулируй под ваш вкус */
+  cursor: pointer;
+  object-fit: cover; /* если это <img> */
+}
+
+/* Если нужно чуть больше “кликабельной” зоны */
+.admin-panel a.profile-link,
+.admin-panel button#logout-button,
+.admin-panel .account-switcher {
+  padding: 4px; /* добавим 4px вокруг, чтобы зоны были одинаковы */
+  border-radius: 4px;
+}
+
+.admin-panel a.profile-link:hover,
+.admin-panel button#logout-button:hover,
+.admin-panel .account-switcher:hover {
+  background-color: rgba(255,255,255,0.1);
+}
+
 .logout-button {
     background: none;
     border: none;

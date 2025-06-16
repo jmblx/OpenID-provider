@@ -65,8 +65,7 @@ async function renderUserPanel() {
     const switchIcon = document.createElement('img');
     switchIcon.src = '/icons/switchUser.svg'; // иконка «сменить аккаунт»
     switchIcon.alt = 'Switch Account';
-    switchIcon.style.width = '24px';
-    switchIcon.style.height = '24px';
+    switchIcon.classList.add('panel-icon');
     switchIcon.style.cursor = 'pointer';
 
     switcher.appendChild(switchIcon);
@@ -127,7 +126,11 @@ async function renderUserPanel() {
     logoutBtn.className = 'logout-button';
     logoutBtn.title = 'Logout';
     logoutBtn.onclick = () => logoutClient();
-    logoutBtn.innerHTML = `<img src="/icons/logout.svg" alt="Logout">`;
+    const logoutImg = document.createElement('img');
+    logoutImg.src = '/icons/logout.svg';
+    logoutImg.alt = 'Logout';
+    logoutImg.classList.add('panel-icon');
+    logoutBtn.appendChild(logoutImg);
     right.appendChild(logoutBtn);
 
     panel.appendChild(right);
