@@ -1,27 +1,4 @@
 import { getStoredParams } from './manageParamsMod.js';
-import {fetchWithAuth, loadUserData, loadUserAvatar, logoutClient} from './commonApi.js';
-
-export async function uploadUserAvatar() {
-    const fileInput = document.getElementById('avatar-upload');
-    if (!fileInput?.files?.length) return false;
-
-    try {
-        const formData = new FormData();
-        formData.append('file', fileInput.files[0]);
-
-        const response = await fetchWithAuth('/api/avatar', {
-            method: 'POST',
-            body: formData
-        });
-        window.cachedUserDataPromise.avatar_update_timestamp = response.avatar_update_timestamp
-        await loadUserAvatar()
-
-        return true;
-    } catch (error) {
-        console.error('Error uploading avatar:', error);
-        throw error;
-    }
-}
 
 export function setupReturnButton() {
     const params = getStoredParams();

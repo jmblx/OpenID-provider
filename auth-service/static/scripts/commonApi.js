@@ -50,56 +50,89 @@ export async function fetchWithAuth(url, options = {}) {
 }
 
 
-window.cachedUserDataPromise = window.cachedUserDataPromise || null;
+window._userDataPromise = null;
+window._userData = null;
 
 export async function loadUserData(emailElementId = 'user-email') {
-  if (!window.cachedUserDataPromise) {
-    window.cachedUserDataPromise = fetchWithAuth('/api/me')
-      .then(response => response.json())
+  if (!window._userDataPromise) {
+    window._userDataPromise = fetchWithAuth('/api/me')
+      .then(res => res.json())
+      .then(data => {
+        // Сохраняем и сам объект
+        window._userData = data;
+        return data;
+      })
       .catch(err => {
-        window.cachedUserDataPromise = null;
+        window._userDataPromise = null;
         throw err;
       });
   }
 
-  const userData = await window.cachedUserDataPromise;
+  const userData = await window._userDataPromise;
 
   if (emailElementId) {
     const el = document.getElementById(emailElementId);
-    if (el) {
-      el.textContent = userData.email;
-    }
+    if (el) el.textContent = userData.email;
   }
 
   return userData;
 }
 
+export async function uploadUserAvatar() {
+  const fileInput = document.getElementById('avatar-upload');
+  if (!fileInput?.files?.length) return false;
+
+  const formData = new FormData();
+  formData.append('file', fileInput.files[0]);
+
+  const res = await fetchWithAuth('/api/avatar', {
+    method: 'POST',
+    body: formData,
+  });
+
+  // Предполагаем, что сервер вернул JSON с полем avatar_update_timestamp
+  const { avatar_update_timestamp } = await res.json();
+
+  // Обновляем и в кэше userData
+  if (window._userData) {
+    window._userData.avatar_update_timestamp = avatar_update_timestamp;
+  }
+  // Если кто-то в будущем вызывает loadUserData() — он возьмёт из _userDataPromise,
+  // но для аватара мы уже обновили объект.
+
+  // И тут же перезагрузим картинку
+  await loadUserAvatar();
+  return true;
+}
 
 export async function loadUserAvatar(avatarElementId = 'user-avatar') {
-    const avatarUrl = '/user-avatars/jwt/';
+  const avatarBase = '/user-avatars/jwt/';
+  // Гарантируем, что данные загружены
+  if (!window._userDataPromise) {
+    await loadUserData();
+  }
+  // Ждём, пока промис отработает и наполнятся window._userData
+  await window._userDataPromise;
 
-    try {
-        const userData = await window.cachedUserDataPromise;
-        const lastUpdate = userData.avatar_update_timestamp;
-        const url = lastUpdate ? `${avatarUrl}?t=${lastUpdate}` : `${avatarUrl}?t=${Math.floor(Date.now() / 1000)}`;
+  // Берём таймстамп из объекта
+  const ts = window._userData?.avatar_update_timestamp;
+  // Если вдруг нет — на всякий случай fallback на текущее время
+  const url = ts ? `${avatarBase}?t=${ts}` : `${avatarBase}?t=${Math.floor(Date.now() / 1000)}`;
 
-        const response = await fetchWithAuth(url);
-        const blob = await response.blob();
-        const imageUrl = URL.createObjectURL(blob);
+  try {
+    const response = await fetchWithAuth(url);
+    const blob = await response.blob();
+    const imageUrl = URL.createObjectURL(blob);
 
-        if (avatarElementId && document.getElementById(avatarElementId)) {
-            document.getElementById(avatarElementId).src = imageUrl;
-        }
-
-        return imageUrl;
-    } catch (error) {
-        console.error('Error loading avatar:', error);
-        const defaultAvatar = '/icons/defaultAvatar.svg';
-        if (avatarElementId && document.getElementById(avatarElementId)) {
-            document.getElementById(avatarElementId).src = defaultAvatar;
-        }
-        return defaultAvatar;
-    }
+    const img = document.getElementById(avatarElementId);
+    if (img) img.src = imageUrl;
+    return imageUrl;
+  } catch (err) {
+    console.error('Error loading avatar:', err);
+    const img = document.getElementById(avatarElementId);
+    if (img) img.src = '/icons/defaultAvatar.svg';
+    return '/icons/defaultAvatar.svg';
+  }
 }
 
 export function redirectToLogin() {
