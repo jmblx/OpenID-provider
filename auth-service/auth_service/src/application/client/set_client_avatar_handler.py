@@ -34,10 +34,10 @@ class SetClientAvatarHandler:
         if not client:
             raise ClientNotFound()
         client.avatar_upd_at = datetime.now()
-        avatar_path = await self.media_storage.set_avatar(
+        client_avatar_data = await self.media_storage.set_avatar(
             content=command.image.content,
             content_type=command.image.content_type,
             object_id=str(client.id),
         )
         await self.uow.commit()
-        return avatar_path
+        return client_avatar_data["avatar_presigned_url"]

@@ -11,6 +11,9 @@ class SetUserAvatarCommand:
     image: ImageDTO
 
 
+
+
+
 class SetUserAvatarHandler:
     def __init__(
         self,
@@ -27,9 +30,9 @@ class SetUserAvatarHandler:
         command: SetUserAvatarCommand,
     ) -> str:
         user = await self.idp.get_current_user()
-        avatar_path = await self.media_storage.set_avatar(
+        new_avatar_data = await self.media_storage.set_avatar(
             content=command.image.content,
             content_type=command.image.content_type,
             object_id=str(user.id.value),
         )
-        return avatar_path
+        return new_avatar_data

@@ -84,6 +84,7 @@ export async function loadUserAvatar(avatarElementId = 'user-avatar') {
         const url = lastUpdate ? `${avatarUrl}?t=${lastUpdate}` : `${avatarUrl}?t=${Math.floor(Date.now() / 1000)}`;
 
         const response = await fetchWithAuth(url);
+        window.cachedUserDataPromise.avatar_update_timestamp = response.avatar_update_timestamp
         const blob = await response.blob();
         const imageUrl = URL.createObjectURL(blob);
 

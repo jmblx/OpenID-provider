@@ -8,7 +8,7 @@ from minio import Minio
 from minio.error import S3Error
 from redis.asyncio import Redis
 
-from application.common.interfaces.imedia_storage import StorageService, UserS3StorageService
+from application.common.interfaces.imedia_storage import StorageService, UserS3StorageService, SetAvatarResponse
 from infrastructure.external_services.storage.config import MinIOConfig
 
 
@@ -37,7 +37,7 @@ class MinIOService(StorageService):
     def _get_avatar_filename(self, object_id: str) -> str:
         return f"{object_id}.webp"
 
-    async def set_avatar(self, content: bytes, content_type: str, object_id: str) -> str:
+    async def set_avatar(self, content: bytes, content_type: str, object_id: str) -> SetAvatarResponse:
         """
         Загружает аватарку в MinIO.
         """
@@ -51,7 +51,7 @@ class MinIOService(StorageService):
                 length=len(processed_content),
                 content_type="image/webp"
             )
-            return self.get_presigned_avatar_url(object_id)
+            return {"avatar_presigned_url": self.get_presigned_avatar_url(object_id)}
         except S3Error as e:
             raise Exception(f"Ошибка при загрузке файла в MinIO: {e}")
 
@@ -78,13 +78,14 @@ class UserMinIOService(UserS3StorageService, MinIOService):
         super().__init__(config, bucket_name)
         self.redis = redis
 
-    async def set_avatar(self, content: bytes, content_type: str, object_id: str) -> str:
+    async def set_avatar(self, content: bytes, content_type: str, object_id: str) -> SetAvatarResponse:
         """
         Загружает аватарку в MinIO и сохраняет время загрузки в Redis.
         """
         avatar_presigned_url = await super().set_avatar(content, content_type, object_id)
-        await self.redis.set(f"user_avatar:{object_id}", int(time.time()))
-        return avatar_presigned_url
+        avatar_update_timestamp = int(time.time())
+        await self.redis.set(f"user_avatar:{object_id}", avatar_update_timestamp)
+        return {"avatar_presigned_url": avatar_presigned_url, "avatar_update_timestamp": avatar_update_timestamp}
 
     async def get_user_avatar_update_timestamp(self, user_id: str) -> int | None:
         value = await self.redis.get(f"user_avatar:{user_id}")

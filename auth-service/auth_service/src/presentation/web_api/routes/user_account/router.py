@@ -10,6 +10,7 @@ from application.auth_as.identify_by_cookies_query import (
     IdentifyByCookiesQueryHandler,
 )
 from application.auth_for_client.get_userinfo_handler import GetUserInfoQueryHandler
+from application.common.interfaces.imedia_storage import SetAvatarResponse
 from application.dtos.set_image import ImageDTO
 from application.user.add_role_to_user_handler import (
     AddRoleToUserHandler,
@@ -50,7 +51,7 @@ async def add_role_to_user(
 async def get_me(handler: FromDishka[IdentifyByCookiesQueryHandler]) -> UserSchema:
     return UserSchema(**await handler.handle())
 
-@user_account_router.post("/avatar")
+@user_account_router.post("/avatar", response_model=SetAvatarResponse)
 async def set_avatar(handler: FromDishka[SetUserAvatarHandler], file: UploadFile = File(...)) -> ORJSONResponse:
     if not file:
         raise HTTPException(status_code=400, detail="Файл не был передан")
@@ -61,9 +62,9 @@ async def set_avatar(handler: FromDishka[SetUserAvatarHandler], file: UploadFile
         content=content,
         content_type=file.content_type
     )
-    avatar_path = await handler.handle(SetUserAvatarCommand(image_dto))
+    new_avatar_data = await handler.handle(SetUserAvatarCommand(image_dto))
 
-    return ORJSONResponse({"avatar_path": avatar_path})
+    return ORJSONResponse(new_avatar_data)
 
 
 @user_account_router.get("/userinfo")
