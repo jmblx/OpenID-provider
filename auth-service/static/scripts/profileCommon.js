@@ -9,10 +9,11 @@ export async function uploadUserAvatar() {
         const formData = new FormData();
         formData.append('file', fileInput.files[0]);
 
-        await fetchWithAuth('/api/avatar', {
+        const response = await fetchWithAuth('/api/avatar', {
             method: 'POST',
             body: formData
         });
+        window.cachedUserDataPromise.avatar_update_timestamp = response.avatar_update_timestamp
         await loadUserAvatar()
 
         return true;
