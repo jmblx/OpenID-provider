@@ -13,8 +13,8 @@ export async function uploadUserAvatar() {
             method: 'POST',
             body: formData
         });
+        await loadUserAvatar()
 
-        localStorage.setItem('lastAvatarUpdate', Date.now());
         return true;
     } catch (error) {
         console.error('Error uploading avatar:', error);
