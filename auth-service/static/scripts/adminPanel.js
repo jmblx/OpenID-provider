@@ -1,6 +1,6 @@
 // userPanel.js
 
-import { fetchWithAuth, loadUserAvatar, logoutClient, redirectToLogin } from './commonApi.js';
+import {fetchWithAuth, loadUserAvatar, loadUserData, logoutClient, redirectToLogin} from './commonApi.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
     await renderUserPanel();
