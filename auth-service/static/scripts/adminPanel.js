@@ -31,7 +31,7 @@ async function renderUserPanel() {
         });
         panel.appendChild(left);
     } else {
-        panel.appendChild(document.createElement('div')); // чтобы правый блок был справа
+        panel.appendChild(document.createElement('div'));
     }
 
     const right = document.createElement('div');
@@ -78,10 +78,23 @@ async function renderUserPanel() {
         item.addEventListener('click', () => switchAccount(id));
         menu.appendChild(item);
     });
+
+    const profileBtn = document.createElement('div');
+    profileBtn.className = 'account-item d-flex align-items-center p-2';
+    profileBtn.style.cursor = 'pointer';
+    profileBtn.style.borderTop = '1px solid #e0e0e0';
+    profileBtn.innerHTML = `
+        <img src="/icons/profile.svg" width="20" height="20" style="margin-right: 8px;">
+        <span>Профиль</span>
+    `;
+    profileBtn.addEventListener('click', () => {
+        window.location.href = '/pages/profile.html';
+    });
+    menu.appendChild(profileBtn);
+
     const addBtn = document.createElement('div');
     addBtn.className = 'account-item d-flex align-items-center p-2';
     addBtn.style.cursor = 'pointer';
-    addBtn.style.borderTop = '1px solid #e0e0e0';
     addBtn.innerHTML = `
         <span style="font-size: 20px; margin-right: 8px;">＋</span>
         <span>Добавить аккаунт</span>
@@ -98,7 +111,6 @@ async function renderUserPanel() {
             alert('Ошибка выхода для добавления аккаунта');
         }
     });
-    menu.appendChild(addBtn);
     menu.appendChild(addBtn);
 
     switcher.appendChild(menu);
@@ -131,7 +143,6 @@ async function switchAccount(newId) {
             body: JSON.stringify({ new_active_user_id: newId })
         });
         if (!resp.ok) throw new Error(`status ${resp.status}`);
-        // просто перезагружаем страницу, теперь запросы пойдут от лица нового аккаунта
         window.location.reload();
     } catch (e) {
         console.error('Switch account error:', e);
