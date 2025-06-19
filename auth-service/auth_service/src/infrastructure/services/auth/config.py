@@ -1,22 +1,27 @@
+import os
 from pathlib import Path
 
-from pydantic import BaseModel
 from dotenv import load_dotenv
+from pydantic import BaseModel
 
 load_dotenv()
 
 
 class JWTSettings(BaseModel):
-    private_key_path: Path = (
-        Path(__file__).parent.parent.parent.parent.parent
-        / "certs"
-        / "jwt-private.pem"
-    )
-    public_key_path: Path = (
-        Path(__file__).parent.parent.parent.parent.parent
-        / "certs"
-        / "jwt-public.pem"
-    )
+    if os.getenv("PRIVATE_KEY_PATH") is None:
+        private_key_path: Path = (
+            Path(__file__).parent.parent.parent.parent.parent
+            / "certs"
+            / "jwt-private.pem"
+        )
+        public_key_path: Path = (
+            Path(__file__).parent.parent.parent.parent.parent
+            / "certs"
+            / "jwt-public.pem"
+        )
+    else:
+        private_key_path: Path = Path(os.getenv("PRIVATE_KEY_PATH"))
+        public_key_path: Path = Path(os.getenv("PUBLIC_KEY_PATH"))
     algorithm: str = "RS512"
     access_token_expire_minutes: int = 1500
     refresh_token_expire_days: int = 30

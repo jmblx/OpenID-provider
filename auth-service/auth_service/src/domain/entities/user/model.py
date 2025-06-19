@@ -1,3 +1,4 @@
+from dataclasses import dataclass, field
 from uuid import UUID, uuid4
 
 from domain.common.services.pwd_service import PasswordHasher
@@ -5,14 +6,11 @@ from domain.entities.client.model import Client
 from domain.entities.resource_server.model import ResourceServer
 from domain.entities.role.model import Role
 from domain.entities.user.value_objects import (
-    UserID,
     Email,
     HashedPassword,
     RawPassword,
+    UserID,
 )
-
-from dataclasses import dataclass, field
-
 from domain.exceptions.auth import InvalidCredentialsError
 from domain.exceptions.pwd_hasher import PasswordMismatchError
 

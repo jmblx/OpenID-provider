@@ -1,10 +1,10 @@
 from abc import ABC, abstractmethod
 from uuid import UUID
 
-from application.common.auth_server_token_types import (
-    Fingerprint,
+from application.common.client_token_types import (
+    ClientAccessToken,
+    ClientRefreshTokenWithData,
 )
-from application.common.client_token_types import ClientAccessToken, ClientRefreshTokenWithData
 
 
 class ClientTokenCreationService(ABC):

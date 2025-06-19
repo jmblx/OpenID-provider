@@ -12,7 +12,6 @@ from infrastructure.external_services.message_routing.nats_utils import (
     send_via_nats,
 )
 
-
 logger = logging.getLogger(__name__)
 
 

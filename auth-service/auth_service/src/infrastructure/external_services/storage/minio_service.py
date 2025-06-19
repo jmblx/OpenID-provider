@@ -3,12 +3,16 @@ import time
 from datetime import timedelta
 from io import BytesIO
 
-from PIL import Image
 from minio import Minio
 from minio.error import S3Error
+from PIL import Image
 from redis.asyncio import Redis
 
-from application.common.interfaces.imedia_storage import StorageService, UserS3StorageService, SetAvatarResponse
+from application.common.interfaces.imedia_storage import (
+    SetAvatarResponse,
+    StorageService,
+    UserS3StorageService,
+)
 from infrastructure.external_services.storage.config import MinIOConfig
 
 
@@ -19,7 +23,7 @@ class MinIOService(StorageService):
             config.endpoint_url,
             access_key=config.access_key,
             secret_key=config.secret_key,
-            secure=False
+            secure=False,
         )
         self.bucket_name = bucket_name
 
@@ -37,7 +41,9 @@ class MinIOService(StorageService):
     def _get_avatar_filename(self, object_id: str) -> str:
         return f"{object_id}.webp"
 
-    async def set_avatar(self, content: bytes, content_type: str, object_id: str) -> SetAvatarResponse:
+    async def set_avatar(
+        self, content: bytes, content_type: str, object_id: str
+    ) -> SetAvatarResponse:
         """
         Загружает аватарку в MinIO.
         """
@@ -49,9 +55,13 @@ class MinIOService(StorageService):
                 filename,
                 BytesIO(processed_content),
                 length=len(processed_content),
-                content_type="image/webp"
+                content_type="image/webp",
             )
-            return {"avatar_presigned_url": self.get_presigned_avatar_url(object_id)}
+            return {
+                "avatar_presigned_url": self.get_presigned_avatar_url(
+                    object_id
+                )
+            }
         except S3Error as e:
             raise Exception(f"Ошибка при загрузке файла в MinIO: {e}")
 
@@ -64,9 +74,11 @@ class MinIOService(StorageService):
             presigned_url = self.s3_client.presigned_get_object(
                 self.bucket_name,
                 self._get_avatar_filename(object_id),
-                expires=timedelta(minutes=5)
+                expires=timedelta(minutes=5),
             )
-            presigned_url = presigned_url.replace("minio:9000", os.getenv("HOST_ADDRESS"))
+            presigned_url = presigned_url.replace(
+                "minio:9000", os.getenv("HOST_ADDRESS")
+            )
 
             return presigned_url
         except S3Error as e:
@@ -78,16 +90,24 @@ class UserMinIOService(UserS3StorageService, MinIOService):
         super().__init__(config, bucket_name)
         self.redis = redis
 
-    async def set_avatar(self, content: bytes, content_type: str, object_id: str) -> SetAvatarResponse:
+    async def set_avatar(
+        self, content: bytes, content_type: str, object_id: str
+    ) -> SetAvatarResponse:
         """
         Загружает аватарку в MinIO и сохраняет время загрузки в Redis.
         """
-        new_avatar_data = await super().set_avatar(content, content_type, object_id)
+        new_avatar_data = await super().set_avatar(
+            content, content_type, object_id
+        )
         avatar_update_timestamp = int(time.time())
-        await self.redis.set(f"user_avatar:{object_id}", avatar_update_timestamp)
+        await self.redis.set(
+            f"user_avatar:{object_id}", avatar_update_timestamp
+        )
         new_avatar_data["avatar_update_timestamp"] = avatar_update_timestamp
         return new_avatar_data
 
-    async def get_user_avatar_update_timestamp(self, user_id: str) -> int | None:
+    async def get_user_avatar_update_timestamp(
+        self, user_id: str
+    ) -> int | None:
         value = await self.redis.get(f"user_avatar:{user_id}")
         return int(value) if value else None

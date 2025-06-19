@@ -15,13 +15,26 @@ class YandexLoginCommand:
 
 
 class YandexLoginHandler:
-    def __init__(self, auth_server_service: HttpAuthServerService, yandex_id_provider: YandexIdentityProvider, base_idp: UserIdentityProvider):
+    def __init__(
+        self,
+        auth_server_service: HttpAuthServerService,
+        yandex_id_provider: YandexIdentityProvider,
+        base_idp: UserIdentityProvider,
+    ):
         self.auth_server_service = auth_server_service
         self.yandex_id_provider = yandex_id_provider
         self.base_idp = base_idp
 
-    async def handle(self, command: YandexLoginCommand) -> tuple[AuthServerTokens, UserID | None, UserID | None]:
-        new_active_user = await self.yandex_id_provider.get_current_user(command.yandex_token)
-        tokens = await self.auth_server_service.create_and_save_tokens(new_active_user, is_admin=new_active_user.is_admin)
-        previous_account_id, new_account_id = await change_active_account_id(self.base_idp, new_active_user)
+    async def handle(
+        self, command: YandexLoginCommand
+    ) -> tuple[AuthServerTokens, UserID | None, UserID | None]:
+        new_active_user = await self.yandex_id_provider.get_current_user(
+            command.yandex_token
+        )
+        tokens = await self.auth_server_service.create_and_save_tokens(
+            new_active_user, is_admin=new_active_user.is_admin
+        )
+        previous_account_id, new_account_id = await change_active_account_id(
+            self.base_idp, new_active_user
+        )
         return tokens, previous_account_id, new_account_id

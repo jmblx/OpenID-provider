@@ -26,4 +26,4 @@ class ClientNotFound(DomainError):
 
     @property
     def title(self) -> str:
-        return f"Client not found"
+        return "Client not found"

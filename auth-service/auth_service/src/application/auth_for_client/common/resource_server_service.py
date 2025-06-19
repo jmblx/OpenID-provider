@@ -1,6 +1,4 @@
-from abc import ABC, abstractmethod
-
-from domain.entities.user.model import User
+from abc import ABC
 
 
 class ResourceServerService(ABC):

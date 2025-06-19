@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from domain.entities.user.value_objects import RawPassword, HashedPassword
+from domain.entities.user.value_objects import HashedPassword, RawPassword
 
 
 class PasswordHasher(ABC):

@@ -17,7 +17,7 @@ class RoleNotFoundError(DomainError):
 
     @property
     def title(self) -> str:
-        return f"Roles not found (or not all found)"
+        return "Roles not found (or not all found)"
 
 
 # @dataclass(eq=False)

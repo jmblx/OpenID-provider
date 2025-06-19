@@ -1,14 +1,16 @@
 from dataclasses import dataclass
 
-from application.user.reset_pwd.service import (
-    ResetPwdService,
-    ResetPasswordCode, ResetPasswordToken,
-)
 from application.common.interfaces.user_repo import UserRepository
 from application.common.uow import Uow
-from core.exceptions.user_password.exceptions import InvalidResetPasswordCode, InvalidResetPasswordToken
+from application.user.reset_pwd.service import (
+    ResetPasswordToken,
+    ResetPwdService,
+)
+from core.exceptions.user_password.exceptions import (
+    InvalidResetPasswordToken,
+)
 from domain.common.services.pwd_service import PasswordHasher
-from domain.entities.user.value_objects import UserID, RawPassword
+from domain.entities.user.value_objects import RawPassword, UserID
 
 
 @dataclass
@@ -45,4 +47,5 @@ class ResetPasswordWithTokenHandler:
         await self.user_repo.save(user)
         await self.uow.commit()
         await self.reset_pwd_service.delete_reset_token(
-            ResetPasswordToken(command.reset_token))
+            ResetPasswordToken(command.reset_token)
+        )

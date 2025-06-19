@@ -7,8 +7,8 @@ from starlette.responses import Response
 from starlette.status import HTTP_200_OK
 
 from application.auth_as.invalidate_other_tokens_handler import (
-    InvalidateOtherTokensHandler,
     InvalidateOtherTokensCommand,
+    InvalidateOtherTokensHandler,
 )
 from application.auth_as.refresh_tokens_auth_server_handler import (
     RefreshTokensHandler,
@@ -16,10 +16,17 @@ from application.auth_as.refresh_tokens_auth_server_handler import (
 from application.auth_as.revoke_token_handler import (
     RevokeTokenHandler,
 )
-from application.common.auth_server_token_types import AuthServerRefreshToken, Fingerprint
+from application.common.auth_server_token_types import (
+    AuthServerRefreshToken,
+    Fingerprint,
+)
 from presentation.web_api.manage_tokens import set_auth_server_tokens
 
-token_manage_router = APIRouter(route_class=DishkaRoute, tags=["auth-server-code-manage"], prefix="/auth-service")
+token_manage_router = APIRouter(
+    route_class=DishkaRoute,
+    tags=["auth-server-code-manage"],
+    prefix="/auth-service",
+)
 
 
 @token_manage_router.post("/refresh")

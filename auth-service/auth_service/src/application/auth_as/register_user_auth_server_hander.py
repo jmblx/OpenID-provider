@@ -1,15 +1,17 @@
 import secrets
 from dataclasses import dataclass
-from typing import TypedDict, cast
+from typing import cast
 from uuid import UUID
 
+from application.common.auth_server_token_types import (
+    AuthServerTokens,
+)
 from application.common.interfaces.email_confirmation_service import (
-    UserRegisterNotifyData,
     EmailConfirmationServiceI,
+    UserRegisterNotifyData,
 )
 from application.common.interfaces.http_auth import HttpAuthServerService
 from application.common.interfaces.user_repo import UserRepository
-from application.common.auth_server_token_types import AuthServerAccessToken, AuthServerRefreshToken, AuthServerTokens
 from application.common.uow import Uow
 from domain.common.services.pwd_service import PasswordHasher
 from domain.entities.user.model import User

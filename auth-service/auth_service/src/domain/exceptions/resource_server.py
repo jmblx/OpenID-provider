@@ -8,4 +8,4 @@ class ResourceServerNotFoundError(DomainError):
 
     @property
     def title(self) -> str:
-        return f"ResourceServer not found"
+        return "ResourceServer not found"

@@ -3,7 +3,7 @@ from typing import NewType
 
 from domain.entities.user.model import User
 
-OAuth2Token = NewType('OAuthToken', str)
+OAuth2Token = NewType("OAuthToken", str)
 
 
 class OauthIdentityProvider(ABC):

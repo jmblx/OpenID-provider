@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import TypedDict, Literal
+from typing import Literal, TypedDict
 from uuid import UUID, uuid4
 
 from domain.entities.resource_server.value_objects import ResourceServerIds

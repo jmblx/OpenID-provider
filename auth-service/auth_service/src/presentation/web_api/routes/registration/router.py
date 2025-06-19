@@ -5,16 +5,16 @@ from fastapi.responses import ORJSONResponse
 from starlette import status
 
 from application.auth_as.register_user_auth_server_hander import (
-    RegisterUserHandler,
     RegisterUserCommand,
+    RegisterUserHandler,
 )
 from domain.exceptions.auth import (
     InvalidClientError,
     InvalidRedirectURLError,
 )
 from domain.exceptions.user import UserAlreadyExistsError
-from presentation.web_api.responses import ErrorResponse
 from presentation.web_api.manage_tokens import set_auth_server_tokens
+from presentation.web_api.responses import ErrorResponse
 
 reg_router = APIRouter(route_class=DishkaRoute, tags=["reg"])
 

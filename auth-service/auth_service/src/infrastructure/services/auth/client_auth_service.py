@@ -1,11 +1,19 @@
 from uuid import UUID
 
 from application.common.auth_server_token_types import Fingerprint
-from application.common.client_token_types import ClientRefreshToken, ClientAccessTokenPayload, ClientTokens
-from application.common.interfaces.client_token_creation import ClientTokenCreationService
+from application.common.client_token_types import (
+    ClientAccessTokenPayload,
+    ClientRefreshToken,
+    ClientTokens,
+)
+from application.common.interfaces.client_token_creation import (
+    ClientTokenCreationService,
+)
 from application.common.interfaces.http_auth import HttpClientService
 from application.common.interfaces.jwt_service import JWTService
-from application.common.interfaces.white_list import ClientTokenWhitelistService
+from application.common.interfaces.white_list import (
+    ClientTokenWhitelistService,
+)
 from application.common.services.auth_code import AuthorizationCodeStorage
 from domain.entities.user.model import User
 from infrastructure.services.auth.config import JWTSettings
@@ -39,7 +47,9 @@ class HttpClientServiceImpl(HttpClientService):
     async def invalidate_other_tokens(
         self, refresh_token: ClientRefreshToken
     ) -> None:
-        payload: ClientAccessTokenPayload = self.jwt_service.decode(refresh_token)
+        payload: ClientAccessTokenPayload = self.jwt_service.decode(
+            refresh_token
+        )
         jti = payload["jti"]
         user_id: UUID = payload["sub"]  # type: ignore
         await self.token_whitelist_service.remove_tokens_except_current(
@@ -55,21 +65,17 @@ class HttpClientServiceImpl(HttpClientService):
     ) -> ClientTokens:
         """Создаёт и сохраняет токены."""
         user_id: UUID = user.id.value
-        access_token = (
-            self.token_creation_service.create_client_access_token(
-                user_id, user_scopes
-            )
+        access_token = self.token_creation_service.create_client_access_token(
+            user_id, user_scopes
         )
         refresh_token_data = (
             await self.token_creation_service.create_client_refresh_token(
                 user_id, client_id, rs_ids
             )
         )
-        await (
-            self.token_whitelist_service.replace_refresh_token(
-                refresh_token_data,
-                self.jwt_settings.refresh_token_by_user_limit,
-            )
+        await self.token_whitelist_service.replace_refresh_token(
+            refresh_token_data,
+            self.jwt_settings.refresh_token_by_user_limit,
         )
         return {
             "access_token": access_token,

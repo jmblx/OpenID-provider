@@ -12,4 +12,6 @@ class ThirdPartyRegisterCommand:
 
 class ThirdPartyNotificationService(ABC):
     @abstractmethod
-    async def send_register_notification(self, command: ThirdPartyRegisterCommand) -> None: ...
+    async def send_register_notification(
+        self, command: ThirdPartyRegisterCommand
+    ) -> None: ...

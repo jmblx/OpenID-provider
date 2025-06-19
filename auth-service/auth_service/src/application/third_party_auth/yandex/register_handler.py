@@ -1,16 +1,20 @@
-import secrets
 from dataclasses import dataclass
 from typing import cast
 
-from application.auth_as.register_user_auth_server_hander import RegisterUserResult
-from application.common.interfaces.email_confirmation_service import EmailConfirmationServiceI, UserRegisterNotifyData
+from application.auth_as.register_user_auth_server_hander import (
+    RegisterUserResult,
+)
 from application.common.interfaces.http_auth import HttpAuthServerService
 from application.common.interfaces.user_repo import UserRepository
 from application.common.uow import Uow
 from application.third_party_auth.common.idp import OAuth2Token
-from application.third_party_auth.common.password_generation import generate_random_password
-from application.third_party_auth.common.third_party_notification_service import ThirdPartyNotificationService, \
-    ThirdPartyRegisterCommand
+from application.third_party_auth.common.password_generation import (
+    generate_random_password,
+)
+from application.third_party_auth.common.third_party_notification_service import (
+    ThirdPartyNotificationService,
+    ThirdPartyRegisterCommand,
+)
 from application.third_party_auth.yandex.idp import YandexIdentityProvider
 from domain.common.services.pwd_service import PasswordHasher
 from domain.entities.user.model import User
@@ -30,7 +34,7 @@ class YandexRegisterHandler:
         uow: Uow,
         notification_service: ThirdPartyNotificationService,
         auth_server_service: HttpAuthServerService,
-        yandex_idp: YandexIdentityProvider
+        yandex_idp: YandexIdentityProvider,
     ):
         self.user_repository = user_repo
         self.hash_service = hash_service
@@ -39,8 +43,12 @@ class YandexRegisterHandler:
         self.auth_server_service = auth_server_service
         self.yandex_idp = yandex_idp
 
-    async def handle(self, command: YandexRegisterCommand) -> RegisterUserResult:
-        email = await self.yandex_idp.get_yandex_user_email(command.yandex_token)
+    async def handle(
+        self, command: YandexRegisterCommand
+    ) -> RegisterUserResult:
+        email = await self.yandex_idp.get_yandex_user_email(
+            command.yandex_token
+        )
         existing_user = await self.user_repository.get_by_email(
             email=email,
         )
@@ -58,10 +66,12 @@ class YandexRegisterHandler:
         auth_tokens = await self.auth_server_service.create_and_save_tokens(
             user
         )
-        notify_data = ThirdPartyRegisterCommand(email=email.value, generated_password=generated_password, provider="yandex")
-        await self.notification_service.send_register_notification(
-            notify_data
+        notify_data = ThirdPartyRegisterCommand(
+            email=email.value,
+            generated_password=generated_password,
+            provider="yandex",
         )
+        await self.notification_service.send_register_notification(notify_data)
         await self.uow.commit()
         result = {**auth_tokens, "user_id": user_id}
         return cast(RegisterUserResult, result)

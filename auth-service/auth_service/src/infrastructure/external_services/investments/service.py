@@ -1,9 +1,7 @@
 import json
 import logging
-from datetime import datetime, timedelta, date
-from typing import List, Dict
+from datetime import date
 
-import pytz
 import redis.asyncio as aioredis
 
 # Настройка логирования

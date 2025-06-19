@@ -12,14 +12,21 @@ class UserData(TypedDict):
     avatar_update_timestamp: int | None
     is_admin: bool
 
+
 class IdentifyByCookiesQueryHandler:
-    def __init__(self, idp: UserIdentityProvider, s3_storage: UserS3StorageService):
+    def __init__(
+        self, idp: UserIdentityProvider, s3_storage: UserS3StorageService
+    ):
         self.idp = idp
         self.s3_storage = s3_storage
 
     async def handle(self) -> UserData:
         user = await self.idp.get_current_user()
-        avatar_update_timestamp = await self.s3_storage.get_user_avatar_update_timestamp(str(user.id.value))
+        avatar_update_timestamp = (
+            await self.s3_storage.get_user_avatar_update_timestamp(
+                str(user.id.value)
+            )
+        )
         return {
             "email": user.email.value,
             "id": user.id.value,

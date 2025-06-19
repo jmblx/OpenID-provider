@@ -3,8 +3,7 @@ import os
 from fastapi import FastAPI
 
 from .middleware import PrometheusMiddleware
-from .utils import setting_telemetry, metrics
-
+from .utils import metrics, setting_telemetry
 
 APP_NAME = "api"
 GRPC_ENDPOINT = os.getenv("GRPC_ENDPOINT", "http://backend_service.tempo:4317")

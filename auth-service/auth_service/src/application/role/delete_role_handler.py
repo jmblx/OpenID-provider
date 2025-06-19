@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
-from application.common.uow import Uow
 from application.common.interfaces.role_repo import RoleRepository
+from application.common.uow import Uow
 from domain.entities.role.value_objects import RoleID
 
 

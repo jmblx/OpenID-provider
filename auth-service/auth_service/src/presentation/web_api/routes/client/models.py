@@ -1,7 +1,6 @@
 from pydantic import BaseModel
 
 from domain.entities.client.value_objects import ClientTypeEnum
-from presentation.web_api.routes.auth.models import UserAuthRequest
 
 
 class ClientAuthResponseModel(BaseModel):

@@ -1,22 +1,22 @@
 import logging
 from dataclasses import dataclass
-from typing import cast, TypedDict
+from typing import TypedDict
 from uuid import UUID
 
 from fastapi import HTTPException
 
 from application.auth_as.common.scopes_service import ScopesService
-from application.common.client_token_types import ClientAccessToken, ClientRefreshToken
-from application.common.interfaces.imedia_storage import StorageService
-from application.common.interfaces.role_repo import RoleRepository
-from application.common.interfaces.user_repo import UserRepository
-from application.common.services.auth_code import AuthorizationCodeStorage, AuthCodeData
-from application.common.auth_server_token_types import (
-    AuthServerAccessToken,
-    AuthServerRefreshToken,
-    Fingerprint,
+from application.common.client_token_types import (
+    ClientAccessToken,
+    ClientRefreshToken,
 )
 from application.common.interfaces.http_auth import HttpClientService
+from application.common.interfaces.role_repo import RoleRepository
+from application.common.interfaces.user_repo import UserRepository
+from application.common.services.auth_code import (
+    AuthCodeData,
+    AuthorizationCodeStorage,
+)
 from application.common.uow import Uow
 from domain.entities.user.value_objects import UserID
 
@@ -57,11 +57,11 @@ class CodeToTokenHandler:
     ) -> bool:
         return user_code_challenger == real_code_challenger
 
-    async def handle(
-        self, command: CodeToTokenCommand
-    ) -> CodeToTokenResponse:
-        auth_code_data: AuthCodeData = await self.auth_code_storage.retrieve_auth_code_data(
-            command.auth_code
+    async def handle(self, command: CodeToTokenCommand) -> CodeToTokenResponse:
+        auth_code_data: AuthCodeData = (
+            await self.auth_code_storage.retrieve_auth_code_data(
+                command.auth_code
+            )
         )
         if not auth_code_data:
             raise HTTPException(
@@ -96,9 +96,11 @@ class CodeToTokenHandler:
         user_roles = await self.role_repo.get_user_roles_by_rs_ids(
             user_id=user.id, rs_ids=rs_ids
         )
-        logger.info(f"User roles: %s, rs_ids: %s", user_roles, rs_ids)
-        user_scopes = self.scopes_service.calculate_full_user_scopes_for_client(
-            user_roles
+        logger.info("User roles: %s, rs_ids: %s", user_roles, rs_ids)
+        user_scopes = (
+            self.scopes_service.calculate_full_user_scopes_for_client(
+                user_roles
+            )
         )
         for k in auth_code_data["user_data_needed"]:
             user_scopes.append(f"{k}:0100")

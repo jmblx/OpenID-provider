@@ -3,8 +3,11 @@ from datetime import datetime
 from typing import NewType, TypedDict
 from uuid import UUID
 
-from application.common.auth_server_token_types import BaseToken, AuthServerRefreshTokenData, AuthServerAccessTokenPayload, \
-    RefreshTokenPayload
+from application.common.auth_server_token_types import (
+    AuthServerAccessTokenPayload,
+    BaseToken,
+    RefreshTokenPayload,
+)
 
 ClientAccessToken = NewType("AuthServerAccessToken", BaseToken)
 ClientRefreshToken = NewType("AuthServerRefreshToken", BaseToken)

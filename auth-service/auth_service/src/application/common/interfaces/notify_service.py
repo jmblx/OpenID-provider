@@ -1,7 +1,4 @@
 from abc import ABC, abstractmethod
-from uuid import UUID
-
-from mypy.build import TypedDict
 
 from application.user.reset_pwd.service import ResetPasswordCode
 

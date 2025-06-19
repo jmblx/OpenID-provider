@@ -5,9 +5,9 @@ from pydantic import BaseModel
 from application.client.common.client_reader import ClientReader
 from domain.entities.client.model import Client
 from domain.entities.client.value_objects import (
+    AllowedRedirectUrls,
     ClientID,
     ClientRedirectUrl,
-    AllowedRedirectUrls,
 )
 from domain.exceptions.client import ClientNotFound
 

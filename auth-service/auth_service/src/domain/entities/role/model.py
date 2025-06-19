@@ -1,11 +1,10 @@
 from dataclasses import dataclass, field
 
-from domain.entities.client.value_objects import ClientID
 from domain.entities.resource_server.value_objects import ResourceServerID
 from domain.entities.role.value_objects import (
+    RoleBaseScopes,
     RoleID,
     RoleName,
-    RoleBaseScopes,
 )
 
 

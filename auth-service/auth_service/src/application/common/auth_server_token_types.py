@@ -1,20 +1,22 @@
 from dataclasses import dataclass
-from datetime import datetime, timedelta
-from statistics import covariance
+from datetime import datetime
 from typing import NewType, TypedDict
 from uuid import UUID
 
 from domain.entities.user.value_objects import UserID
 
-
 BaseToken = NewType("BaseToken", str)
 Fingerprint = NewType("Fingerprint", str)
 AuthServerRefreshToken = NewType("AuthServerRefreshToken", BaseToken)
 AuthServerAccessToken = NewType("AuthServerAccessToken", BaseToken)
-NonActiveRefreshTokens = NewType("NonActiveRefreshTokens", dict[UserID, AuthServerRefreshToken])
+NonActiveRefreshTokens = NewType(
+    "NonActiveRefreshTokens", dict[UserID, AuthServerRefreshToken]
+)
+
 
 class AuthServerAccessTokenPayload(TypedDict, total=False):
     """Типизированный словарь для представления данных в payload JWT."""
+
     sub: UserID
     exp: datetime
     iat: datetime
@@ -39,6 +41,7 @@ class AuthServerRefreshTokenData:
     jti: str
     fingerprint: Fingerprint | None
     created_at: datetime
+
 
 class RefreshTokenPayload(TypedDict):
     sub: str

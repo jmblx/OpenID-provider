@@ -10,11 +10,15 @@ class ResourceServerRepositoryImpl(ResourceServerRepository):
     def __init__(self, session: AsyncSession):
         self.session = session
 
-    async def get_by_id(self, rs_id: ResourceServerID) -> ResourceServer | None:
+    async def get_by_id(
+        self, rs_id: ResourceServerID
+    ) -> ResourceServer | None:
         rs = await self.session.get(ResourceServer, rs_id)
         return rs
 
-    async def save(self, resource_server: ResourceServer) -> ResourceServerCreateDTO:
+    async def save(
+        self, resource_server: ResourceServer
+    ) -> ResourceServerCreateDTO:
         resource_server = await self.session.merge(resource_server)
         await self.session.flush()
         return ResourceServerCreateDTO(resource_server.id)

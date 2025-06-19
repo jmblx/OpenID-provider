@@ -2,9 +2,9 @@ from dataclasses import dataclass
 from datetime import datetime
 
 from application.client.common.client_repo import ClientRepository
+from application.common.interfaces.imedia_storage import ClientS3StorageService
 from application.common.uow import Uow
 from application.dtos.set_image import ImageDTO
-from application.common.interfaces.imedia_storage import ClientS3StorageService
 from domain.entities.client.value_objects import ClientID
 from domain.exceptions.client import ClientNotFound
 
@@ -20,7 +20,7 @@ class SetClientAvatarHandler:
         self,
         client_repo: ClientRepository,
         media_storage: ClientS3StorageService,
-        uow: Uow
+        uow: Uow,
     ):
         self.client_repo = client_repo
         self.media_storage = media_storage

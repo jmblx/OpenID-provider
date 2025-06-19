@@ -3,7 +3,6 @@ from typing import NewType
 
 from domain.exceptions.role import InvalidPermissionsError
 
-
 # @dataclass(frozen=True)
 # class RoleID:
 #     value: int
@@ -92,7 +91,7 @@ class RoleBaseScopes:
             c in "01" for c in permission_str
         ):
             raise InvalidPermissionsError(
-                f"Permission string must be a 4-bit binary string."
+                "Permission string must be a 4-bit binary string."
             )
 
         permission_to_add = int(permission_str, 2)
@@ -111,7 +110,7 @@ class RoleBaseScopes:
             c in "01" for c in permission_str
         ):
             raise InvalidPermissionsError(
-                f"Permission string must be a 4-bit binary string."
+                "Permission string must be a 4-bit binary string."
             )
 
         permission_to_remove = int(permission_str, 2)

@@ -41,10 +41,3 @@ class InvalidCredentialsError(DomainError):
     @property
     def title(self) -> str:
         return "Invalid credentials."
-
-
-@dataclass(eq=False)
-class InvalidAdminCredentialsError(DomainError):
-    @property
-    def title(self) -> str:
-        return "Invalid admin credentials."

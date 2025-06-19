@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Sequence
+from collections.abc import Sequence
 
 from domain.entities.client.value_objects import ClientID
 from domain.entities.resource_server.value_objects import ResourceServerID
@@ -26,9 +26,7 @@ class RoleRepository(ABC):
     ) -> Sequence[Role]: ...
 
     @abstractmethod
-    async def get_base_rs_roles(
-        self, client_id: ClientID
-    ) -> list[Role]: ...
+    async def get_base_rs_roles(self, client_id: ClientID) -> list[Role]: ...
 
     @abstractmethod
     async def get_user_roles_by_rs_ids(

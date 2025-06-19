@@ -1,13 +1,12 @@
 import logging
 
-import redis.asyncio as aioredis
 import orjson
-from typing import Optional
-from application.common.services.auth_code import (
-    AuthorizationCodeStorage,
-    AuthCodeData,
-)
+import redis.asyncio as aioredis
 
+from application.common.services.auth_code import (
+    AuthCodeData,
+    AuthorizationCodeStorage,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -20,12 +19,20 @@ class RedisAuthorizationCodeStorage(AuthorizationCodeStorage):
         self, auth_code: str, data: AuthCodeData, expiration_time: int = 600
     ) -> None:
         if data["rs_ids"]:
-            await self.redis_client.sadd(f"auth_code:{auth_code}:rs_ids", *data["rs_ids"])
-            await self.redis_client.expire(f"auth_code:{auth_code}:rs_ids", expiration_time)
+            await self.redis_client.sadd(
+                f"auth_code:{auth_code}:rs_ids", *data["rs_ids"]
+            )
+            await self.redis_client.expire(
+                f"auth_code:{auth_code}:rs_ids", expiration_time
+            )
 
-        json_data = orjson.dumps({"user_data_needed": data["user_data_needed"]})
+        json_data = orjson.dumps(
+            {"user_data_needed": data["user_data_needed"]}
+        )
         await self.redis_client.set(
-            f"auth_code:{auth_code}:user_data_needed", json_data, ex=expiration_time
+            f"auth_code:{auth_code}:user_data_needed",
+            json_data,
+            ex=expiration_time,
         )
 
         json_data = orjson.dumps(data)
@@ -35,18 +42,24 @@ class RedisAuthorizationCodeStorage(AuthorizationCodeStorage):
 
     async def retrieve_auth_code_data(
         self, auth_code: str
-    ) -> Optional[AuthCodeData]:
+    ) -> AuthCodeData | None:
         raw_data = await self.redis_client.get(f"auth_code:{auth_code}")
         if not raw_data:
             return None
 
         data_dict = orjson.loads(raw_data)
-        rs_ids = await self.redis_client.smembers(f"auth_code:{auth_code}:rs_ids")
+        rs_ids = await self.redis_client.smembers(
+            f"auth_code:{auth_code}:rs_ids"
+        )
         data_dict["rs_ids"] = list(map(int, rs_ids)) if rs_ids else []
 
-        user_data_needed_raw = await self.redis_client.get(f"auth_code:{auth_code}:user_data_needed")
+        user_data_needed_raw = await self.redis_client.get(
+            f"auth_code:{auth_code}:user_data_needed"
+        )
         if user_data_needed_raw:
-            data_dict["user_data_needed"] = orjson.loads(user_data_needed_raw)["user_data_needed"]
+            data_dict["user_data_needed"] = orjson.loads(user_data_needed_raw)[
+                "user_data_needed"
+            ]
         else:
             data_dict["user_data_needed"] = []
         logger.info(f"Retrieved auth code data: {data_dict}")

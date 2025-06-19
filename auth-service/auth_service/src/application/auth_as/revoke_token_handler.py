@@ -1,5 +1,5 @@
-from application.common.interfaces.http_auth import HttpAuthServerService
 from application.common.auth_server_token_types import AuthServerRefreshToken
+from application.common.interfaces.http_auth import HttpAuthServerService
 
 
 class RevokeTokenHandler:

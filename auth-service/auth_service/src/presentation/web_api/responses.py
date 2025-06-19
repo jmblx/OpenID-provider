@@ -1,4 +1,4 @@
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Generic, TypeVar
 
 from fastapi.responses import ORJSONResponse
@@ -35,6 +35,6 @@ class ErrorResponse(Generic[TError]):
 
 
 default_success = ORJSONResponse(
-        {"status": "success"},
-        status_code=status.HTTP_200_OK,
-    )
+    {"status": "success"},
+    status_code=status.HTTP_200_OK,
+)

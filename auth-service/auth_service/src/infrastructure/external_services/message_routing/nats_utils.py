@@ -3,7 +3,6 @@ import logging
 
 from nats.aio.client import Client
 
-
 logger = logging.getLogger(__name__)
 
 

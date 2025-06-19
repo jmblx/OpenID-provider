@@ -1,7 +1,7 @@
 import datetime
 from typing import Annotated
 
-from sqlalchemy import JSON, ForeignKey, text  # , ForeignKey
+from sqlalchemy import ForeignKey, text  # , ForeignKey
 from sqlalchemy.orm import mapped_column
 
 # Базовые аннотации для моделей БД

@@ -1,23 +1,19 @@
 from abc import ABC, abstractmethod
-from typing import TypeVar, Generic, NewType
-from uuid import UUID
+from typing import Generic, TypeVar
 
 from application.common.auth_server_token_types import (
-    Fingerprint,
     AuthServerTokens,
+    Fingerprint,
 )
-from application.common.client_token_types import ClientTokens, ClientRefreshToken
+from application.common.client_token_types import ClientTokens
 from domain.entities.user.model import User
-
 
 TokenType = TypeVar("TokenType")
 
 
 class HttpService(ABC, Generic[TokenType]):
     @abstractmethod
-    async def invalidate_other_tokens(
-        self, refresh_token: TokenType
-    ) -> None:
+    async def invalidate_other_tokens(self, refresh_token: TokenType) -> None:
         """
         Инвалидирует все токены пользователя, кроме текущего.
         """
@@ -56,12 +52,13 @@ class HttpService(ABC, Generic[TokenType]):
 
 class HttpAuthServerService(HttpService[AuthServerTokens]):
     """Абстракция для сервиса аутентификации и управления токенами."""
+
     @abstractmethod
     async def create_and_save_tokens(
         self,
         user: User,
         fingerprint: Fingerprint | None = None,
-        is_admin: bool = False
+        is_admin: bool = False,
     ) -> AuthServerTokens: ...
 
 
@@ -74,13 +71,3 @@ class HttpClientService(HttpService[ClientTokens]):
         client_id: int,
         rs_ids: list[int] | None,
     ) -> ClientTokens: ...
-
-
-SessionID = NewType("SessionID", UUID)
-
-
-class HttpAdminSessionService(ABC):
-    @abstractmethod
-    async def create_and_save_session(
-        self, admin_username: str
-    ) -> SessionID: ...

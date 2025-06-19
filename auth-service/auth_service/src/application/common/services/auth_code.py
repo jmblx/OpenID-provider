@@ -1,9 +1,8 @@
 import uuid
 from abc import ABC, abstractmethod
-from typing import Optional, TypedDict, Literal, get_args
+from typing import Literal, TypedDict, get_args
 
 from domain.entities.resource_server.value_objects import ResourceServerIds
-
 
 UserScope = Literal["email", "avatar_path"]
 ALLOWED_SCOPES: list[str] = list(get_args(UserScope))
@@ -25,16 +24,14 @@ class AuthorizationCodeStorage(ABC):
         """
         Сохраняет данные, связанные с авторизационным кодом.
         """
-        pass
 
     @abstractmethod
     async def retrieve_auth_code_data(
         self, auth_code: str
-    ) -> Optional[AuthCodeData]:
+    ) -> AuthCodeData | None:
         """
         Извлекает и удаляет данные, связанные с авторизационным кодом.
         """
-        pass
 
     @abstractmethod
     async def delete_auth_code_data(self, auth_code: str) -> None:

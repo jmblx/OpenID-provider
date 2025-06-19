@@ -5,7 +5,11 @@ from domain.exceptions.client import ClientNotFound
 
 
 class GetClientAvatarHandler:
-    def __init__(self, client_storage: ClientS3StorageService, client_repo: ClientRepository):
+    def __init__(
+        self,
+        client_storage: ClientS3StorageService,
+        client_repo: ClientRepository,
+    ):
         self.client_storage = client_storage
         self.client_repo = client_repo
 

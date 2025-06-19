@@ -1,8 +1,11 @@
 from dataclasses import dataclass
 
-from application.resource_server.common.rs_repo import ResourceServerRepository
 from application.common.uow import Uow
-from domain.entities.resource_server.value_objects import ResourceServerID, ResourceServerType
+from application.resource_server.common.rs_repo import ResourceServerRepository
+from domain.entities.resource_server.value_objects import (
+    ResourceServerID,
+    ResourceServerType,
+)
 from domain.exceptions.resource_server import ResourceServerNotFoundError
 
 

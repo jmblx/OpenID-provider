@@ -3,12 +3,12 @@ import string
 from dataclasses import dataclass
 from typing import cast
 
-from application.user.reset_pwd.service import (
-    ResetPwdService,
-    ResetPasswordCode,
-)
 from application.common.interfaces.notify_service import NotifyService
 from application.common.interfaces.user_repo import UserRepository
+from application.user.reset_pwd.service import (
+    ResetPasswordCode,
+    ResetPwdService,
+)
 from domain.entities.user.model import User
 from domain.entities.user.value_objects import Email
 
@@ -20,7 +20,7 @@ class RequestChangePasswordCommand:
 
 def generate_6_digit_code():
     alphabet = string.digits
-    return ''.join(secrets.choice(alphabet) for _ in range(6))
+    return "".join(secrets.choice(alphabet) for _ in range(6))
 
 
 class RequestChangePasswordHandler:

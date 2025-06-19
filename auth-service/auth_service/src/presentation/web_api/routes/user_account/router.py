@@ -3,26 +3,33 @@ from uuid import UUID
 
 from dishka import FromDishka
 from dishka.integrations.fastapi import DishkaRoute
-from fastapi import APIRouter, UploadFile, File, HTTPException
+from fastapi import APIRouter, File, HTTPException, UploadFile
 from fastapi.responses import ORJSONResponse
 
 from application.auth_as.identify_by_cookies_query import (
     IdentifyByCookiesQueryHandler,
 )
-from application.auth_for_client.get_userinfo_handler import GetUserInfoQueryHandler
+from application.auth_for_client.get_userinfo_handler import (
+    GetUserInfoQueryHandler,
+)
 from application.common.interfaces.imedia_storage import SetAvatarResponse
 from application.dtos.set_image import ImageDTO
 from application.user.add_role_to_user_handler import (
-    AddRoleToUserHandler,
     AddRoleToUserCommand,
+    AddRoleToUserHandler,
 )
 from application.user.delete_user_handler import (
-    DeleteUserHandler,
     DeleteUserCommand,
+    DeleteUserHandler,
 )
-from application.user.set_user_avatar_handler import SetUserAvatarHandler, SetUserAvatarCommand
+from application.user.set_user_avatar_handler import (
+    SetUserAvatarCommand,
+    SetUserAvatarHandler,
+)
 from presentation.web_api.common.schemas import UserSchema
-from presentation.web_api.routes.user_account.schemas import ClientGetUserDataInfo
+from presentation.web_api.routes.user_account.schemas import (
+    ClientGetUserDataInfo,
+)
 
 user_account_router = APIRouter(route_class=DishkaRoute, tags=["user_account"])
 
@@ -48,25 +55,29 @@ async def add_role_to_user(
 
 
 @user_account_router.get("/me")
-async def get_me(handler: FromDishka[IdentifyByCookiesQueryHandler]) -> UserSchema:
+async def get_me(
+    handler: FromDishka[IdentifyByCookiesQueryHandler],
+) -> UserSchema:
     return UserSchema(**await handler.handle())
 
+
 @user_account_router.post("/avatar", response_model=SetAvatarResponse)
-async def set_avatar(handler: FromDishka[SetUserAvatarHandler], file: UploadFile = File(...)) -> ORJSONResponse:
+async def set_avatar(
+    handler: FromDishka[SetUserAvatarHandler], file: UploadFile = File(...)
+) -> ORJSONResponse:
     if not file:
         raise HTTPException(status_code=400, detail="Файл не был передан")
 
     content = await file.read()
 
-    image_dto = ImageDTO(
-        content=content,
-        content_type=file.content_type
-    )
+    image_dto = ImageDTO(content=content, content_type=file.content_type)
     new_avatar_data = await handler.handle(SetUserAvatarCommand(image_dto))
 
     return ORJSONResponse(new_avatar_data)
 
 
 @user_account_router.get("/userinfo")
-async def get_userinfo(handler: FromDishka[GetUserInfoQueryHandler]) -> ClientGetUserDataInfo:
+async def get_userinfo(
+    handler: FromDishka[GetUserInfoQueryHandler],
+) -> ClientGetUserDataInfo:
     return ClientGetUserDataInfo(**await handler.handle())

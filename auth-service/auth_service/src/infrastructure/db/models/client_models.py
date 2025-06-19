@@ -1,21 +1,17 @@
 import sqlalchemy as sa
 from sqlalchemy import Index
 from sqlalchemy.dialects.postgresql import ARRAY
-from sqlalchemy.orm import composite, relationship
+from sqlalchemy.orm import composite
 
 from domain.entities.client.model import Client
 from domain.entities.client.value_objects import (
-    ClientTypeEnum,
-    ClientName,
-    ClientBaseUrl,
-    ClientType,
     AllowedRedirectUrls,
+    ClientBaseUrl,
+    ClientName,
+    ClientType,
+    ClientTypeEnum,
 )
 from infrastructure.db.models.registry import mapper_registry
-from infrastructure.db.models.secondary import (
-    user_client_association_table,
-    client_rs_association_table,
-)
 
 client_table = sa.Table(
     "client",
@@ -32,11 +28,11 @@ client_table = sa.Table(
     sa.Column("search_name", sa.String, nullable=False),
     sa.Column("avatar_upd_at", sa.DateTime(timezone=True), nullable=True),
     Index(
-        'idx_client_search_name_trgm',
-        'search_name',
-        postgresql_using='gin',
-        postgresql_ops={'search_name': 'gin_trgm_ops'}
-    )
+        "idx_client_search_name_trgm",
+        "search_name",
+        postgresql_using="gin",
+        postgresql_ops={"search_name": "gin_trgm_ops"},
+    ),
 )
 
 mapper_registry.map_imperatively(

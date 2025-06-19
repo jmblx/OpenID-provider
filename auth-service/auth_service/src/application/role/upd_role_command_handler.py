@@ -1,9 +1,9 @@
 import logging
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
 from application.common.interfaces.role_repo import RoleRepository
 from application.common.uow import Uow
-from domain.entities.role.value_objects import RoleID, RoleBaseScopes, RoleName
+from domain.entities.role.value_objects import RoleBaseScopes, RoleID, RoleName
 from domain.exceptions.role import RoleNotFoundError
 
 
@@ -39,7 +39,7 @@ class UpdateRoleHandler:
                 command.new_is_base if command.new_base_scopes else None
             ),
         }
-        logger.info(f"Updating role with updates: %s", updates)
+        logger.info("Updating role with updates: %s", updates)
 
         for attr, value in updates.items():
             if value is not None:

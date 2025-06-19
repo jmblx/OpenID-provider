@@ -1,9 +1,9 @@
-from sqlalchemy import Table, Column, Integer, String, ForeignKey, Boolean
+from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, Table
 from sqlalchemy.dialects.postgresql import JSONB
-from sqlalchemy.orm import relationship, composite
+from sqlalchemy.orm import composite, relationship
 
 from domain.entities.role.model import Role
-from domain.entities.role.value_objects import RoleName, RoleBaseScopes
+from domain.entities.role.value_objects import RoleBaseScopes, RoleName
 from infrastructure.db.models.registry import mapper_registry
 from infrastructure.db.models.secondary import user_role_association
 

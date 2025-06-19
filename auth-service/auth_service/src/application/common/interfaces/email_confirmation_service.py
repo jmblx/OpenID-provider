@@ -1,5 +1,5 @@
 import secrets
-from abc import abstractmethod, ABC
+from abc import ABC, abstractmethod
 from typing import TypedDict
 from uuid import UUID
 

@@ -1,13 +1,17 @@
 from datetime import datetime, timedelta
-from typing import cast, Any
+from typing import cast
 from uuid import UUID
 
 import jwt
 from pytz import timezone
 
+from application.common.auth_server_token_types import (
+    AuthServerAccessTokenPayload,
+    BaseToken,
+    JwtToken,
+)
 from application.common.client_token_types import ClientAccessTokenPayload
 from application.common.interfaces.jwt_service import JWTService
-from application.common.auth_server_token_types import AuthServerAccessTokenPayload, JwtToken, BaseToken
 from domain.exceptions.auth import InvalidTokenError, TokenExpiredError
 from infrastructure.services.auth.config import JWTSettings
 
@@ -46,7 +50,9 @@ class JWTServiceImpl(JWTService):
             "expires_at": expire,
         }
 
-    def decode(self, token: BaseToken) -> AuthServerAccessTokenPayload | ClientAccessTokenPayload:
+    def decode(
+        self, token: BaseToken
+    ) -> AuthServerAccessTokenPayload | ClientAccessTokenPayload:
         """Декодирует JWT токен и возвращает его payload."""
         try:
             payload = jwt.decode(

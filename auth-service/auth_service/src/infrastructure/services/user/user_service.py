@@ -4,14 +4,16 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from application.common.interfaces.role_repo import RoleRepository
 from application.common.interfaces.user_repo import UserRepository
 from application.user.common.user_service import UserService
-from domain.entities.resource_server.model import ResourceServer
 from domain.entities.user.model import User
 from infrastructure.db.models.secondary import user_role_association
 
 
 class UserServiceImpl(UserService):
     def __init__(
-        self, user_repository: UserRepository, role_repository: RoleRepository, session: AsyncSession
+        self,
+        user_repository: UserRepository,
+        role_repository: RoleRepository,
+        session: AsyncSession,
     ):
         self.user_repository = user_repository
         self.role_repository = role_repository
@@ -34,16 +36,20 @@ class UserServiceImpl(UserService):
             return
 
         existing_rs = await self.session.execute(
-            select(user_rs.c.rs_id).where(user_rs.c.user_id == user_id, user_rs.c.rs_id.in_(rs_ids))
+            select(user_rs.c.rs_id).where(
+                user_rs.c.user_id == user_id, user_rs.c.rs_id.in_(rs_ids)
+            )
         )
         existing_rs_ids = {row.rs_id for row in existing_rs}
 
         existing_roles = await self.session.execute(
             select(user_role_association.c.role_id)
             .where(user_role.c.user_id == user_id)
-            .where(user_role.c.role_id.in_(
-                select(role.c.id).where(role.c.rs_id.in_(rs_ids))
-            ))
+            .where(
+                user_role.c.role_id.in_(
+                    select(role.c.id).where(role.c.rs_id.in_(rs_ids))
+                )
+            )
         )
         existing_role_ids = {row.role_id for row in existing_roles}
 
@@ -51,10 +57,11 @@ class UserServiceImpl(UserService):
         new_rs_ids = set(rs_ids) - existing_rs_ids
         if new_rs_ids:
             await self.session.execute(
-                insert(user_rs)
-                .from_select(
+                insert(user_rs).from_select(
                     [user_rs.c.user_id, user_rs.c.rs_id],
-                    select(user_id, resource_server.c.id).where(resource_server.c.id.in_(new_rs_ids))
+                    select(user_id, resource_server.c.id).where(
+                        resource_server.c.id.in_(new_rs_ids)
+                    ),
                 )
             )
 
@@ -65,9 +72,10 @@ class UserServiceImpl(UserService):
 
         if new_role_ids:
             await self.session.execute(
-                insert(user_role)
-                .from_select(
+                insert(user_role).from_select(
                     [user_role.c.user_id, user_role.c.role_id],
-                    select(user_id, role.c.id).where(role.c.id.in_(new_role_ids))
+                    select(user_id, role.c.id).where(
+                        role.c.id.in_(new_role_ids)
+                    ),
                 )
             )

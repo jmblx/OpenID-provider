@@ -1,8 +1,8 @@
 import uuid
 
-from application.common.interfaces.http_auth import SessionID
-
 from redis.asyncio import Redis
+
+from application.common.interfaces.http_auth import SessionID
 
 
 class HttpAdminSessionService:
@@ -10,8 +10,11 @@ class HttpAdminSessionService:
         self.redis = redis
 
     async def create_and_save_session(
-        self, admin_username: str,
+        self,
+        admin_username: str,
     ) -> SessionID:
         session_id = SessionID(uuid.uuid4())
-        await self.redis.set(f"admin:session:{admin_username}", str(session_id))
+        await self.redis.set(
+            f"admin:session:{admin_username}", str(session_id)
+        )
         return session_id

@@ -9,7 +9,6 @@ import yaml
 # from infrastructure.log.main import AppLoggingConfig
 from presentation.web_api.gunicorn.config import GunicornConfig
 
-
 if os.getenv("DEBUG", True).lower() not in ("false", "0"):
     from dotenv import load_dotenv
 
@@ -24,15 +23,18 @@ DEFAULT_TOML_CONFIG_PATH = (
     / "config.toml"
 )
 LOGGING_CONFIG_PATH = (
-    Path(__file__).resolve().parent.parent.parent.parent
-    / "config"
-    / "logging.yaml"
-) if TRACING else (
-    Path(__file__).resolve().parent.parent.parent.parent
-    / "config"
-    / "logging_non_tracing.yaml"
+    (
+        Path(__file__).resolve().parent.parent.parent.parent
+        / "config"
+        / "logging.yaml"
+    )
+    if TRACING
+    else (
+        Path(__file__).resolve().parent.parent.parent.parent
+        / "config"
+        / "logging_non_tracing.yaml"
+    )
 )
-
 
 
 @dataclass
@@ -64,7 +66,7 @@ def load_config(path: str | None = None) -> PresentationConfig:
     try:
         with path.open("r") as f:
             app_logging_config = yaml.safe_load(f)
-    except IOError:
+    except OSError:
         logging.basicConfig(level=logging.DEBUG)
         logger.warning("Logging config file not found, use basic config")
     return PresentationConfig(gunicorn_config, app_logging_config)

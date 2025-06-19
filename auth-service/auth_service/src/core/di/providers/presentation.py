@@ -1,15 +1,20 @@
 from typing import cast
 from uuid import UUID
 
-from dishka import Provider, provide, Scope
+from dishka import Provider, Scope, provide
 from fastapi import Request
 
 from application.common.auth_server_token_types import (
-    Fingerprint,
+    AuthServerAccessToken,
     AuthServerRefreshToken,
-    NonActiveRefreshTokens, AuthServerAccessToken, AuthServerTokens,
+    AuthServerTokens,
+    Fingerprint,
+    NonActiveRefreshTokens,
 )
-from application.common.client_token_types import ClientAccessToken, ClientRefreshToken
+from application.common.client_token_types import (
+    ClientAccessToken,
+    ClientRefreshToken,
+)
 from domain.entities.user.value_objects import UserID
 
 
@@ -28,11 +33,19 @@ class PresentationProvider(Provider):
     def provide_auth_server_access_token(
         self, request: Request
     ) -> AuthServerAccessToken:
-        return AuthServerAccessToken(request.headers.get("Authorization").replace("Bearer ", ""))
-    
+        headers = {
+            key.lower(): value for key, value in request.headers.items()
+        }
+
+        auth_header = headers.get("authorization")
+
+        return AuthServerAccessToken(auth_header.replace("Bearer ", ""))
+
     @provide(scope=Scope.REQUEST, provides=AuthServerTokens)
     def provide_auth_server_tokens(
-        self, access_token: AuthServerAccessToken, refresh_token: AuthServerRefreshToken
+        self,
+        access_token: AuthServerAccessToken,
+        refresh_token: AuthServerRefreshToken,
     ) -> AuthServerTokens:
         return {
             "access_token": access_token,
@@ -58,7 +71,9 @@ class PresentationProvider(Provider):
     ) -> NonActiveRefreshTokens:
         return NonActiveRefreshTokens(
             {
-                UserID(UUID(cookie.split(":")[1])): cast(AuthServerRefreshToken, value)
+                UserID(UUID(cookie.split(":")[1])): cast(
+                    AuthServerRefreshToken, value
+                )
                 for cookie, value in request.cookies.items()
                 if cookie.startswith("refresh_token:")
             }

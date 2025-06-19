@@ -1,50 +1,82 @@
-import asyncio
 import os
-import sys
 from collections.abc import AsyncGenerator
+from pathlib import Path
 from typing import Any, TypedDict
+from unittest.mock import MagicMock
 from uuid import UUID
 
+os.environ["PRIVATE_KEY_PATH"] = str(
+    Path(__file__).resolve().parent.parent.parent / "certs" / "jwt-private.pem"
+)
+os.environ["PUBLIC_KEY_PATH"] = str(
+    Path(__file__).resolve().parent.parent.parent / "certs" / "jwt-public.pem"
+)
+os.environ["REDIS_HOST"] = "localhost"
+
+import docker
 import pytest
 from alembic import command
 from alembic.config import Config
-from dishka import make_async_container, AsyncContainer
+from dishka import (
+    AsyncContainer,
+    Provider,
+    Scope,
+    make_async_container,
+    provide,
+)
 from dishka.integrations.fastapi import setup_dishka
-import docker
 from httpx import AsyncClient
-from sqlalchemy import text, NullPool
+from sqlalchemy import NullPool, text
 from sqlalchemy.ext.asyncio import (
     AsyncEngine,
     AsyncSession,
     async_sessionmaker,
     create_async_engine,
 )
+from starlette.requests import Request
 
-sys.path.insert(
-    0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../src"))
-)
-
-from application.common.interfaces.user_repo import UserRepository
-from application.common.interfaces.http_auth import HttpAuthServerService
 from application.common.auth_server_token_types import Fingerprint
-from domain.entities.client.model import Client
-from domain.entities.client.value_objects import ClientTypeEnum
-from domain.entities.role.model import Role
-from domain.entities.user.model import User
-from domain.entities.user.value_objects import UserID, Email, HashedPassword
-from infrastructure.db.repositories.user_repo_impl import UserRepositoryImpl
+from application.common.interfaces.http_auth import HttpAuthServerService
+from application.common.interfaces.user_repo import UserRepository
 from auth_service.tests.config import TEST_DATABASE_URI
 from core.di.container import prod_provders
+from domain.common.services.pwd_service import PasswordHasher
+from domain.entities.client.model import Client
+from domain.entities.client.value_objects import ClientTypeEnum
+from domain.entities.resource_server.model import ResourceServer
+from domain.entities.resource_server.value_objects import ResourceServerType
+from domain.entities.role.model import Role
+from domain.entities.user.model import User
+from domain.entities.user.value_objects import UserID
+from infrastructure.db.repositories.user_repo_impl import UserRepositoryImpl
 from presentation.web_api.main import create_app
 
 os.environ["USE_NULLPOOL"] = "true"
 
 
+class MockRequestProvider(Provider):
+    @provide(provides=Request, scope=Scope.REQUEST)
+    async def provide_request(self) -> Request:
+        mock = MagicMock(spec=Request)
+        mock.headers = {
+            "X-Device-Fingerprint": "5efe7689dab485b716bc0f9161e4479f046c076e317867adb562a510b7f1c52b",
+            "authorization": "Bearer ",
+        }
+        mock.cookies = {}
+        return mock
+
+
 @pytest.fixture(scope="session")
-async def container():
-    container = make_async_container(*prod_provders)
+async def container(redis_container, nats_container) -> AsyncContainer:
+    container = make_async_container(*prod_provders, MockRequestProvider())
     yield container
     await container.close()
+
+
+@pytest.fixture()
+async def rq_container(container: AsyncContainer):
+    async with container(scope=Scope.REQUEST) as request_container:
+        yield request_container
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -91,7 +123,7 @@ async def async_session(
 
 @pytest.fixture(scope="function")
 async def real_user_repo(async_session: AsyncSession) -> UserRepository:
-    yield UserRepositoryImpl(session=async_session)
+    return UserRepositoryImpl(session=async_session)
 
 
 @pytest.fixture(scope="session")
@@ -100,6 +132,11 @@ async def ac(container) -> AsyncGenerator[AsyncClient, None]:
     setup_dishka(container, app)
     async with AsyncClient(app=app, base_url="http://test") as ac:
         yield ac
+
+
+@pytest.fixture(scope="session")
+async def ph(container: AsyncContainer) -> PasswordHasher:
+    return await container.get(PasswordHasher)
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -115,14 +152,6 @@ class StaticEntities(TypedDict):
     roles: list[Role]
     client: Client
     user: User
-
-
-user_static_data = {
-    "id": UUID("e768a26d-8984-4b65-8d3c-f9122cc6245e"),
-    "email": "admin@test.com",
-    "hashed_password": "$argon2id$v=19$m=65536,t=3,p=4$vQVGHMbE2VuwM/Blbd84Qg$HwB3YX/lT153K592RLgGA9gL2Z8Nngc1hxWZ1vcZ1ag",
-    "client_id": 1,
-}
 
 
 @pytest.fixture(scope="session")
@@ -146,51 +175,49 @@ def static_entities() -> dict:
             },
         ],
         "user": {
-            "id": UUID("e768a26d-8984-4b65-8d3c-f9122cc6245e"),
+            "user_id": UUID("e768a26d-8984-4b65-8d3c-f9122cc6245e"),
             "email": "admin@test.com",
-            "hashed_password": "$argon2id$v=19$m=65536,t=3,p=4$vQVGHMbE2VuwM/Blbd84Qg$HwB3YX/lT153K592RLgGA9gL2Z8Nngc1hxWZ1vcZ1ag",
+            "raw_password": "string",
         },
     }
 
 
 @pytest.fixture(scope="session", autouse=True)
-async def populate_database(static_entities, session_maker):
+async def populate_database(
+    static_entities, session_maker, ph: PasswordHasher
+):
     """Наполняет базу данных статическими сущностями перед тестами."""
-    async with session_maker() as session:
+    async with session_maker() as async_session:
         client = Client.create(**static_entities["client"])
-        session.add(client)
-        await session.flush()
-        await session.refresh(client)
+        async_session.add(client)
+        rs = ResourceServer.create(
+            name="test_server", type=ResourceServerType.RBAC_BY_AS
+        )
+        async_session.add(rs)
+        await async_session.flush()
+        await async_session.refresh(client)
+        await async_session.refresh(rs)
 
         roles = [
-            Role.create(client_id=client.id.value, **role_data)
+            Role.create(rs_id=rs.id, **role_data)
             for role_data in static_entities["roles"]
         ]
-        session.add_all(roles)
-        await session.flush(roles)
-        await session.refresh(roles[0])
-        await session.refresh(roles[1])
+        async_session.add_all(roles)
+        await async_session.flush(roles)
+        await async_session.refresh(roles[0])
+        await async_session.refresh(roles[1])
 
-        user = User(
-            role_id=roles[0].id,
-            **static_entities["user"],
-        )
-        session.add(user)
-        await session.commit()
+        user = User.create(**static_entities["user"], password_hasher=ph)
+        async_session.add(user)
+        await async_session.commit()
 
 
-# --- Фикстуры для сущностей ---
 @pytest.fixture
 async def admin_role(async_session):
     """Фикстура для получения роли Admin."""
     return await async_session.scalar(
         text("SELECT * FROM roles WHERE name = 'Admin' LIMIT 1")
     )
-
-
-@pytest.fixture
-async def new_user():
-    return User.create()
 
 
 @pytest.fixture
@@ -221,7 +248,6 @@ async def user_in_db(async_session):
 async def rollback_on_db_mutation(request, async_session):
     """Откатывает изменения базы данных после тестов с меткой `db_mutation`."""
     if "db_mutation" in request.keywords:
-        # Начинаем новую транзакцию
         async with async_session.begin_nested():
             yield
             await async_session.rollback()
@@ -275,7 +301,7 @@ def nats_container():
 @pytest.fixture
 async def nats_client(container: AsyncContainer):
     nats_client = await container.get(Client)
-    yield nats_client
+    return nats_client
 
 
 @pytest.fixture
@@ -284,4 +310,4 @@ async def redis_client(container):
 
     client = await container.get(aioredis.Redis)
     yield client
-    await client.flushall()  # Очистить данные после теста
+    await client.flushall()

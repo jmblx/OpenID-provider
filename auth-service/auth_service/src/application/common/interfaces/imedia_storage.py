@@ -1,4 +1,3 @@
-import datetime
 from abc import ABC, abstractmethod
 from typing import NewType, TypedDict
 
@@ -10,7 +9,9 @@ class SetAvatarResponse(TypedDict, total=False):
 
 class StorageService(ABC):
     @abstractmethod
-    async def set_avatar(self, content: bytes, content_type: str, object_id: str) -> SetAvatarResponse:
+    async def set_avatar(
+        self, content: bytes, content_type: str, object_id: str
+    ) -> SetAvatarResponse:
         """
         Загружает файл в указанный бакет.
 
@@ -31,8 +32,12 @@ class StorageService(ABC):
         :return: Подписанная ссылка на файл
         """
 
+
 class UserS3StorageService(StorageService):
     @abstractmethod
-    async def get_user_avatar_update_timestamp(self, user_id: str) -> int | None: ...
+    async def get_user_avatar_update_timestamp(
+        self, user_id: str
+    ) -> int | None: ...
+
 
 ClientS3StorageService = NewType("ClientS3StorageService", StorageService)

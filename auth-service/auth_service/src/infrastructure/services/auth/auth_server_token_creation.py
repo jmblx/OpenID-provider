@@ -1,11 +1,14 @@
-import json
 from datetime import timedelta
+from uuid import UUID, uuid4
 
+from application.common.auth_server_token_types import (
+    AuthServerAccessToken,
+    AuthServerRefreshTokenWithData,
+)
+from application.common.interfaces.auth_server_token_creation import (
+    AuthServerTokenCreationService,
+)
 from application.common.interfaces.jwt_service import JWTService
-from application.common.interfaces.auth_server_token_creation import AuthServerTokenCreationService
-from application.common.auth_server_token_types import AuthServerAccessToken, AuthServerRefreshTokenWithData
-from uuid import uuid4, UUID
-
 from infrastructure.services.auth.config import JWTSettings
 
 

@@ -5,10 +5,17 @@ from application.auth_for_client.common.allow_client_access_service import (
 )
 from application.client.client_queries import ValidateClientRequest
 from application.common.id_provider import UserIdentityProvider
-from application.resource_server.common.rs_reader import ResourceServerReader
-from application.common.services.auth_code import AuthorizationCodeStorage, AuthCodeData
+from application.common.services.auth_code import (
+    AuthCodeData,
+    AuthorizationCodeStorage,
+)
 from application.common.services.client_service import ClientService
-from application.common.services.pkce import PKCEData, PKCEService, PKCECodeChallengeMethod
+from application.common.services.pkce import (
+    PKCECodeChallengeMethod,
+    PKCEData,
+    PKCEService,
+)
+from application.resource_server.common.rs_reader import ResourceServerReader, ResourceServerData
 from domain.exceptions.user import UnauthenticatedUserError
 
 
@@ -26,7 +33,7 @@ class MeData:
     client_name: str
     auth_code: str
     redirect_url: str
-    rs_names: dict[int, str]
+    rs_names: dict[int, ResourceServerData]
 
 
 class GetMeDataHandler:
@@ -36,7 +43,7 @@ class GetMeDataHandler:
         client_service: ClientService,
         auth_code_storage: AuthorizationCodeStorage,
         pkce_service: PKCEService,
-        rs_reader: ResourceServerReader
+        rs_reader: ResourceServerReader,
     ):
         self.idp = idp
         self.client_service = client_service
@@ -44,9 +51,7 @@ class GetMeDataHandler:
         self.pkce_service = pkce_service
         self.rs_reader = rs_reader
 
-    async def handle(
-        self, command: GetMeDataCommand
-    ) -> MeData:
+    async def handle(self, command: GetMeDataCommand) -> MeData:
         user = await self.idp.get_current_user()
         if not user:
             raise UnauthenticatedUserError()
@@ -56,9 +61,6 @@ class GetMeDataHandler:
                 redirect_url=command.redirect_url,
             )
         )
-        # await self.rs_service.add_rs_by_ids_to_user(
-        #     user, command.required_resources["rs_ids"]
-        # )
         auth_code = self.auth_code_storage.generate_auth_code()
         pkce_data = PKCEData(
             code_verifier=command.code_verifier,
@@ -70,12 +72,18 @@ class GetMeDataHandler:
             "code_challenger": self.pkce_service.generate_code_challenge(
                 pkce_data
             ),
-            **command.required_resources
+            **command.required_resources,
         }
-        rs_names = await self.rs_reader.get_resource_server_data_by_ids(command.required_resources["rs_ids"])
+        rs_names = await self.rs_reader.get_resource_server_data_by_ids(
+            command.required_resources["rs_ids"]
+        )
 
         await self.auth_code_storage.store_auth_code_data(
             auth_code, auth_code_data, expiration_time=6000
         )
-        return MeData(redirect_url=command.redirect_url, client_name=client.name.value, auth_code=auth_code, rs_names=rs_names)
-
+        return MeData(
+            redirect_url=command.redirect_url,
+            client_name=client.name.value,
+            auth_code=auth_code,
+            rs_names=rs_names,
+        )

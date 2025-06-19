@@ -1,21 +1,19 @@
 import time
-from typing import Tuple
 
 from opentelemetry import trace
-from starlette.middleware.base import RequestResponseEndpoint
 from starlette.requests import Request
 from starlette.responses import Response
 from starlette.routing import Match
 from starlette.status import HTTP_500_INTERNAL_SERVER_ERROR
-from starlette.types import ASGIApp, Scope, Receive, Send
+from starlette.types import ASGIApp, Receive, Scope, Send
 
 from .labels import (
-    INFO,
-    RESPONSES,
-    REQUESTS_IN_PROGRESS,
-    REQUESTS,
-    REQUESTS_PROCESSING_TIME,
     EXCEPTIONS,
+    INFO,
+    REQUESTS,
+    REQUESTS_IN_PROGRESS,
+    REQUESTS_PROCESSING_TIME,
+    RESPONSES,
 )
 
 
@@ -78,7 +76,7 @@ class PrometheusMiddleware:
             ).dec()
 
     @staticmethod
-    def get_path(request: Request) -> Tuple[str, bool]:
+    def get_path(request: Request) -> tuple[str, bool]:
         for route in request.app.routes:
             match, child_scope = route.matches(request.scope)
             if match == Match.FULL:

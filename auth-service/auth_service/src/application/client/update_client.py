@@ -4,12 +4,12 @@ from application.client.common.client_repo import ClientRepository
 from application.common.uow import Uow
 from domain.entities.client.model import Client
 from domain.entities.client.value_objects import (
-    ClientID,
-    ClientTypeEnum,
-    ClientName,
-    ClientBaseUrl,
     AllowedRedirectUrls,
+    ClientBaseUrl,
+    ClientID,
+    ClientName,
     ClientType,
+    ClientTypeEnum,
 )
 from domain.exceptions.client import ClientNotFound
 
@@ -44,11 +44,7 @@ class UpdateClientCommandHandler:
                 if command.allowed_redirect_urls
                 else None
             ),
-            "type": (
-                ClientType(command.type)
-                if command.type
-                else None
-            ),
+            "type": (ClientType(command.type) if command.type else None),
         }
         for attr, value in updates.items():
             if value is not None:

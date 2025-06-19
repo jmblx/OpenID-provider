@@ -7,11 +7,11 @@ from application.common.base_exceptions import ApplicationError
 class InvalidResetPasswordCode(ApplicationError):
     @property
     def title(self) -> str:
-        return f"Invalid reset password code"
+        return "Invalid reset password code"
 
 
 @dataclass(eq=False)
 class InvalidResetPasswordToken(ApplicationError):
     @property
     def title(self) -> str:
-        return f"Invalid reset password token"
+        return "Invalid reset password token"

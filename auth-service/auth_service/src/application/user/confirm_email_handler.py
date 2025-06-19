@@ -36,7 +36,7 @@ class ConfirmEmailHandler:
             )
         )
         logger.info(
-            f"user_id: %s \nconf_token: %s",
+            "user_id: %s \nconf_token: %s",
             user_id,
             command.email_confirmation_token,
         )

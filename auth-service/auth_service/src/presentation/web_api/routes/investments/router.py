@@ -7,6 +7,9 @@ from starlette.status import HTTP_200_OK
 from application.investments.read_all_investments.read_all_investments_handler import (
     InvestmentsQueryHandler,
 )
+from application.notification_query_handler import (
+    NotificationQueryHandler,
+)
 from application.user.buy_investments.buy_investment_handler import (
     BuyInvestmentHandler,
     BuyItemCommand,
@@ -14,9 +17,6 @@ from application.user.buy_investments.buy_investment_handler import (
 from application.user.sell_investments.sell_investment_handler import (
     SellInvestmentHandler,
     SellItemCommand,
-)
-from application.notification_query_handler import (
-    NotificationQueryHandler,
 )
 
 inv_router = APIRouter(route_class=DishkaRoute, tags=["investments"])

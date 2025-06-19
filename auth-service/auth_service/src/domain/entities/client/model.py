@@ -1,15 +1,15 @@
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import Self, Union
+from typing import Self
 
 from domain.entities.client.value_objects import (
-    ClientID,
-    ClientType,
-    ClientName,
-    ClientBaseUrl,
     AllowedRedirectUrls,
-    ClientTypeEnum,
+    ClientBaseUrl,
+    ClientID,
+    ClientName,
     ClientRedirectUrl,
+    ClientType,
+    ClientTypeEnum,
 )
 from domain.exceptions.auth import InvalidRedirectURLError
 
@@ -22,7 +22,7 @@ class Client:
     allowed_redirect_urls: AllowedRedirectUrls
     type: ClientType
     search_name: str
-    avatar_upd_at: datetime
+    avatar_upd_at: datetime | None
 
     @classmethod
     def create(
@@ -37,7 +37,8 @@ class Client:
             ClientBaseUrl(base_url),
             AllowedRedirectUrls(allowed_redirect_urls),
             ClientType(type),
-            cls.make_search_name(name, base_url)
+            cls.make_search_name(name, base_url),
+            None,
         )
         return client
 

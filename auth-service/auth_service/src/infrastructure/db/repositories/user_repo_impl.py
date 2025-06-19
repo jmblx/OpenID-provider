@@ -1,39 +1,34 @@
-from typing import Sequence
-from uuid import UUID
+from collections.abc import Sequence
 
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, insert, literal, cast
 import sqlalchemy.dialects.postgresql as sa_pg
-from sqlalchemy.orm import joinedload
+from sqlalchemy import cast, insert, select
 from sqlalchemy.dialects.postgresql import UUID as PG_UUID
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import joinedload
 
 from application.common.interfaces.user_repo import (
-    UserRepository,
     IdentificationFields,
+    UserRepository,
 )
 from domain.entities.resource_server.value_objects import ResourceServerID
 from domain.entities.user.model import User
-from domain.entities.user.value_objects import UserID, Email
+from domain.entities.user.value_objects import Email, UserID
 from infrastructure.db.exception_mapper import exception_mapper
 from infrastructure.db.models import role_table, rs_table
-from infrastructure.db.models.secondary import user_role_association, user_rs_association_table
+from infrastructure.db.models.secondary import (
+    user_role_association,
+    user_rs_association_table,
+)
 
 
 class UserRepositoryImpl(UserRepository):
     def __init__(self, session: AsyncSession):
         self.session = session
 
-    @exception_mapper
     async def save(self, user: User) -> None:
-        """
-        Сохраняет пользователя в базе данных.
-        """
         await self.session.merge(user)
 
     async def delete(self, user: User) -> None:
-        """
-        Удаляет пользователя по его идентификатору.
-        """
         await self.session.delete(user)
 
     async def get_by_fields_with_clients(
@@ -77,13 +72,12 @@ class UserRepositoryImpl(UserRepository):
         await self.session.execute(stmt)
 
     async def add_rs_to_user(
-            self, user_id: UserID, rs_ids: Sequence[ResourceServerID]
+        self, user_id: UserID, rs_ids: Sequence[ResourceServerID]
     ) -> None:
         user_uuid = user_id.value
 
         existing_rs = await self.session.execute(
-            select(user_rs_association_table.c.rs_id)
-            .where(
+            select(user_rs_association_table.c.rs_id).where(
                 user_rs_association_table.c.user_id == user_uuid,
                 user_rs_association_table.c.rs_id.in_(rs_ids),
             )
@@ -95,35 +89,49 @@ class UserRepositoryImpl(UserRepository):
         if new_rs_ids:
             await self.session.execute(
                 insert(user_rs_association_table).from_select(
-                    [user_rs_association_table.c.user_id, user_rs_association_table.c.rs_id],
-                    select(cast(user_uuid, PG_UUID), rs_table.c.id)  # Исправлено: PG_UUID вместо встроенного UUID
-                    .where(rs_table.c.id.in_(new_rs_ids))
+                    [
+                        user_rs_association_table.c.user_id,
+                        user_rs_association_table.c.rs_id,
+                    ],
+                    select(
+                        cast(user_uuid, PG_UUID), rs_table.c.id
+                    ).where(  # Исправлено: PG_UUID вместо встроенного UUID
+                        rs_table.c.id.in_(new_rs_ids)
+                    ),
                 )
             )
 
         existing_roles = await self.session.execute(
-            select(user_role_association.c.role_id)
-            .where(
+            select(user_role_association.c.role_id).where(
                 user_role_association.c.user_id == user_uuid,
                 user_role_association.c.role_id.in_(
-                    select(role_table.c.id)
-                    .where(role_table.c.rs_id.in_(rs_ids), role_table.c.is_base.is_(True))
+                    select(role_table.c.id).where(
+                        role_table.c.rs_id.in_(rs_ids),
+                        role_table.c.is_base.is_(True),
+                    )
                 ),
             )
         )
         existing_role_ids = {row.role_id for row in existing_roles}
 
         new_roles = await self.session.execute(
-            select(role_table.c.id)
-            .where(role_table.c.rs_id.in_(rs_ids), role_table.c.is_base.is_(True))
+            select(role_table.c.id).where(
+                role_table.c.rs_id.in_(rs_ids), role_table.c.is_base.is_(True)
+            )
         )
         new_role_ids = {row.id for row in new_roles} - existing_role_ids
 
         if new_role_ids:
             await self.session.execute(
                 insert(user_role_association).from_select(
-                    [user_role_association.c.user_id, user_role_association.c.role_id],
-                    select(cast(user_uuid, PG_UUID), role_table.c.id)  # Исправлено: PG_UUID вместо встроенного UUID
-                    .where(role_table.c.id.in_(new_role_ids))
+                    [
+                        user_role_association.c.user_id,
+                        user_role_association.c.role_id,
+                    ],
+                    select(
+                        cast(user_uuid, PG_UUID), role_table.c.id
+                    ).where(
+                        role_table.c.id.in_(new_role_ids)
+                    ),
                 )
             )

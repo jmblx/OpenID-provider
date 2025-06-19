@@ -1,10 +1,10 @@
 from abc import ABC, abstractmethod
-from typing import TypedDict, Sequence
+from collections.abc import Sequence
+from typing import TypedDict
 
 from domain.entities.resource_server.value_objects import ResourceServerID
-from domain.entities.role.model import Role
 from domain.entities.user.model import User
-from domain.entities.user.value_objects import UserID, Email
+from domain.entities.user.value_objects import Email, UserID
 
 
 class IdentificationFields(TypedDict, total=False):

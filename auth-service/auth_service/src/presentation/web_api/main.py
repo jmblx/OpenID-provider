@@ -7,25 +7,30 @@ from dishka.integrations.fastapi import (
     setup_dishka,
 )
 from fastapi import FastAPI
-from fastapi.responses import ORJSONResponse
 
 from core.di.container import container
 from infrastructure.log.main import configure_logging
 from presentation.web_api.config import load_config
+from presentation.web_api.exceptions import setup_exception_handlers
 from presentation.web_api.middlewares import setup_middlewares
 from presentation.web_api.routes.auth.router import auth_router
+from presentation.web_api.routes.auth_server_token_manage.router import (
+    token_manage_router,
+)
 from presentation.web_api.routes.client.client_router import client_router
-from presentation.web_api.exceptions import setup_exception_handlers
-from presentation.web_api.routes.client_token_manage.client_token_manage_router import client_token_manage_router
-from presentation.web_api.routes.registration.router import reg_router
-from presentation.web_api.routes.resource_server.router import rs_router
-from presentation.web_api.routes.role.router import role_router
-from presentation.web_api.routes.auth_server_token_manage.router import token_manage_router
-from presentation.web_api.routes.healthcheck.router import healthcheck_router
+from presentation.web_api.routes.client_token_manage.client_token_manage_router import (
+    client_token_manage_router,
+)
 from presentation.web_api.routes.email_confirmation.router import (
     email_conf_router,
 )
-from presentation.web_api.routes.third_party_providers.router import third_party_router
+from presentation.web_api.routes.healthcheck.router import healthcheck_router
+from presentation.web_api.routes.registration.router import reg_router
+from presentation.web_api.routes.resource_server.router import rs_router
+from presentation.web_api.routes.role.router import role_router
+from presentation.web_api.routes.third_party_providers.router import (
+    third_party_router,
+)
 from presentation.web_api.routes.user_account.router import user_account_router
 from presentation.web_api.routes.user_password.router import (
     user_password_router,
@@ -87,8 +92,8 @@ if os.getenv("GUNICORN_MAIN", "false").lower() not in ("false", "0"):
         gunicorn_app = Application(
             application=create_production_app(),
             options={
-                **asdict(config.gunicorn_config),  # Опции Gunicorn
-                "logconfig_dict": config.app_logging_config,  # Конфиг логирования
+                **asdict(config.gunicorn_config),
+                "logconfig_dict": config.app_logging_config,
             },
         )
         gunicorn_app.run()

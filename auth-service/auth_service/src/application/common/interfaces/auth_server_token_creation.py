@@ -3,10 +3,9 @@ from uuid import UUID
 
 from application.common.auth_server_token_types import (
     AuthServerAccessToken,
-    Fingerprint,
     AuthServerRefreshTokenWithData,
+    Fingerprint,
 )
-from domain.entities.user.model import User
 
 
 class AuthServerTokenCreationService(ABC):

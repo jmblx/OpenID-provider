@@ -1,4 +1,4 @@
-from abc import abstractmethod, ABC
+from abc import ABC, abstractmethod
 
 from application.dtos.client import ClientCreateDTO
 from domain.entities.client.model import Client

@@ -1,7 +1,5 @@
 from dataclasses import dataclass
-from typing import Type
 
-from pydantic_settings import BaseSettings
 from dotenv import load_dotenv
 
 # from presentation.web_api.gunicorn.logger import GunicornLoggingConfig
@@ -19,5 +17,5 @@ class GunicornConfig:
     timeout: int = 30
     worker_class: str = "uvicorn.workers.UvicornWorker"
     proxy_protocol: bool = True  # Добавьте это
-    proxy_allow_ips: str = "*"   # И это
+    proxy_allow_ips: str = "*"  # И это
     forwarded_allow_ips: str = "*"  # Критически важно!

@@ -1,19 +1,20 @@
-from dataclasses import asdict
-
 from dishka import FromDishka
 from dishka.integrations.fastapi import DishkaRoute
 from fastapi import APIRouter
 from fastapi.responses import ORJSONResponse
-from starlette.status import HTTP_201_CREATED, HTTP_200_OK
+from starlette.status import HTTP_200_OK, HTTP_201_CREATED
 
 from application.role.create_role_handler import (
     CreateRoleCommand,
     CreateRoleHandler,
 )
-from application.role.delete_role_handler import DeleteRoleHandler, DeleteRoleCommand
+from application.role.delete_role_handler import (
+    DeleteRoleCommand,
+    DeleteRoleHandler,
+)
 from application.role.upd_role_command_handler import (
-    UpdateRoleHandler,
     UpdateRoleCommand,
+    UpdateRoleHandler,
 )
 from presentation.web_api.routes.role.schemas import UpdateRole
 

@@ -1,21 +1,20 @@
 from sqlalchemy import (
-    Table,
-    Column,
-    String,
-    Boolean,
-    Integer,
-    ForeignKey,
     UUID as SQLAlchemyUUID,
 )
-from sqlalchemy.orm import relationship, composite
+from sqlalchemy import (
+    Boolean,
+    Column,
+    String,
+    Table,
+)
+from sqlalchemy.orm import composite, relationship
 
-from domain.entities.role.value_objects import RoleID
 from domain.entities.user.model import User
-from domain.entities.user.value_objects import UserID, Email, HashedPassword
+from domain.entities.user.value_objects import Email, HashedPassword, UserID
 from infrastructure.db.models.registry import mapper_registry
 from infrastructure.db.models.secondary import (
-    user_client_association_table,
-    user_role_association, user_rs_association_table,
+    user_role_association,
+    user_rs_association_table,
 )
 
 user_table = Table(
@@ -44,7 +43,12 @@ mapper_registry.map_imperatively(
             back_populates="users_roles",
             uselist=True,
         ),
-        "resource_servers": relationship("ResourceServer", uselist=True, back_populates="users_rss", secondary=user_rs_association_table),
+        "resource_servers": relationship(
+            "ResourceServer",
+            uselist=True,
+            back_populates="users_rss",
+            secondary=user_rs_association_table,
+        ),
         "is_admin": user_table.c.is_admin,
         # "clients": relationship(
         #     "Client",

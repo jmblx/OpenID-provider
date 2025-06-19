@@ -19,11 +19,11 @@ rs_table = sa.Table(
     ),
     sa.Column("search_name", sa.String, nullable=False),
     Index(
-        'idx_resource_server_search_name_trgm',
-        'search_name',
-        postgresql_using='gin',
-        postgresql_ops={'search_name': 'gin_trgm_ops'}
-    )
+        "idx_resource_server_search_name_trgm",
+        "search_name",
+        postgresql_using="gin",
+        postgresql_ops={"search_name": "gin_trgm_ops"},
+    ),
 )
 
 mapper_registry.map_imperatively(
@@ -38,7 +38,12 @@ mapper_registry.map_imperatively(
         "roles": relationship(
             "Role", back_populates="resource_server", uselist=True
         ),
-        "users_rss": relationship("User", back_populates="resource_servers", uselist=True, secondary=user_rs_association_table),
+        "users_rss": relationship(
+            "User",
+            back_populates="resource_servers",
+            uselist=True,
+            secondary=user_rs_association_table,
+        ),
     },
     column_prefix="_",
 )

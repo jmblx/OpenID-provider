@@ -1,8 +1,8 @@
-from dataclasses import dataclass
 import logging
+from dataclasses import dataclass
 
-from application.resource_server.common.rs_repo import ResourceServerRepository
 from application.common.uow import Uow
+from application.resource_server.common.rs_repo import ResourceServerRepository
 from application.resource_server.dtos import ResourceServerCreateDTO
 from domain.entities.resource_server.model import ResourceServer
 from domain.entities.resource_server.value_objects import ResourceServerType
@@ -21,7 +21,9 @@ class RegisterResourceServerHandler:
         self.rs_repo = rs_repo
         self.uow = uow
 
-    async def handle(self, command: RegisterResourceServerCommand) -> ResourceServerCreateDTO:
+    async def handle(
+        self, command: RegisterResourceServerCommand
+    ) -> ResourceServerCreateDTO:
         rs = ResourceServer.create(
             name=command.name,
             type=command.type,

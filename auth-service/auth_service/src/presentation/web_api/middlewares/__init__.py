@@ -2,8 +2,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.trustedhost import TrustedHostMiddleware
 
-from .metrics import add_metrics_middleware
 from ..config import TRACING
+from .metrics import add_metrics_middleware
 
 
 def setup_middlewares(app: FastAPI):

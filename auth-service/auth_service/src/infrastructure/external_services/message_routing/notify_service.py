@@ -1,6 +1,3 @@
-import secrets
-from typing import cast
-
 from nats.aio.client import Client
 
 from application.common.interfaces.notify_service import NotifyService

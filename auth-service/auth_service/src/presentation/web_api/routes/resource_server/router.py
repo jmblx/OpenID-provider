@@ -9,25 +9,41 @@ from starlette import status
 from starlette.responses import Response
 
 from application.common.views.rs_view import ResourceServerIdsData
-from application.resource_server.find_rs import FindRSQuery, FindRSHandler
-from application.resource_server.get_all_resource_servers import GetAllRSIdsHandler, GetRSIdsQuery
-from application.resource_server.read_rs_view_handler import ReadResourceServerPageViewQueryHandler, \
-    ReadResourceServerPageViewQuery
-from application.resource_server.register_rs_handler import RegisterResourceServerCommand, \
-    RegisterResourceServerHandler
 from application.resource_server.dtos import ResourceServerCreateDTO
-from application.resource_server.update_rs_handler import UpdateResourceServerHandler, UpdateResourceServerCommand
+from application.resource_server.find_rs import FindRSHandler, FindRSQuery
+from application.resource_server.get_all_resource_servers import (
+    GetAllRSIdsHandler,
+    GetRSIdsQuery,
+)
+from application.resource_server.read_rs_view_handler import (
+    ReadResourceServerPageViewQuery,
+    ReadResourceServerPageViewQueryHandler,
+)
+from application.resource_server.register_rs_handler import (
+    RegisterResourceServerCommand,
+    RegisterResourceServerHandler,
+)
+from application.resource_server.update_rs_handler import (
+    UpdateResourceServerCommand,
+    UpdateResourceServerHandler,
+)
 from domain.entities.resource_server.value_objects import ResourceServerID
 from presentation.web_api.common.schemas import PaginationData
-from presentation.web_api.routes.resource_server.models import ResourceServerViewModel, UpdateResourceServerModel
+from presentation.web_api.routes.resource_server.models import (
+    ResourceServerViewModel,
+    UpdateResourceServerModel,
+)
 
-rs_router = APIRouter(route_class=DishkaRoute, tags=["resource_server"], prefix="/rs")
+rs_router = APIRouter(
+    route_class=DishkaRoute, tags=["resource_server"], prefix="/rs"
+)
+
 
 @rs_router.post("")
 async def register_rs(
     command: RegisterResourceServerCommand,
     handler: FromDishka[RegisterResourceServerHandler],
-    response: Response
+    response: Response,
 ) -> ResourceServerCreateDTO:
     response.status_code = status.HTTP_201_CREATED
     rs = await handler.handle(command)
@@ -67,6 +83,7 @@ async def update_rs(
     return ORJSONResponse(
         {"status": "success"}, status_code=status.HTTP_200_OK
     )
+
 
 @rs_router.get("/{rs_id}")
 async def get_rs(

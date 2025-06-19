@@ -6,18 +6,16 @@ from infrastructure.services.auth.config import JWTSettings
 
 
 class SettingsProvider(Provider):
-    @staticmethod
     @provide(scope=Scope.APP)
-    def provide_storage_settings() -> MinIOConfig:
+    def provide_storage_settings(self) -> MinIOConfig:
         return MinIOConfig()
 
-    @staticmethod
     @provide(scope=Scope.APP, provides=JWTSettings)
-    def provide_jwt_settings() -> JWTSettings:
+    def provide_jwt_settings(self) -> JWTSettings:
         return JWTSettings()
 
-    @staticmethod
     @provide(scope=Scope.APP)
-    def provide_admin_settings() -> AdminSettings:
+    def provide_admin_settings(self) -> AdminSettings:
         return AdminSettings()
+
     # firebase_config = provide(FirebaseConfig().from_env, scope=Scope.APP, provides=FirebaseConfig

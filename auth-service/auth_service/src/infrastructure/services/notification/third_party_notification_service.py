@@ -1,12 +1,16 @@
-from dataclasses import dataclass, asdict
+from dataclasses import asdict, dataclass
 from typing import Literal
 
 from nats.aio.client import Client
 from redis.asyncio import Redis
 
-from application.third_party_auth.common.third_party_notification_service import ThirdPartyNotificationService
+from application.third_party_auth.common.third_party_notification_service import (
+    ThirdPartyNotificationService,
+)
 from infrastructure.external_services.message_routing.config import NatsConfig
-from infrastructure.external_services.message_routing.nats_utils import send_via_nats
+from infrastructure.external_services.message_routing.nats_utils import (
+    send_via_nats,
+)
 
 
 @dataclass
@@ -27,7 +31,9 @@ class ThirdPartyNotificationServiceImpl(ThirdPartyNotificationService):
         self._nats_config = nats_config
         self._redis = redis
 
-    async def send_register_notification(self, command: ThirdPartyRegisterCommand) -> None:
+    async def send_register_notification(
+        self, command: ThirdPartyRegisterCommand
+    ) -> None:
         await send_via_nats(
             self._nats_client,
             self._nats_config.third_party_register_sub,

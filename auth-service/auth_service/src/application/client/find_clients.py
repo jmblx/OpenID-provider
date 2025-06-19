@@ -14,5 +14,9 @@ class FindClientsHandler:
     def __init__(self, client_reader: ClientReader):
         self.client_reader = client_reader
 
-    async def handle(self, query: FindClientsQuery) -> dict[ClientID, ClientsIdsData]:
-        return await self.client_reader.find_by_marks(query.search_input.strip().lower())
+    async def handle(
+        self, query: FindClientsQuery
+    ) -> dict[ClientID, ClientsIdsData]:
+        return await self.client_reader.find_by_marks(
+            query.search_input.strip().lower()
+        )

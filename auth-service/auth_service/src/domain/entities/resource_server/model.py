@@ -2,8 +2,8 @@ from dataclasses import dataclass, field
 from typing import Self
 
 from domain.entities.resource_server.value_objects import (
-    ResourceServerType,
     ResourceServerID,
+    ResourceServerType,
 )
 
 

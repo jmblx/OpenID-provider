@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 
-from application.common.views.client_view import ClientView, ClientsIdsData
+from application.common.views.client_view import ClientsIdsData, ClientView
 from domain.entities.client.value_objects import ClientID
 
 

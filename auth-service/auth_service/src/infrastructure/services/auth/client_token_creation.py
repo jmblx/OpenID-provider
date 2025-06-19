@@ -2,12 +2,15 @@ import logging
 from datetime import timedelta
 from uuid import UUID, uuid4
 
-from application.common.auth_server_token_types import AuthServerAccessToken, Fingerprint
-from application.common.client_token_types import ClientRefreshTokenWithData, ClientAccessToken
-from application.common.interfaces.client_token_creation import ClientTokenCreationService
+from application.common.client_token_types import (
+    ClientAccessToken,
+    ClientRefreshTokenWithData,
+)
+from application.common.interfaces.client_token_creation import (
+    ClientTokenCreationService,
+)
 from application.common.interfaces.jwt_service import JWTService
 from infrastructure.services.auth.config import JWTSettings
-
 
 logger = logging.getLogger(__name__)
 
@@ -36,7 +39,12 @@ class ClientTokenCreationServiceImpl(ClientTokenCreationService):
         self, user_id: UUID, client_id: int, rs_ids: list[int]
     ) -> ClientRefreshTokenWithData:
         jti = str(uuid4())
-        jwt_payload = {"sub": str(user_id), "jti": jti, "client_id": client_id, "rs_ids": rs_ids}
+        jwt_payload = {
+            "sub": str(user_id),
+            "jti": jti,
+            "client_id": client_id,
+            "rs_ids": rs_ids,
+        }
         encoded_token = self.jwt_service.encode(
             payload=jwt_payload,
             expire_timedelta=timedelta(

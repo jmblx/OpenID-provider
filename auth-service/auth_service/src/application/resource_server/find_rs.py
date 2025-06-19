@@ -14,5 +14,9 @@ class FindRSHandler:
     def __init__(self, rs_reader: ResourceServerReader):
         self.rs_reader = rs_reader
 
-    async def handle(self, query: FindRSQuery) -> dict[ResourceServerID, ResourceServerIdsData]:
-        return await self.rs_reader.find_by_marks(query.search_input.strip().lower())
+    async def handle(
+        self, query: FindRSQuery
+    ) -> dict[ResourceServerID, ResourceServerIdsData]:
+        return await self.rs_reader.find_by_marks(
+            query.search_input.strip().lower()
+        )

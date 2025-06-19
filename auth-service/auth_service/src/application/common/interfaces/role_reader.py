@@ -1,4 +1,4 @@
-from abc import abstractmethod, ABC
+from abc import ABC, abstractmethod
 
 from domain.entities.role.model import Role
 from domain.entities.role.value_objects import RoleID

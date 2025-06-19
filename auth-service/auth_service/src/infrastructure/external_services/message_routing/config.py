@@ -12,7 +12,11 @@ THIRD_PARTY_REGISTER_SUB = os.getenv(
 
 class NatsConfig:
     def __init__(
-        self, uri: str, reset_pwd_email_sub: str, email_confirmation_sub: str, third_party_register_sub: str
+        self,
+        uri: str,
+        reset_pwd_email_sub: str,
+        email_confirmation_sub: str,
+        third_party_register_sub: str,
     ):
         self.uri = uri
         self.reset_pwd_email_sub = reset_pwd_email_sub
@@ -25,5 +29,5 @@ class NatsConfig:
             uri=NATS_URL,
             reset_pwd_email_sub=EMAIL_RESET_PWD_SUB,
             email_confirmation_sub=EMAIL_CONFIRMATION_SUB,
-            third_party_register_sub=THIRD_PARTY_REGISTER_SUB
+            third_party_register_sub=THIRD_PARTY_REGISTER_SUB,
         )

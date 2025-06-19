@@ -2,17 +2,22 @@ import logging
 from abc import ABC, abstractmethod
 from uuid import UUID
 
-from fastapi import HTTPException
-from starlette import status
-
-from application.common.client_token_types import ClientAccessToken, ClientRefreshToken
+from application.common.auth_server_token_types import (
+    AuthServerAccessToken,
+    AuthServerRefreshToken,
+    Fingerprint,
+    NonActiveRefreshTokens,
+)
+from application.common.client_token_types import (
+    ClientAccessToken,
+    ClientRefreshToken,
+)
 from application.common.interfaces.jwt_service import JWTService
 from application.common.interfaces.user_repo import UserRepository
-from application.common.auth_server_token_types import (
-    AuthServerRefreshToken,
-    Fingerprint, NonActiveRefreshTokens, AuthServerAccessToken,
+from application.common.interfaces.white_list import (
+    AuthServerTokenWhitelistService,
+    ClientTokenWhitelistService,
 )
-from application.common.interfaces.white_list import AuthServerTokenWhitelistService, ClientTokenWhitelistService
 from domain.entities.client.value_objects import ClientID
 from domain.entities.resource_server.value_objects import ResourceServerID
 from domain.entities.user.model import User
@@ -52,7 +57,9 @@ class BaseTokenProvider(ABC):
 
     def _decode_token(self, token_name: str, token_value: str) -> dict:
         if token_name not in self._decoded_tokens:
-            self._decoded_tokens[token_name] = self.jwt_service.decode(token_value)
+            self._decoded_tokens[token_name] = self.jwt_service.decode(
+                token_value
+            )
         return self._decoded_tokens[token_name]
 
 
@@ -80,7 +87,9 @@ class UserIdentityProviderImpl(UserIdentityProvider, BaseTokenProvider):
         return payload["jti"]
 
     async def _validate_refresh_token(self, jti: UUID) -> UserID:
-        token_data = await self.token_whitelist_service.get_refresh_token_data(jti)
+        token_data = await self.token_whitelist_service.get_refresh_token_data(
+            jti
+        )
         if not token_data or token_data.fingerprint != self.fingerprint:
             raise InvalidTokenError()
         return UserID(token_data.user_id)
@@ -117,8 +126,12 @@ class ClientIdentityProviderImpl(ClientIdentityProvider, BaseTokenProvider):
         self.token_whitelist_service = token_whitelist_service
         self.fingerprint = fingerprint
 
-        self._client_access_token_payload = self._decode_token("client_access_token", self.client_access_token)
-        self._client_refresh_token_payload = self._decode_token("client_refresh_token", self.client_refresh_token)
+        self._client_access_token_payload = self._decode_token(
+            "client_access_token", self.client_access_token
+        )
+        self._client_refresh_token_payload = self._decode_token(
+            "client_refresh_token", self.client_refresh_token
+        )
 
     def get_current_client_id(self) -> ClientID:
         return self._client_refresh_token_payload["client_id"]
@@ -134,7 +147,9 @@ class ClientIdentityProviderImpl(ClientIdentityProvider, BaseTokenProvider):
 
     async def get_current_user_id(self) -> UserID:
         jti = self._get_refresh_token_jti()
-        token_data = await self.token_whitelist_service.get_refresh_token_data(jti)
+        token_data = await self.token_whitelist_service.get_refresh_token_data(
+            jti
+        )
         logger.info("code data: %s", token_data)
         return UserID(token_data.user_id)
 

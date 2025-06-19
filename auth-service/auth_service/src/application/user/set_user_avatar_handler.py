@@ -1,17 +1,17 @@
 from dataclasses import dataclass
 
 from application.common.id_provider import UserIdentityProvider
+from application.common.interfaces.imedia_storage import (
+    SetAvatarResponse,
+    UserS3StorageService,
+)
 from application.common.interfaces.user_repo import UserRepository
 from application.dtos.set_image import ImageDTO
-from application.common.interfaces.imedia_storage import UserS3StorageService, SetAvatarResponse
 
 
 @dataclass
 class SetUserAvatarCommand:
     image: ImageDTO
-
-
-
 
 
 class SetUserAvatarHandler:

@@ -1,5 +1,3 @@
-import logging
-
 from fastapi import FastAPI
 from gunicorn.app.base import BaseApplication
 

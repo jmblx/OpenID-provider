@@ -1,6 +1,6 @@
 import logging
 from dataclasses import dataclass
-from typing import List, cast, TypedDict
+from typing import TypedDict, cast
 from uuid import UUID
 
 from application.common.auth_server_token_types import NonActiveRefreshTokens
@@ -28,12 +28,19 @@ log = logging.getLogger(__name__)
 
 
 class GetAvailableAccountsHandler:
-    def __init__(self, idp: UserIdentityProvider, user_reader: UserReader, s3_storage: UserS3StorageService):
+    def __init__(
+        self,
+        idp: UserIdentityProvider,
+        user_reader: UserReader,
+        s3_storage: UserS3StorageService,
+    ):
         self.idp = idp
         self.user_reader = user_reader
         self.s3_storage = s3_storage
 
-    async def handle(self, query: GetAvailableAccountsQuery) -> GetAvailableAccountsResponse:
+    async def handle(
+        self, query: GetAvailableAccountsQuery
+    ) -> GetAvailableAccountsResponse:
         current_user_id = await self.idp.try_get_current_user_id()
         users_ids = list(query.non_active_accounts.keys())
         log.info("Current user id: %s", current_user_id)
@@ -41,10 +48,19 @@ class GetAvailableAccountsHandler:
             users_ids.append(current_user_id)
         accounts_data = cast(
             dict[UUID, AvailableAccountData],
-            await self.user_reader.get_user_card_data_by_id(users_ids)
+            await self.user_reader.get_user_card_data_by_id(users_ids),
         )
         if accounts_data is not None:
             for account_id in accounts_data.keys():
-                accounts_data[account_id]["avatar_url"] = self.s3_storage.get_presigned_avatar_url(str(account_id))
-            return GetAvailableAccountsResponse(accounts=accounts_data, active_account_id=current_user_id.value if current_user_id else None)
-        return GetAvailableAccountsResponse(accounts={}, active_account_id=None)
+                accounts_data[account_id]["avatar_url"] = (
+                    self.s3_storage.get_presigned_avatar_url(str(account_id))
+                )
+            return GetAvailableAccountsResponse(
+                accounts=accounts_data,
+                active_account_id=(
+                    current_user_id.value if current_user_id else None
+                ),
+            )
+        return GetAvailableAccountsResponse(
+            accounts={}, active_account_id=None
+        )

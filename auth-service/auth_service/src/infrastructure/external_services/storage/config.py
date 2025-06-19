@@ -1,20 +1,22 @@
 import os
 
-from pydantic import BaseModel
 from dotenv import load_dotenv
+from pydantic import BaseModel
 
 load_dotenv()
 
 endpoint_url = os.getenv("MINIO_ENDPOINT_URL")
 try:
     import aiobotocore
+
     endpoint_url: str = (
         endpoint_url
         if endpoint_url.startswith(("http://", "https://"))
         else f"http://{endpoint_url}"
     )
-except ModuleNotFoundError as e:
+except ModuleNotFoundError:
     pass
+
 
 class MinIOConfig(BaseModel):
     endpoint_url: str = endpoint_url

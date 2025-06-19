@@ -1,5 +1,5 @@
-from sqlalchemy import Table, Column, ForeignKey
 import sqlalchemy as sa
+from sqlalchemy import Column, ForeignKey, Table
 from sqlalchemy.dialects.postgresql import UUID as PGUUID
 
 from infrastructure.db.models.registry import mapper_registry
@@ -39,8 +39,12 @@ user_rs_association_table = Table(
     "user_rs_association_table",
     mapper_registry.metadata,
     Column("id", sa.Integer, primary_key=True, autoincrement=True),
-    Column("rs_id", sa.Integer, ForeignKey("resource_server.id"), nullable=False),
-    Column("user_id", PGUUID(as_uuid=True), ForeignKey("user.id"), nullable=False),
+    Column(
+        "rs_id", sa.Integer, ForeignKey("resource_server.id"), nullable=False
+    ),
+    Column(
+        "user_id", PGUUID(as_uuid=True), ForeignKey("user.id"), nullable=False
+    ),
 )
 
 # user_strategy_association_table = Table(

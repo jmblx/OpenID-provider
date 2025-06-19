@@ -1,11 +1,11 @@
 from application.auth_as.common.scopes_service import ScopesService
+from application.common.auth_server_token_types import (
+    Fingerprint,
+)
 from application.common.client_token_types import ClientTokens
 from application.common.id_provider import ClientIdentityProvider
 from application.common.interfaces.http_auth import HttpClientService
 from application.common.interfaces.role_repo import RoleRepository
-from application.common.auth_server_token_types import (
-    Fingerprint,
-)
 
 
 class RefreshClientTokensHandler:

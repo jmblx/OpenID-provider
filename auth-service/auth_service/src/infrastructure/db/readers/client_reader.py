@@ -1,18 +1,18 @@
 import logging
 
-from sqlalchemy import select, text, func, or_
+from sqlalchemy import or_, select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from application.client.common.client_reader import (
+    ClientAuthData,
+    ClientReader,
+)
 from application.common.interfaces.role_repo import RoleRepository
-from application.common.views.client_view import ClientView, ClientsIdsData
+from application.common.views.client_view import ClientsIdsData, ClientView
 from domain.entities.client.model import Client
 from domain.entities.client.value_objects import ClientID
 from domain.exceptions.client import ClientNotFound
 from infrastructure.db.models import client_table
-from application.client.common.client_reader import (
-    ClientReader,
-    ClientAuthData,
-)
 from infrastructure.db.readers.common import change_layout
 
 logger = logging.getLogger(__name__)
@@ -66,7 +66,11 @@ class ClientReaderImpl(ClientReader):
     async def read_all_clients_ids_data(
         self, from_: int, limit: int
     ) -> dict[ClientID, ClientsIdsData]:
-        query = select(Client.id, Client.name).where(Client.id > from_).limit(limit)
+        query = (
+            select(Client.id, Client.name)
+            .where(Client.id > from_)
+            .limit(limit)
+        )
         data = await self.session.execute(query)
         clients_data = data.mappings().all()
         result = {

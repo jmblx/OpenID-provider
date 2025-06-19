@@ -3,7 +3,7 @@ from urllib.parse import unquote
 
 from dishka import FromDishka
 from dishka.integrations.fastapi import DishkaRoute
-from fastapi import APIRouter, UploadFile, File, HTTPException
+from fastapi import APIRouter, File, HTTPException, UploadFile
 from fastapi.params import Param
 from fastapi.responses import ORJSONResponse
 from starlette.status import HTTP_204_NO_CONTENT
@@ -14,26 +14,35 @@ from application.client.add_allowed_url import (
 )
 from application.client.avatar_query import GetClientAvatarHandler
 from application.client.client_queries import (
-    ValidateClientRequest,
-    ClientAuthValidationQueryHandler,
     ClientAuthResponse,
+    ClientAuthValidationQueryHandler,
+    ValidateClientRequest,
 )
-from application.client.find_clients import FindClientsQuery, FindClientsHandler
-from application.client.get_all_clients import GetClientsIdsHandler, GetClientsIdsQuery
-from application.client.set_client_avatar_handler import SetClientAvatarHandler, SetClientAvatarCommand
-from application.common.views.client_view import ClientsIdsData
+from application.client.find_clients import (
+    FindClientsHandler,
+    FindClientsQuery,
+)
+from application.client.get_all_clients import (
+    GetClientsIdsHandler,
+    GetClientsIdsQuery,
+)
 from application.client.read_client_view_handler import (
-    ReadClientPageViewQueryHandler,
     ReadClientPageViewQuery,
+    ReadClientPageViewQueryHandler,
 )
 from application.client.register_client_hadler import (
-    RegisterClientHandler,
     RegisterClientCommand,
+    RegisterClientHandler,
+)
+from application.client.set_client_avatar_handler import (
+    SetClientAvatarCommand,
+    SetClientAvatarHandler,
 )
 from application.client.update_client import (
     UpdateClientCommand,
     UpdateClientCommandHandler,
 )
+from application.common.views.client_view import ClientsIdsData
 from application.dtos.client import ClientCreateDTO
 from application.dtos.set_image import ImageDTO
 from domain.entities.client.value_objects import ClientID
@@ -44,7 +53,9 @@ from presentation.web_api.routes.client.models import (
     UpdateClientModel,
 )
 
-client_router = APIRouter(prefix="/client", route_class=DishkaRoute, tags=["client"])
+client_router = APIRouter(
+    prefix="/client", route_class=DishkaRoute, tags=["client"]
+)
 
 
 @client_router.post("")
@@ -106,8 +117,7 @@ async def get_client_ids(
     pagination_data: Annotated[PaginationData, Param()],
 ) -> dict[ClientID, ClientsIdsData]:
     query = GetClientsIdsQuery(
-        after_id=pagination_data.after_id,
-        page_size=pagination_data.page_size
+        after_id=pagination_data.after_id, page_size=pagination_data.page_size
     )
     client_ids_data = await handler.handle(query)
     return client_ids_data
@@ -115,7 +125,9 @@ async def get_client_ids(
 
 @client_router.get("/{client_id}")
 async def get_client(
-    handler: FromDishka[ReadClientPageViewQueryHandler], client_id: int, load_avatar: bool = False
+    handler: FromDishka[ReadClientPageViewQueryHandler],
+    client_id: int,
+    load_avatar: bool = False,
 ) -> ClientViewModel:
     client_view = await handler.handle(
         ReadClientPageViewQuery(client_id=client_id, load_avatar=load_avatar)
@@ -124,21 +136,26 @@ async def get_client(
 
 
 @client_router.post("/{client_id}/avatar")
-async def set_avatar(handler: FromDishka[SetClientAvatarHandler], client_id: int, file: UploadFile = File(...)) -> ORJSONResponse:
+async def set_avatar(
+    handler: FromDishka[SetClientAvatarHandler],
+    client_id: int,
+    file: UploadFile = File(...),
+) -> ORJSONResponse:
     if not file:
         raise HTTPException(status_code=400, detail="Файл не был передан")
 
     content = await file.read()
 
-    image_dto = ImageDTO(
-        content=content,
-        content_type=file.content_type
+    image_dto = ImageDTO(content=content, content_type=file.content_type)
+    avatar_path = await handler.handle(
+        SetClientAvatarCommand(image=image_dto, client_id=client_id)
     )
-    avatar_path = await handler.handle(SetClientAvatarCommand(image=image_dto, client_id=client_id))
 
     return ORJSONResponse({"avatar_path": avatar_path})
 
 
 @client_router.get("/{client_id}/avatar")
-async def get_client_avatar_url(handler: FromDishka[GetClientAvatarHandler], client_id: int) -> ORJSONResponse:
+async def get_client_avatar_url(
+    handler: FromDishka[GetClientAvatarHandler], client_id: int
+) -> ORJSONResponse:
     return ORJSONResponse({"avatar_url": await handler.handle(client_id)})
