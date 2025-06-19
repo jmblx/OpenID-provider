@@ -9,7 +9,7 @@ import yaml
 # from infrastructure.log.main import AppLoggingConfig
 from presentation.web_api.gunicorn.config import GunicornConfig
 
-if os.getenv("DEBUG", True).lower() not in ("false", "0"):
+if os.getenv("DEBUG", "True").lower() not in ("false", "0"):
     from dotenv import load_dotenv
 
     load_dotenv()
