@@ -30,7 +30,7 @@ jobs:
       - name: Install test dependencies
         run: |
           cd ./auth-service/auth_service
-          poetry install --with test --no-root  
+          poetry install --with test --no-root
 
       - name: Run tests
         run: |

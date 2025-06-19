@@ -1,3 +1,6 @@
+import sys
+print("pzda", sys.path)
+
 import os
 from collections.abc import AsyncGenerator
 from pathlib import Path

@@ -117,7 +117,7 @@ python_files = ["test_*.py"]
 python_classes = ["Test*"]
 python_functions = ["test_*"]
 filterwarnings = "ignore::DeprecationWarning"
-pythonpath = ". src"
+pythonpath = ["src"]
 
 [build-system]
 requires = ["poetry-core"]
