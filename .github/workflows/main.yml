@@ -30,6 +30,7 @@ jobs:
       - name: Install test dependencies
         run: |
           cd ./auth-service/auth_service
+          echo "${{ secrets.TEST_ENV }}" > .env
           poetry install --with test --no-root
 
       - name: Run tests
