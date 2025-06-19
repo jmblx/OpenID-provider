@@ -1,6 +1,7 @@
 from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Self
+from urllib.parse import urlparse
 
 from domain.entities.client.value_objects import (
     AllowedRedirectUrls,
@@ -64,7 +65,16 @@ class Client:
     @staticmethod
     def make_search_name(name: str, base_url: str | None) -> str:
         """
-        Объединяет name и base_url в строку для поиска, приводя к нижнему регистру.
+        Объединяет name и домен (или схему, если не http/https) из base_url в строку для поиска, приводя к нижнему регистру.
         """
         base_url = base_url or ""
-        return f"{name.strip().lower()} {base_url.strip()}".lower()
+        parsed = urlparse(base_url.strip())
+
+        if parsed.scheme in ("http", "https"):
+            part = parsed.hostname or ""
+        elif parsed.scheme:
+            part = parsed.scheme
+        else:
+            part = ""
+
+        return f"{name.strip().lower()} {part}".lower()
