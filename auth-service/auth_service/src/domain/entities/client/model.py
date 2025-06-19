@@ -76,5 +76,7 @@ class Client:
             part = parsed.scheme
         else:
             part = ""
-
+        name_len = len(name)
+        if name_len < len(part):
+            part = part[:7]
         return f"{name.strip().lower()} {part}".lower()

@@ -80,7 +80,7 @@ class ClientReaderImpl(ClientReader):
         return result
 
     async def find_by_marks(
-        self, search_input: str, similarity: float = 0.3
+        self, search_input: str, similarity: float = 0.25
     ) -> dict[ClientID, ClientsIdsData] | None:
         await self.session.execute(
             text(f"SET LOCAL pg_trgm.similarity_threshold = {similarity};")
