@@ -29,3 +29,4 @@ class ResourceServer:
 
     def rename(self, name: str) -> None:
         self.name = name
+        self.search_name = name.strip().lower()

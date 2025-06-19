@@ -53,6 +53,7 @@ class Client:
 
     def rename(self, name: str) -> None:
         self.name = ClientName(name)
+        self.search_name = self.make_search_name(name, self.base_url.value)
 
     def add_allowed_redirect_url(self, new_allowed_redirect_url: str) -> None:
         self.allowed_redirect_urls = AllowedRedirectUrls(

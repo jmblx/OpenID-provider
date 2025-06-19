@@ -26,8 +26,10 @@ class UpdateResourceServerHandler:
         if not rs:
             raise ResourceServerNotFoundError()
 
+        if command.new_name:
+            rs.rename(command.new_name)
+
         updates = {
-            "name": (command.new_name if command.new_name else None),
             "type": (command.new_type if command.new_type else None),
         }
 

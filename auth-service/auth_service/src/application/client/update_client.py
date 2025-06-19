@@ -34,8 +34,10 @@ class UpdateClientCommandHandler:
         )
         if not client:
             raise ClientNotFound()
+
+        if command.name:
+            client.rename(command.name)
         updates = {
-            "name": (ClientName(command.name) if command.name else None),
             "base_url": (
                 ClientBaseUrl(command.base_url) if command.base_url else None
             ),
